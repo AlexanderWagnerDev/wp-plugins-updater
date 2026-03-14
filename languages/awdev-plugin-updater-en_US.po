@@ -46,22 +46,6 @@ msgid "✓ Settings saved."
 msgstr "✓ Settings saved."
 
 #: includes/settings.php
-msgid "Update Server"
-msgstr "Update Server"
-
-#: includes/settings.php
-msgid "The base URL of your self-hosted update API. Each plugin endpoint is resolved as {server}/{slug}.php"
-msgstr "The base URL of your self-hosted update API. Each plugin endpoint is resolved as {server}/{slug}.php"
-
-#: includes/settings.php
-msgid "API Base URL"
-msgstr "API Base URL"
-
-#: includes/settings.php
-msgid "Must start with https://"
-msgstr "Must start with https://"
-
-#: includes/settings.php
 msgid "Managed Plugins"
 msgstr "Managed Plugins"
 
