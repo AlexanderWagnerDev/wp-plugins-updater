@@ -2,8 +2,8 @@
 /**
  * Plugin Name: AWDev Plugin Updater
  * Plugin URI: https://github.com/AlexanderWagnerDev/wp-plugins-updater
- * Description: Self-hosted updater for AlexanderWagnerDev plugins. Manages updates from wp-plugins-updates.awdev.space instead of WordPress.org.
- * Version: 1.0.0
+ * Description: Self-hosted updater for AlexanderWagnerDev plugins. Manages updates from a self-hosted server instead of WordPress.org.
+ * Version: 0.0.1
  * Requires at least: 6.0
  * Tested up to: 6.9
  * Requires PHP: 7.4
@@ -40,20 +40,23 @@ require_once AWDEV_UPDATER_PATH . 'includes/settings.php';
 
 /**
  * Register all managed AlexanderWagnerDev plugins.
- * Built-in plugins are always registered when installed.
+ *
+ * Built-in plugins are always registered automatically.
+ * This plugin registers itself so it receives self-updates from the update server.
  * Additional plugins can be added via the Settings page.
  */
 add_action( 'plugins_loaded', function () {
 	$managed = (array) get_option( 'awdev_managed_plugins', [] );
 
 	$built_in = [
+		// Self-update: this plugin updates itself via the update server.
+		'awdev-plugin-updater/awdev-plugin-updater.php' => 'awdev-plugin-updater',
+		// DarkAdmin - Dark Mode for Adminpanel.
 		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => 'darkadmin',
 	];
 
 	foreach ( $built_in as $basename => $api_slug ) {
-		if ( is_plugin_active( $basename ) || array_key_exists( $basename, $managed ) ) {
-			new AWDev_Updater( $basename, AWDEV_UPDATE_SERVER . '/' . $api_slug . '.php' );
-		}
+		new AWDev_Updater( $basename, AWDEV_UPDATE_SERVER . '/' . $api_slug . '.php' );
 	}
 
 	foreach ( $managed as $basename => $api_slug ) {
@@ -67,7 +70,7 @@ add_action( 'plugins_loaded', function () {
  * Add settings link in the Plugins list.
  */
 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), function ( $actions ) {
-	$url             = admin_url( 'options-general.php?page=awdev-updater' );
+	$url                 = admin_url( 'options-general.php?page=awdev-updater' );
 	$actions['settings'] = '<a href="' . esc_url( $url ) . '">' . __( 'Settings', 'awdev-plugin-updater' ) . '</a>';
 	return $actions;
 } );
