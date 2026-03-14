@@ -11,8 +11,8 @@ define( 'AWDEV_SETTINGS_SLUG', 'awdev-plugins-updater' );
  */
 add_action( 'admin_menu', function () {
 	add_options_page(
-		__( 'AWDev Plugins Updater', 'awdev-plugin-updater' ),
-		__( 'AWDev Updater', 'awdev-plugin-updater' ),
+		__( 'AWDev Plugins Updater', 'awdev-plugins-updater' ),
+		__( 'AWDev Plugins Updater', 'awdev-plugins-updater' ),
 		'manage_options',
 		AWDEV_SETTINGS_SLUG,
 		'awdev_render_settings_page'
@@ -69,7 +69,7 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
  */
 add_action( 'admin_post_awdev_flush_cache', function () {
 	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'Not allowed.', 'awdev-plugin-updater' ) );
+		wp_die( esc_html__( 'Not allowed.', 'awdev-plugins-updater' ) );
 	}
 	check_admin_referer( 'awdev_flush_cache' );
 
@@ -110,21 +110,21 @@ function awdev_get_last_checked( string $slug ): string {
 	$key     = '_transient_timeout_awdev_upd_' . sanitize_key( $slug );
 	$timeout = (int) get_option( $key, 0 );
 	if ( ! $timeout ) {
-		return __( 'Never', 'awdev-plugin-updater' );
+		return __( 'Never', 'awdev-plugins-updater' );
 	}
 	$checked = $timeout - ( 6 * HOUR_IN_SECONDS );
 	$diff    = time() - $checked;
 	if ( $diff < 60 ) {
-		return __( 'Just now', 'awdev-plugin-updater' );
+		return __( 'Just now', 'awdev-plugins-updater' );
 	}
 	if ( $diff < HOUR_IN_SECONDS ) {
 		$mins = (int) ( $diff / 60 );
 		/* translators: %d = number of minutes */
-		return sprintf( _n( '%d minute ago', '%d minutes ago', $mins, 'awdev-plugin-updater' ), $mins );
+		return sprintf( _n( '%d minute ago', '%d minutes ago', $mins, 'awdev-plugins-updater' ), $mins );
 	}
 	$hours = (int) ( $diff / HOUR_IN_SECONDS );
 	/* translators: %d = number of hours */
-	return sprintf( _n( '%d hour ago', '%d hours ago', $hours, 'awdev-plugin-updater' ), $hours );
+	return sprintf( _n( '%d hour ago', '%d hours ago', $hours, 'awdev-plugins-updater' ), $hours );
 }
 
 /**
@@ -142,7 +142,7 @@ function awdev_render_settings_page(): void {
 			'name'     => 'AWDev Plugins Updater',
 			'api_slug' => 'awdev-plugin-updater',
 		],
-		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => [
+		'wp-darkadmin-plugin/darkadmin.php' => [
 			'name'     => 'DarkAdmin – Dark Mode for Adminpanel',
 			'api_slug' => 'darkadmin',
 		],
@@ -168,25 +168,25 @@ function awdev_render_settings_page(): void {
 			<div class="awdev-page-header-inner">
 				<span class="awdev-header-icon dashicons dashicons-update-alt"></span>
 				<div>
-					<h1 class="awdev-page-title"><?php esc_html_e( 'AWDev Plugins Updater', 'awdev-plugin-updater' ); ?></h1>
+					<h1 class="awdev-page-title"><?php esc_html_e( 'AWDev Plugins Updater', 'awdev-plugins-updater' ); ?></h1>
 					<p class="awdev-page-subtitle">
-						<?php esc_html_e( 'Self-hosted update manager for AlexanderWagnerDev plugins', 'awdev-plugin-updater' ); ?>
+						<?php esc_html_e( 'Self-hosted update manager for AlexanderWagnerDev plugins', 'awdev-plugins-updater' ); ?>
 						&mdash; v<?php echo esc_html( AWDEV_UPDATER_VERSION ); ?>
 					</p>
 				</div>
 			</div>
 			<div class="awdev-status-badge awdev-status-active">
 				<span class="awdev-status-dot"></span>
-				<?php esc_html_e( 'Active', 'awdev-plugin-updater' ); ?>
+				<?php esc_html_e( 'Active', 'awdev-plugins-updater' ); ?>
 			</div>
 		</div>
 
 		<?php if ( $cache_flushed ) : ?>
-		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Update cache flushed. WordPress will re-check all plugins on the next update cycle.', 'awdev-plugin-updater' ); ?></p></div>
+		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Update cache flushed. WordPress will re-check all plugins on the next update cycle.', 'awdev-plugins-updater' ); ?></p></div>
 		<?php endif; ?>
 
 		<?php if ( isset( $_GET['settings-updated'] ) ) : ?>
-		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Settings saved.', 'awdev-plugin-updater' ); ?></p></div>
+		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Settings saved.', 'awdev-plugins-updater' ); ?></p></div>
 		<?php endif; ?>
 
 		<form method="post" action="options.php">
@@ -196,20 +196,20 @@ function awdev_render_settings_page(): void {
 			<div class="awdev-card">
 				<div class="awdev-card-header">
 					<span class="dashicons dashicons-plugins-checked"></span>
-					<h2><?php esc_html_e( 'Managed Plugins', 'awdev-plugin-updater' ); ?></h2>
+					<h2><?php esc_html_e( 'Managed Plugins', 'awdev-plugins-updater' ); ?></h2>
 				</div>
 				<div class="awdev-card-body">
 					<p class="awdev-card-description">
-						<?php esc_html_e( 'All AlexanderWagnerDev plugins that receive updates from the self-hosted server.', 'awdev-plugin-updater' ); ?>
+						<?php esc_html_e( 'All AlexanderWagnerDev plugins that receive updates from the self-hosted server.', 'awdev-plugins-updater' ); ?>
 					</p>
 
 					<table class="awdev-plugin-table">
 						<thead>
 							<tr>
-								<th><?php esc_html_e( 'Plugin', 'awdev-plugin-updater' ); ?></th>
-								<th><?php esc_html_e( 'Installed', 'awdev-plugin-updater' ); ?></th>
-								<th><?php esc_html_e( 'Remote Version', 'awdev-plugin-updater' ); ?></th>
-								<th><?php esc_html_e( 'Type', 'awdev-plugin-updater' ); ?></th>
+								<th><?php esc_html_e( 'Plugin', 'awdev-plugins-updater' ); ?></th>
+								<th><?php esc_html_e( 'Installed', 'awdev-plugins-updater' ); ?></th>
+								<th><?php esc_html_e( 'Remote Version', 'awdev-plugins-updater' ); ?></th>
+								<th><?php esc_html_e( 'Type', 'awdev-plugins-updater' ); ?></th>
 							</tr>
 						</thead>
 						<tbody>
@@ -221,7 +221,7 @@ function awdev_render_settings_page(): void {
 									<?php echo esc_html( $statuses[ $basename ]['remote_version'] ); ?><br>
 									<span class="awdev-last-checked"><?php echo esc_html( $statuses[ $basename ]['last_checked'] ); ?></span>
 								</td>
-								<td><span class="awdev-badge awdev-badge-builtin"><?php esc_html_e( 'Built-in', 'awdev-plugin-updater' ); ?></span></td>
+								<td><span class="awdev-badge awdev-badge-builtin"><?php esc_html_e( 'Built-in', 'awdev-plugins-updater' ); ?></span></td>
 							</tr>
 							<?php endforeach; ?>
 
@@ -235,8 +235,8 @@ function awdev_render_settings_page(): void {
 									<span class="awdev-last-checked"><?php echo esc_html( $statuses[ $basename ]['last_checked'] ); ?></span>
 								</td>
 								<td>
-									<span class="awdev-badge awdev-badge-custom"><?php esc_html_e( 'Custom', 'awdev-plugin-updater' ); ?></span>
-									<button type="button" class="awdev-remove-row button-link" title="<?php esc_attr_e( 'Remove', 'awdev-plugin-updater' ); ?>"><span class="dashicons dashicons-trash"></span></button>
+									<span class="awdev-badge awdev-badge-custom"><?php esc_html_e( 'Custom', 'awdev-plugins-updater' ); ?></span>
+									<button type="button" class="awdev-remove-row button-link" title="<?php esc_attr_e( 'Remove', 'awdev-plugins-updater' ); ?>"><span class="dashicons dashicons-trash"></span></button>
 								</td>
 							</tr>
 							<?php endforeach; ?>
@@ -246,14 +246,14 @@ function awdev_render_settings_page(): void {
 					<div class="awdev-add-row">
 						<button type="button" id="awdev-add-plugin" class="button">
 							<span class="dashicons dashicons-plus-alt2"></span>
-							<?php esc_html_e( 'Add Plugin', 'awdev-plugin-updater' ); ?>
+							<?php esc_html_e( 'Add Plugin', 'awdev-plugins-updater' ); ?>
 						</button>
 					</div>
 				</div>
 			</div>
 
 			<div class="awdev-submit-row">
-				<?php submit_button( __( 'Save Settings', 'awdev-plugin-updater' ), 'primary', 'submit', false ); ?>
+				<?php submit_button( __( 'Save Settings', 'awdev-plugins-updater' ), 'primary', 'submit', false ); ?>
 			</div>
 		</form>
 
@@ -261,18 +261,18 @@ function awdev_render_settings_page(): void {
 		<div class="awdev-card">
 			<div class="awdev-card-header">
 				<span class="dashicons dashicons-performance"></span>
-				<h2><?php esc_html_e( 'Cache Management', 'awdev-plugin-updater' ); ?></h2>
+				<h2><?php esc_html_e( 'Cache Management', 'awdev-plugins-updater' ); ?></h2>
 			</div>
 			<div class="awdev-card-body">
 				<p class="awdev-card-description">
-					<?php esc_html_e( 'Update data is cached for 6 hours per plugin. Flush the cache to force WordPress to re-check all endpoints immediately.', 'awdev-plugin-updater' ); ?>
+					<?php esc_html_e( 'Update data is cached for 6 hours per plugin. Flush the cache to force WordPress to re-check all endpoints immediately.', 'awdev-plugins-updater' ); ?>
 				</p>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 					<input type="hidden" name="action" value="awdev_flush_cache" />
 					<?php wp_nonce_field( 'awdev_flush_cache' ); ?>
 					<button type="submit" class="button button-secondary">
 						<span class="dashicons dashicons-image-rotate"></span>
-						<?php esc_html_e( 'Flush Update Cache', 'awdev-plugin-updater' ); ?>
+						<?php esc_html_e( 'Flush Update Cache', 'awdev-plugins-updater' ); ?>
 					</button>
 				</form>
 			</div>
@@ -280,7 +280,7 @@ function awdev_render_settings_page(): void {
 
 		<div class="awdev-footer">
 			<p>
-				<?php esc_html_e( 'AWDev Plugins Updater', 'awdev-plugin-updater' ); ?> &ndash;
+				<?php esc_html_e( 'AWDev Plugins Updater', 'awdev-plugins-updater' ); ?> &ndash;
 				<a href="https://alexanderwagnerdev.com" target="_blank" rel="noopener">AlexanderWagnerDev</a>
 				&mdash;
 				<a href="https://github.com/AlexanderWagnerDev/wp-plugins-updater" target="_blank" rel="noopener">GitHub</a>

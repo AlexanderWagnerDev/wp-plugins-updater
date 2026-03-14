@@ -1,0 +1,117 @@
+# Translation template for AWDev Plugins Updater
+# Copyright (C) 2026 AlexanderWagnerDev
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: AWDev Plugins Updater 0.0.1\n"
+"Report-Msgid-Bugs-To: https://github.com/AlexanderWagnerDev/wp-plugins-updater/issues\n"
+"POT-Creation-Date: 2026-03-14T23:00:00+01:00\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: AWDev\n"
+"Domain: awdev-plugins-updater\n"
+
+#: awdev-plugin-updater.php
+msgid "Settings"
+msgstr ""
+
+#: includes/settings.php
+msgid "AWDev Plugins Updater"
+msgstr ""
+
+#: includes/settings.php
+msgid "Self-hosted update manager for AlexanderWagnerDev plugins"
+msgstr ""
+
+#: includes/settings.php
+msgid "Active"
+msgstr ""
+
+#: includes/settings.php
+msgid "✓ Update cache flushed. WordPress will re-check all plugins on the next update cycle."
+msgstr ""
+
+#: includes/settings.php
+msgid "✓ Settings saved."
+msgstr ""
+
+#: includes/settings.php
+msgid "Managed Plugins"
+msgstr ""
+
+#: includes/settings.php
+msgid "All AlexanderWagnerDev plugins that receive updates from the self-hosted server."
+msgstr ""
+
+#: includes/settings.php
+msgid "Plugin"
+msgstr ""
+
+#: includes/settings.php
+msgid "Installed"
+msgstr ""
+
+#: includes/settings.php
+msgid "Remote Version"
+msgstr ""
+
+#: includes/settings.php
+msgid "Type"
+msgstr ""
+
+#: includes/settings.php
+msgid "Built-in"
+msgstr ""
+
+#: includes/settings.php
+msgid "Custom"
+msgstr ""
+
+#: includes/settings.php
+msgid "Remove"
+msgstr ""
+
+#: includes/settings.php
+msgid "Add Plugin"
+msgstr ""
+
+#: includes/settings.php
+msgid "Save Settings"
+msgstr ""
+
+#: includes/settings.php
+msgid "Cache Management"
+msgstr ""
+
+#: includes/settings.php
+msgid "Update data is cached for 6 hours per plugin. Flush the cache to force WordPress to re-check all endpoints immediately."
+msgstr ""
+
+#: includes/settings.php
+msgid "Flush Update Cache"
+msgstr ""
+
+#: includes/settings.php
+msgid "Never"
+msgstr ""
+
+#: includes/settings.php
+msgid "Just now"
+msgstr ""
+
+#: includes/settings.php
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/settings.php
+msgid "%d hour ago"
+msgid_plural "%d hours ago"
+msgstr[0] ""
+msgstr[1] ""
+
+#: includes/settings.php
+msgid "Not allowed."
+msgstr ""

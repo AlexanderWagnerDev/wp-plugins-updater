@@ -11,7 +11,7 @@
  * Author URI: https://alexanderwagnerdev.com
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: awdev-plugin-updater
+ * Text Domain: awdev-plugins-updater
  * Domain Path: /languages
  */
 
@@ -29,7 +29,7 @@ define( 'AWDEV_UPDATE_SERVER', 'https://wp-plugins-updates.awdev.space/api' );
  */
 add_action( 'init', function () {
 	load_plugin_textdomain(
-		'awdev-plugin-updater',
+		'awdev-plugins-updater',
 		false,
 		dirname( plugin_basename( __FILE__ ) ) . '/languages'
 	);
@@ -52,7 +52,7 @@ add_action( 'plugins_loaded', function () {
 		// Self-update: this plugin updates itself via the update server.
 		'awdev-plugin-updater/awdev-plugin-updater.php' => 'awdev-plugin-updater',
 		// DarkAdmin - Dark Mode for Adminpanel.
-		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => 'darkadmin',
+		'wp-darkadmin-plugin/darkadmin.php' => 'darkadmin',
 	];
 
 	foreach ( $built_in as $basename => $api_slug ) {
@@ -71,6 +71,6 @@ add_action( 'plugins_loaded', function () {
  */
 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), function ( $actions ) {
 	$url                 = admin_url( 'options-general.php?page=awdev-plugins-updater' );
-	$actions['settings'] = '<a href="' . esc_url( $url ) . '">' . __( 'Settings', 'awdev-plugin-updater' ) . '</a>';
+	$actions['settings'] = '<a href="' . esc_url( $url ) . '">' . __( 'Settings', 'awdev-plugins-updater' ) . '</a>';
 	return $actions;
 } );
