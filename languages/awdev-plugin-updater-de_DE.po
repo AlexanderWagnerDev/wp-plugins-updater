@@ -62,8 +62,8 @@ msgid "API Slug"
 msgstr "API-Slug"
 
 #: includes/settings.php
-msgid "Endpoint"
-msgstr "Endpunkt"
+msgid "Installed"
+msgstr "Installiert"
 
 #: includes/settings.php
 msgid "Remote Version"
@@ -104,6 +104,26 @@ msgstr "Update-Daten werden 6 Stunden pro Plugin gecacht. Cache leeren, um WordP
 #: includes/settings.php
 msgid "Flush Update Cache"
 msgstr "Update-Cache leeren"
+
+#: includes/settings.php
+msgid "Never"
+msgstr "Nie"
+
+#: includes/settings.php
+msgid "Just now"
+msgstr "Gerade eben"
+
+#: includes/settings.php
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] "Vor %d Minute"
+msgstr[1] "Vor %d Minuten"
+
+#: includes/settings.php
+msgid "%d hour ago"
+msgid_plural "%d hours ago"
+msgstr[0] "Vor %d Stunde"
+msgstr[1] "Vor %d Stunden"
 
 #: includes/settings.php
 msgid "Not allowed."

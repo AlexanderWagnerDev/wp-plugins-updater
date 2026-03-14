@@ -1,8 +1,48 @@
 /*
  * AWDev Plugin Updater - Settings Page Styles
- * Consistent with DarkAdmin design system
+ * Uses CSS custom properties so DarkAdmin can override without extra rules.
  * Author: AlexanderWagnerDev
  */
+
+/* Light-mode defaults */
+:root {
+  --awdev-bg:          #fff;
+  --awdev-bg-alt:      #f6f7f7;
+  --awdev-bg-row:      #f9f9f9;
+  --awdev-border:      #dcdcde;
+  --awdev-text:        #1d2327;
+  --awdev-text-muted:  #646970;
+  --awdev-link:        #2271b1;
+  --awdev-code-bg:     #f0f0f1;
+  --awdev-code-color:  #2271b1;
+  --awdev-shadow:      rgba(0,0,0,.07);
+  --awdev-badge-bi-bg: #dbeafe;
+  --awdev-badge-bi-fg: #1e40af;
+  --awdev-badge-cu-bg: #fef3c7;
+  --awdev-badge-cu-fg: #92400e;
+  --awdev-active-bg:   #d1fadf;
+  --awdev-active-fg:   #12532e;
+}
+
+/* DarkAdmin overrides - just redefine the vars, nothing else needed */
+body.adm-dark-active {
+  --awdev-bg:          var(--adm-surface-1);
+  --awdev-bg-alt:      var(--adm-bg);
+  --awdev-bg-row:      var(--adm-surface-2);
+  --awdev-border:      var(--adm-border);
+  --awdev-text:        var(--adm-text);
+  --awdev-text-muted:  var(--adm-text-muted);
+  --awdev-link:        var(--adm-link);
+  --awdev-code-bg:     var(--adm-surface-3);
+  --awdev-code-color:  var(--adm-link);
+  --awdev-shadow:      rgba(0,0,0,.25);
+  --awdev-badge-bi-bg: #1e3a5f;
+  --awdev-badge-bi-fg: #93c5fd;
+  --awdev-badge-cu-bg: #4a2e0a;
+  --awdev-badge-cu-fg: #fcd34d;
+  --awdev-active-bg:   #12532e50;
+  --awdev-active-fg:   #6ee7a0;
+}
 
 .awdev-settings-wrap {
   max-width: 960px;
@@ -18,11 +58,11 @@
   justify-content: space-between;
   gap: 12px;
   padding: 20px 24px;
-  background: #fff;
-  border: 1px solid #dcdcde;
+  background: var(--awdev-bg);
+  border: 1px solid var(--awdev-border);
   border-radius: 10px;
   margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.07);
+  box-shadow: 0 1px 3px var(--awdev-shadow);
 }
 .awdev-page-header-inner {
   display: flex;
@@ -33,7 +73,7 @@
   font-size: 30px !important;
   width: 30px !important;
   height: 30px !important;
-  color: #2271b1;
+  color: var(--awdev-link);
 }
 .awdev-page-title {
   margin: 0 0 2px !important;
@@ -41,13 +81,13 @@
   font-size: 20px !important;
   font-weight: 700 !important;
   line-height: 1.2 !important;
-  color: #1d2327;
+  color: var(--awdev-text);
   border: none !important;
 }
 .awdev-page-subtitle {
   margin: 0;
   font-size: 12px;
-  color: #646970;
+  color: var(--awdev-text-muted);
 }
 .awdev-status-badge {
   display: inline-flex;
@@ -61,7 +101,7 @@
   text-transform: uppercase;
   white-space: nowrap;
 }
-.awdev-status-active   { background: #d1fadf; color: #12532e; }
+.awdev-status-active   { background: var(--awdev-active-bg); color: var(--awdev-active-fg); }
 .awdev-status-inactive { background: #fee2e2; color: #7f1d1d; }
 .awdev-status-dot {
   width: 7px;
@@ -74,11 +114,11 @@
    CARDS
    ============================================================================= */
 .awdev-card {
-  background: #fff;
-  border: 1px solid #dcdcde;
+  background: var(--awdev-bg);
+  border: 1px solid var(--awdev-border);
   border-radius: 10px;
   margin-bottom: 20px;
-  box-shadow: 0 1px 3px rgba(0,0,0,.07);
+  box-shadow: 0 1px 3px var(--awdev-shadow);
   overflow: hidden;
 }
 .awdev-card-header {
@@ -86,11 +126,11 @@
   align-items: center;
   gap: 10px;
   padding: 13px 20px;
-  background: #f6f7f7;
-  border-bottom: 1px solid #dcdcde;
+  background: var(--awdev-bg-alt);
+  border-bottom: 1px solid var(--awdev-border);
 }
 .awdev-card-header .dashicons {
-  color: #2271b1;
+  color: var(--awdev-link);
   font-size: 17px !important;
   width: 17px !important;
   height: 17px !important;
@@ -101,7 +141,7 @@
   padding: 0 !important;
   font-size: 14px !important;
   font-weight: 600 !important;
-  color: #1d2327;
+  color: var(--awdev-text);
   border: none !important;
 }
 .awdev-card-body {
@@ -110,37 +150,8 @@
 .awdev-card-description {
   margin: 0 0 16px !important;
   font-size: 13px;
-  color: #646970;
+  color: var(--awdev-text-muted);
   line-height: 1.5;
-}
-
-/* =============================================================================
-   FIELD ROW
-   ============================================================================= */
-.awdev-field-row {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 16px;
-}
-.awdev-field-info {
-  display: flex;
-  flex-direction: column;
-  gap: 3px;
-}
-.awdev-field-title {
-  font-size: 14px;
-  font-weight: 600;
-  color: #1d2327;
-}
-.awdev-field-desc {
-  font-size: 12px;
-  color: #646970;
-}
-.awdev-url-input {
-  width: 400px;
-  max-width: 100%;
-  font-size: 13px !important;
 }
 
 /* =============================================================================
@@ -155,32 +166,37 @@
 .awdev-plugin-table th {
   text-align: left;
   padding: 8px 10px;
-  background: #f6f7f7;
-  border: 1px solid #dcdcde;
+  background: var(--awdev-bg-alt);
+  border: 1px solid var(--awdev-border);
   font-weight: 600;
-  color: #1d2327;
+  color: var(--awdev-text-muted);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: .4px;
 }
 .awdev-plugin-table td {
-  padding: 10px 10px;
-  border: 1px solid #dcdcde;
+  padding: 10px;
+  border: 1px solid var(--awdev-border);
   vertical-align: middle;
-  color: #1d2327;
+  color: var(--awdev-text);
 }
-.awdev-plugin-table tr:nth-child(even) td { background: #f9f9f9; }
+.awdev-plugin-table tr:nth-child(even) td { background: var(--awdev-bg-row); }
 .awdev-plugin-table code {
-  background: #f0f0f1;
+  background: var(--awdev-code-bg);
   padding: 2px 6px;
   border-radius: 4px;
   font-size: 11px;
-  color: #2271b1;
+  color: var(--awdev-code-color);
 }
 .awdev-plugin-table a {
-  color: #2271b1;
+  color: var(--awdev-link);
   font-size: 11px;
   word-break: break-all;
+}
+.awdev-last-checked {
+  font-size: 11px;
+  color: var(--awdev-text-muted);
+  margin-top: 2px;
 }
 .awdev-input-basename,
 .awdev-input-slug {
@@ -200,8 +216,8 @@
   font-weight: 600;
   letter-spacing: .3px;
 }
-.awdev-badge-builtin  { background: #dbeafe; color: #1e40af; }
-.awdev-badge-custom   { background: #fef3c7; color: #92400e; }
+.awdev-badge-builtin { background: var(--awdev-badge-bi-bg); color: var(--awdev-badge-bi-fg); }
+.awdev-badge-custom  { background: var(--awdev-badge-cu-bg); color: var(--awdev-badge-cu-fg); }
 
 /* =============================================================================
    REMOVE BUTTON
@@ -224,7 +240,7 @@
    ============================================================================= */
 .awdev-add-row {
   padding-top: 12px;
-  border-top: 1px solid #dcdcde;
+  border-top: 1px solid var(--awdev-border);
 }
 .awdev-add-row .button {
   display: inline-flex !important;
@@ -235,21 +251,6 @@
   font-size: 15px !important;
   width: 15px !important;
   height: 15px !important;
-}
-
-/* =============================================================================
-   CODE BLOCK
-   ============================================================================= */
-.awdev-code-block {
-  background: #1e1e2e;
-  color: #cdd6f4;
-  padding: 16px;
-  border-radius: 6px;
-  font-size: 12px;
-  line-height: 1.6;
-  overflow-x: auto;
-  font-family: Consolas, Monaco, 'Courier New', monospace;
-  margin: 0;
 }
 
 /* =============================================================================
@@ -264,54 +265,10 @@
   text-align: center;
   padding: 10px 0 4px;
   font-size: 12px;
-  color: #646970;
+  color: var(--awdev-text-muted);
 }
 .awdev-footer a {
-  color: #2271b1;
+  color: var(--awdev-link);
   text-decoration: none;
 }
 .awdev-footer a:hover { text-decoration: underline; }
-
-/* =============================================================================
-   DARK MODE OVERRIDES (when DarkAdmin is active)
-   ============================================================================= */
-body.adm-dark-active .awdev-page-header,
-body.adm-dark-active .awdev-card {
-  background: var(--adm-surface-1) !important;
-  border-color: var(--adm-border) !important;
-}
-body.adm-dark-active .awdev-card-header {
-  background: var(--adm-bg) !important;
-  border-color: var(--adm-border) !important;
-}
-body.adm-dark-active .awdev-card-header .dashicons { color: var(--adm-link) !important; }
-body.adm-dark-active .awdev-card-header h2         { color: var(--adm-text) !important; }
-body.adm-dark-active .awdev-page-title             { color: var(--adm-text) !important; }
-body.adm-dark-active .awdev-header-icon            { color: var(--adm-link) !important; }
-body.adm-dark-active .awdev-page-subtitle,
-body.adm-dark-active .awdev-card-description,
-body.adm-dark-active .awdev-field-desc,
-body.adm-dark-active .awdev-footer                 { color: var(--adm-text-muted) !important; }
-body.adm-dark-active .awdev-field-title            { color: var(--adm-text) !important; }
-body.adm-dark-active .awdev-plugin-table th {
-  background: var(--adm-bg) !important;
-  border-color: var(--adm-border) !important;
-  color: var(--adm-text-muted) !important;
-}
-body.adm-dark-active .awdev-plugin-table td {
-  border-color: var(--adm-border) !important;
-  color: var(--adm-text) !important;
-}
-body.adm-dark-active .awdev-plugin-table tr:nth-child(even) td {
-  background: var(--adm-surface-2) !important;
-}
-body.adm-dark-active .awdev-plugin-table code {
-  background: var(--adm-surface-3) !important;
-  color: var(--adm-link) !important;
-}
-body.adm-dark-active .awdev-plugin-table a         { color: var(--adm-link) !important; }
-body.adm-dark-active .awdev-add-row                { border-color: var(--adm-border) !important; }
-body.adm-dark-active .awdev-footer a               { color: var(--adm-link) !important; }
-body.adm-dark-active .awdev-status-active          { background: #12532e50; color: #6ee7a0; }
-body.adm-dark-active .awdev-badge-builtin          { background: #1e3a5f; color: #93c5fd; }
-body.adm-dark-active .awdev-badge-custom           { background: #4a2e0a; color: #fcd34d; }

@@ -92,6 +92,42 @@ add_action( 'admin_post_awdev_flush_cache', function () {
 } );
 
 /**
+ * Resolve local installed version for a plugin basename.
+ */
+function awdev_get_local_version( string $basename ): string {
+	if ( ! function_exists( 'get_plugins' ) ) {
+		require_once ABSPATH . 'wp-admin/includes/plugin.php';
+	}
+	$plugins = get_plugins();
+	return $plugins[ $basename ]['Version'] ?? '–';
+}
+
+/**
+ * Return human-readable "last checked" time from the transient timeout.
+ * The timeout is set to now + 6h, so last_checked = timeout - 6h.
+ */
+function awdev_get_last_checked( string $slug ): string {
+	$key     = '_transient_timeout_awdev_upd_' . sanitize_key( $slug );
+	$timeout = (int) get_option( $key, 0 );
+	if ( ! $timeout ) {
+		return __( 'Never', 'awdev-plugin-updater' );
+	}
+	$checked = $timeout - ( 6 * HOUR_IN_SECONDS );
+	$diff    = time() - $checked;
+	if ( $diff < 60 ) {
+		return __( 'Just now', 'awdev-plugin-updater' );
+	}
+	if ( $diff < HOUR_IN_SECONDS ) {
+		$mins = (int) ( $diff / 60 );
+		/* translators: %d = number of minutes */
+		return sprintf( _n( '%d minute ago', '%d minutes ago', $mins, 'awdev-plugin-updater' ), $mins );
+	}
+	$hours = (int) ( $diff / HOUR_IN_SECONDS );
+	/* translators: %d = number of hours */
+	return sprintf( _n( '%d hour ago', '%d hours ago', $hours, 'awdev-plugin-updater' ), $hours );
+}
+
+/**
  * Render the settings page.
  */
 function awdev_render_settings_page(): void {
@@ -115,11 +151,12 @@ function awdev_render_settings_page(): void {
 	$statuses = [];
 	foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
 		$slug = $managed[ $basename ] ?? ( $built_in[ $basename ]['api_slug'] ?? '' );
-		$key  = 'awdev_upd_' . sanitize_key( dirname( $basename ) );
+		$key  = 'awdev_upd_' . sanitize_key( $slug );
 		$data = get_transient( $key );
 		$statuses[ $basename ] = [
-			'version' => $data ? ( $data->version ?? '–' ) : '–',
-			'api_url' => AWDEV_UPDATE_SERVER . '/' . sanitize_key( $slug ) . '.php',
+			'remote_version' => $data ? ( $data->version ?? '–' ) : '–',
+			'local_version'  => awdev_get_local_version( $basename ),
+			'last_checked'   => awdev_get_last_checked( $slug ),
 		];
 	}
 
@@ -171,7 +208,7 @@ function awdev_render_settings_page(): void {
 							<tr>
 								<th><?php esc_html_e( 'Plugin', 'awdev-plugin-updater' ); ?></th>
 								<th><?php esc_html_e( 'API Slug', 'awdev-plugin-updater' ); ?></th>
-								<th><?php esc_html_e( 'Endpoint', 'awdev-plugin-updater' ); ?></th>
+								<th><?php esc_html_e( 'Installed', 'awdev-plugin-updater' ); ?></th>
 								<th><?php esc_html_e( 'Remote Version', 'awdev-plugin-updater' ); ?></th>
 								<th><?php esc_html_e( 'Type', 'awdev-plugin-updater' ); ?></th>
 							</tr>
@@ -181,8 +218,11 @@ function awdev_render_settings_page(): void {
 							<tr>
 								<td><strong><?php echo esc_html( $info['name'] ); ?></strong><br><code><?php echo esc_html( $basename ); ?></code></td>
 								<td><code><?php echo esc_html( $info['api_slug'] ); ?></code></td>
-								<td><a href="<?php echo esc_url( $statuses[ $basename ]['api_url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $statuses[ $basename ]['api_url'] ); ?></a></td>
-								<td><?php echo esc_html( $statuses[ $basename ]['version'] ); ?></td>
+								<td><?php echo esc_html( $statuses[ $basename ]['local_version'] ); ?></td>
+								<td>
+									<?php echo esc_html( $statuses[ $basename ]['remote_version'] ); ?><br>
+									<span class="awdev-last-checked"><?php echo esc_html( $statuses[ $basename ]['last_checked'] ); ?></span>
+								</td>
 								<td><span class="awdev-badge awdev-badge-builtin"><?php esc_html_e( 'Built-in', 'awdev-plugin-updater' ); ?></span></td>
 							</tr>
 							<?php endforeach; ?>
@@ -192,8 +232,11 @@ function awdev_render_settings_page(): void {
 							<tr class="awdev-dynamic-row">
 								<td><input type="text" name="awdev_managed_plugins[<?php echo esc_attr( $basename ); ?>][basename]" value="<?php echo esc_attr( $basename ); ?>" class="awdev-input-basename" placeholder="folder/plugin.php" /></td>
 								<td><input type="text" name="awdev_managed_plugins[<?php echo esc_attr( $basename ); ?>][slug]" value="<?php echo esc_attr( $slug ); ?>" class="awdev-input-slug" placeholder="my-plugin" /></td>
-								<td><a href="<?php echo esc_url( $statuses[ $basename ]['api_url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $statuses[ $basename ]['api_url'] ); ?></a></td>
-								<td><?php echo esc_html( $statuses[ $basename ]['version'] ); ?></td>
+								<td><?php echo esc_html( $statuses[ $basename ]['local_version'] ); ?></td>
+								<td>
+									<?php echo esc_html( $statuses[ $basename ]['remote_version'] ); ?><br>
+									<span class="awdev-last-checked"><?php echo esc_html( $statuses[ $basename ]['last_checked'] ); ?></span>
+								</td>
 								<td>
 									<span class="awdev-badge awdev-badge-custom"><?php esc_html_e( 'Custom', 'awdev-plugin-updater' ); ?></span>
 									<button type="button" class="awdev-remove-row button-link" title="<?php esc_attr_e( 'Remove', 'awdev-plugin-updater' ); ?>"><span class="dashicons dashicons-trash"></span></button>

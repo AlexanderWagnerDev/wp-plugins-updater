@@ -62,8 +62,8 @@ msgid "API Slug"
 msgstr "API Slug"
 
 #: includes/settings.php
-msgid "Endpoint"
-msgstr "Endpoint"
+msgid "Installed"
+msgstr "Installed"
 
 #: includes/settings.php
 msgid "Remote Version"
@@ -104,6 +104,26 @@ msgstr "Update data is cached for 6 hours per plugin. Flush the cache to force W
 #: includes/settings.php
 msgid "Flush Update Cache"
 msgstr "Flush Update Cache"
+
+#: includes/settings.php
+msgid "Never"
+msgstr "Never"
+
+#: includes/settings.php
+msgid "Just now"
+msgstr "Just now"
+
+#: includes/settings.php
+msgid "%d minute ago"
+msgid_plural "%d minutes ago"
+msgstr[0] "%d minute ago"
+msgstr[1] "%d minutes ago"
+
+#: includes/settings.php
+msgid "%d hour ago"
+msgid_plural "%d hours ago"
+msgstr[0] "%d hour ago"
+msgstr[1] "%d hours ago"
 
 #: includes/settings.php
 msgid "Not allowed."
