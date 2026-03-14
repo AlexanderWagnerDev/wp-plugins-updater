@@ -51,7 +51,7 @@ GPLv2 or later — see [LICENSE](LICENSE)
 
 ## Deutsch
 
-Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — ohne WordPress.org. Updates werden von einem selbst gehosteten Server ausgeliefert, damit jedes Release auf eigenem Schedule erscheint.
+Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — ohne WordPress.org. Updates werden von einem selbst gehosteten Server ausgeliefert, damit jedes Release auf eigenem Zeitplan erscheint.
 
 ### Funktionen
 
@@ -62,7 +62,7 @@ Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — o
 - ✅ Konfigurierbare API-Basis-URL
 - ✅ Manueller Cache-Flush-Button
 - ✅ 6-Stunden-Update-Cache pro Plugin
-- ✅ „Version details“-Popup im WP-Update-Screen
+- ✅ „Versions-Details“-Popup im WordPress-Update-Screen
 - ✅ Automatische Korrektur des Plugin-Ordnernamens nach ZIP-Extraktion
 - ✅ Dark-Mode-kompatibel über DarkAdmin CSS-Variablen
 - ✅ Übersetzungen: `de_DE`, `de_AT`, `en_US`
@@ -78,18 +78,18 @@ Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — o
 
 *Einstellungen → AWDev Updater* öffnen und auf **Plugin hinzufügen** klicken:
 
-- **Plugin Basename** — z.B. `mein-plugin/mein-plugin.php`
-- **API Slug** — der Bezeichner für den Update-Endpunkt
+- **Plugin-Basename** — z.B. `mein-plugin/mein-plugin.php`
+- **API-Slug** — der Bezeichner zur Auflösung des Update-Endpunkts
 
-## Changelog
+### Changelog
 
-### 0.0.1
-- Initial release
-- Native WordPress update hook integration
-- Settings page with configurable API URL, managed plugin table and cache flush
-- Built-in DarkAdmin support
-- Translations: `de_DE`, `de_AT`, `en_US`
+#### 0.0.1
+- Erste Veröffentlichung
+- Native WordPress-Update-Hook-Integration
+- Einstellungsseite mit konfigurierbarer API-URL, Plugin-Tabelle und Cache-Flush
+- Integrierte DarkAdmin-Unterstützung
+- Übersetzungen: `de_DE`, `de_AT`, `en_US`
 
-## License
+### Lizenz
 
-GPLv2 or later — see [LICENSE](LICENSE)
+GPLv2 oder höher — siehe [LICENSE](LICENSE)
