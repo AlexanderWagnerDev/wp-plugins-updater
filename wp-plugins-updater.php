@@ -29,13 +29,12 @@ require_once AWDEV_UPDATER_PATH . 'includes/settings.php';
 
 /**
  * Register all managed AlexanderWagnerDev plugins.
- * Each entry: new AWDev_Updater( 'plugin-folder/plugin-file.php', 'slug' );
- * The slug maps to: AWDEV_UPDATE_SERVER . '/{slug}.php'
+ * Built-in plugins are always registered when installed.
+ * Additional plugins can be added via the Settings page.
  */
 add_action( 'init', function () {
 	$managed = (array) get_option( 'awdev_managed_plugins', [] );
 
-	// Built-in: always register DarkAdmin if installed
 	$built_in = [
 		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => 'darkadmin',
 	];
@@ -46,7 +45,6 @@ add_action( 'init', function () {
 		}
 	}
 
-	// Dynamically registered plugins via settings page
 	foreach ( $managed as $basename => $api_slug ) {
 		if ( ! isset( $built_in[ $basename ] ) ) {
 			new AWDev_Updater( $basename, AWDEV_UPDATE_SERVER . '/' . sanitize_key( $api_slug ) . '.php' );

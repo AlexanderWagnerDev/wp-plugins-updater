@@ -4,7 +4,7 @@ A self-hosted WordPress plugin updater for [AlexanderWagnerDev](https://alexande
 
 ## Features
 
-- ✅ Full WordPress Settings Page (under *Settings → AWDev Updater*)
+- ✅ Full WordPress Settings Page (*Settings → AWDev Updater*)
 - ✅ Consistent UI with DarkAdmin design system (Dark Mode compatible)
 - ✅ DarkAdmin built-in — auto-registered when installed
 - ✅ Add/remove additional plugins dynamically via Settings UI
@@ -21,11 +21,9 @@ wp-plugins-updater/
 ├── includes/
 │   ├── class-awdev-updater.php  ← Reusable updater class (one instance per plugin)
 │   └── settings.php             ← Settings page, admin hooks, cache flush
-├── assets/
-│   ├── css/settings.css         ← Settings page styles (DarkAdmin-compatible)
-│   └── js/settings.js           ← Dynamic add/remove plugin rows
-└── server/
-    └── darkadmin.php            ← Example API endpoint (deploy to update server)
+└── assets/
+    ├── css/settings.css         ← Settings page styles (DarkAdmin-compatible)
+    └── js/settings.js           ← Dynamic add/remove plugin rows
 ```
 
 ## Update Server JSON Format
@@ -37,7 +35,7 @@ Each endpoint at `https://wp-plugins-updates.awdev.space/api/{slug}.php` must re
   "slug":         "your-plugin-folder",
   "name":         "Your Plugin Name",
   "version":      "1.2.3",
-  "download_url": "https://wp-plugins-updates.awdev.space/zips/your-plugin.zip",
+  "download_url": "https://wp-plugins-updates.awdev.space/downloads/your-plugin.zip",
   "details_url":  "https://alexanderwagnerdev.com/plugins/your-plugin",
   "changelog":    "<h4>1.2.3</h4><ul><li>Fixed XYZ</li></ul>",
   "tested":       "6.9",
@@ -49,9 +47,9 @@ Each endpoint at `https://wp-plugins-updates.awdev.space/api/{slug}.php` must re
 ## Release Workflow
 
 1. Update `version` in your plugin's main PHP file
-2. Build the ZIP and upload to `/zips/` on the update server
-3. Update `version` in the API endpoint (`server/{slug}.php`)
-4. WordPress detects the update automatically within 6 hours (or flush cache manually)
+2. Upload the new ZIP to `/downloads/` on the update server
+3. Update `version` in the API endpoint
+4. WordPress detects the update automatically within 6 hours (or flush cache manually via Settings)
 
 ## License
 
