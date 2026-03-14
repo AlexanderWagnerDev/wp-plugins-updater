@@ -11,7 +11,7 @@ define( 'AWDEV_SETTINGS_SLUG', 'awdev-plugins-updater' );
  */
 add_action( 'admin_menu', function () {
 	add_options_page(
-		__( 'AWDev Plugin Updater', 'awdev-plugin-updater' ),
+		__( 'AWDev Plugins Updater', 'awdev-plugin-updater' ),
 		__( 'AWDev Updater', 'awdev-plugin-updater' ),
 		'manage_options',
 		AWDEV_SETTINGS_SLUG,
@@ -139,7 +139,7 @@ function awdev_render_settings_page(): void {
 
 	$built_in = [
 		'awdev-plugin-updater/awdev-plugin-updater.php' => [
-			'name'     => 'AWDev Plugin Updater',
+			'name'     => 'AWDev Plugins Updater',
 			'api_slug' => 'awdev-plugin-updater',
 		],
 		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => [
@@ -168,7 +168,7 @@ function awdev_render_settings_page(): void {
 			<div class="awdev-page-header-inner">
 				<span class="awdev-header-icon dashicons dashicons-update-alt"></span>
 				<div>
-					<h1 class="awdev-page-title"><?php esc_html_e( 'AWDev Plugin Updater', 'awdev-plugin-updater' ); ?></h1>
+					<h1 class="awdev-page-title"><?php esc_html_e( 'AWDev Plugins Updater', 'awdev-plugin-updater' ); ?></h1>
 					<p class="awdev-page-subtitle">
 						<?php esc_html_e( 'Self-hosted update manager for AlexanderWagnerDev plugins', 'awdev-plugin-updater' ); ?>
 						&mdash; v<?php echo esc_html( AWDEV_UPDATER_VERSION ); ?>
@@ -280,7 +280,7 @@ function awdev_render_settings_page(): void {
 
 		<div class="awdev-footer">
 			<p>
-				<?php esc_html_e( 'AWDev Plugin Updater', 'awdev-plugin-updater' ); ?> &ndash;
+				<?php esc_html_e( 'AWDev Plugins Updater', 'awdev-plugin-updater' ); ?> &ndash;
 				<a href="https://alexanderwagnerdev.com" target="_blank" rel="noopener">AlexanderWagnerDev</a>
 				&mdash;
 				<a href="https://github.com/AlexanderWagnerDev/wp-plugins-updater" target="_blank" rel="noopener">GitHub</a>

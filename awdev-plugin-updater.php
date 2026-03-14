@@ -1,6 +1,6 @@
 <?php
 /**
- * Plugin Name: AWDev Plugin Updater
+ * Plugin Name: AWDev Plugins Updater
  * Plugin URI: https://github.com/AlexanderWagnerDev/wp-plugins-updater
  * Description: Self-hosted updater for AlexanderWagnerDev plugins. Manages updates from a self-hosted server instead of WordPress.org.
  * Version: 0.0.1

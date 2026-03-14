@@ -1,9 +1,9 @@
-# English (United States) translation for AWDev Plugin Updater
+# English (United States) translation for AWDev Plugins Updater
 # Copyright (C) 2026 AlexanderWagnerDev
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: AWDev Plugin Updater 0.0.1\n"
+"Project-Id-Version: AWDev Plugins Updater 0.0.1\n"
 "Report-Msgid-Bugs-To: https://github.com/AlexanderWagnerDev/wp-plugins-updater/issues\n"
 "POT-Creation-Date: 2026-03-14T22:00:00+01:00\n"
 "PO-Revision-Date: 2026-03-14T22:00:00+01:00\n"
@@ -22,8 +22,8 @@ msgid "Settings"
 msgstr "Settings"
 
 #: includes/settings.php
-msgid "AWDev Plugin Updater"
-msgstr "AWDev Plugin Updater"
+msgid "AWDev Plugins Updater"
+msgstr "AWDev Plugins Updater"
 
 #: includes/settings.php
 msgid "AWDev Updater"
