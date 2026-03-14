@@ -31,19 +31,19 @@ msgstr "AWDev Updater"
 
 #: includes/settings.php
 msgid "Self-hosted update manager for AlexanderWagnerDev plugins"
-msgstr "Self-hosted Update-Manager f\u00fcr AlexanderWagnerDev Plugins"
+msgstr "Self-hosted Update-Manager für AlexanderWagnerDev Plugins"
 
 #: includes/settings.php
 msgid "Active"
 msgstr "Aktiv"
 
 #: includes/settings.php
-msgid "\u2713 Update cache flushed. WordPress will re-check all plugins on the next update cycle."
-msgstr "\u2713 Update-Cache geleert. WordPress pr\u00fcft alle Plugins beim n\u00e4chsten Update-Zyklus erneut."
+msgid "✓ Update cache flushed. WordPress will re-check all plugins on the next update cycle."
+msgstr "✓ Update-Cache geleert. WordPress prüft alle Plugins beim nächsten Update-Zyklus erneut."
 
 #: includes/settings.php
-msgid "\u2713 Settings saved."
-msgstr "\u2713 Einstellungen gespeichert."
+msgid "✓ Settings saved."
+msgstr "✓ Einstellungen gespeichert."
 
 #: includes/settings.php
 msgid "Update Server"
@@ -51,7 +51,7 @@ msgstr "Update-Server"
 
 #: includes/settings.php
 msgid "The base URL of your self-hosted update API. Each plugin endpoint is resolved as {server}/{slug}.php"
-msgstr "Die Basis-URL deiner self-hosted Update-API. Jeder Plugin-Endpunkt wird als {server}/{slug}.php aufgel\u00f6st."
+msgstr "Die Basis-URL deiner self-hosted Update-API. Jeder Plugin-Endpunkt wird als {server}/{slug}.php aufgelöst."
 
 #: includes/settings.php
 msgid "API Base URL"
@@ -103,7 +103,7 @@ msgstr "Entfernen"
 
 #: includes/settings.php
 msgid "Add Plugin"
-msgstr "Plugin hinzuf\u00fcgen"
+msgstr "Plugin hinzufügen"
 
 #: includes/settings.php
 msgid "Save Settings"
@@ -115,19 +115,11 @@ msgstr "Cache-Verwaltung"
 
 #: includes/settings.php
 msgid "Update data is cached for 6 hours per plugin. Flush the cache to force WordPress to re-check all endpoints immediately."
-msgstr "Update-Daten werden 6 Stunden pro Plugin gecacht. Cache leeren, um WordPress zur sofortigen Neupr\u00fcfung aller Endpunkte zu zwingen."
+msgstr "Update-Daten werden 6 Stunden pro Plugin gecacht. Cache leeren, um WordPress zur sofortigen Neuprüfung aller Endpunkte zu zwingen."
 
 #: includes/settings.php
 msgid "Flush Update Cache"
 msgstr "Update-Cache leeren"
-
-#: includes/settings.php
-msgid "About & Server Setup"
-msgstr "\u00dcber & Server-Setup"
-
-#: includes/settings.php
-msgid "Each plugin needs a corresponding PHP endpoint on your update server that returns JSON:"
-msgstr "Jedes Plugin ben\u00f6tigt einen entsprechenden PHP-Endpunkt auf deinem Update-Server, der JSON zur\u00fcckgibt:"
 
 #: includes/settings.php
 msgid "Not allowed."
