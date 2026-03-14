@@ -70,7 +70,7 @@ add_action( 'plugins_loaded', function () {
  * Add settings link in the Plugins list.
  */
 add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), function ( $actions ) {
-	$url                 = admin_url( 'options-general.php?page=awdev-updater' );
+	$url                 = admin_url( 'options-general.php?page=awdev-plugins-updater' );
 	$actions['settings'] = '<a href="' . esc_url( $url ) . '">' . __( 'Settings', 'awdev-plugin-updater' ) . '</a>';
 	return $actions;
 } );

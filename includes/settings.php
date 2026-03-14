@@ -4,6 +4,8 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
+define( 'AWDEV_SETTINGS_SLUG', 'awdev-plugins-updater' );
+
 /**
  * Register settings and menu.
  */
@@ -12,7 +14,7 @@ add_action( 'admin_menu', function () {
 		__( 'AWDev Plugin Updater', 'awdev-plugin-updater' ),
 		__( 'AWDev Updater', 'awdev-plugin-updater' ),
 		'manage_options',
-		'awdev-updater',
+		AWDEV_SETTINGS_SLUG,
 		'awdev_render_settings_page'
 	);
 } );
@@ -26,7 +28,7 @@ add_action( 'admin_init', function () {
 	register_setting( 'awdev_settings', 'awdev_update_server', [
 		'type'              => 'string',
 		'sanitize_callback' => 'esc_url_raw',
-		'default'           => 'https://wp-plugins-updates.awdev.space/api',
+		'default'           => AWDEV_UPDATE_SERVER,
 	] );
 } );
 
@@ -49,7 +51,7 @@ function awdev_sanitize_managed_plugins( $input ): array {
  * Enqueue settings page assets.
  */
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
-	if ( $hook !== 'settings_page_awdev-updater' ) {
+	if ( $hook !== 'settings_page_' . AWDEV_SETTINGS_SLUG ) {
 		return;
 	}
 	wp_enqueue_style(
@@ -90,7 +92,7 @@ add_action( 'admin_post_awdev_flush_cache', function () {
 		)
 	);
 
-	wp_redirect( add_query_arg( [ 'page' => 'awdev-updater', 'cache-flushed' => '1' ], admin_url( 'options-general.php' ) ) );
+	wp_redirect( add_query_arg( [ 'page' => AWDEV_SETTINGS_SLUG, 'cache-flushed' => '1' ], admin_url( 'options-general.php' ) ) );
 	exit;
 } );
 
@@ -102,25 +104,26 @@ function awdev_render_settings_page(): void {
 		return;
 	}
 
-	$server       = get_option( 'awdev_update_server', AWDEV_UPDATE_SERVER );
-	$managed      = (array) get_option( 'awdev_managed_plugins', [] );
+	$server  = get_option( 'awdev_update_server', AWDEV_UPDATE_SERVER );
+	$managed = (array) get_option( 'awdev_managed_plugins', [] );
 
-	// Built-in plugins (always shown, cannot be removed)
 	$built_in = [
+		'awdev-plugin-updater/awdev-plugin-updater.php' => [
+			'name'     => 'AWDev Plugin Updater',
+			'api_slug' => 'awdev-plugin-updater',
+		],
 		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => [
 			'name'     => 'DarkAdmin – Dark Mode for Adminpanel',
 			'api_slug' => 'darkadmin',
 		],
 	];
 
-	// Fetch live status for each managed plugin
 	$statuses = [];
 	foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
 		$slug = $managed[ $basename ] ?? ( $built_in[ $basename ]['api_slug'] ?? '' );
 		$key  = 'awdev_upd_' . sanitize_key( dirname( $basename ) );
 		$data = get_transient( $key );
 		$statuses[ $basename ] = [
-			'cached'  => $data !== false,
 			'version' => $data ? ( $data->version ?? '–' ) : '–',
 			'api_url' => $server . '/' . sanitize_key( $slug ) . '.php',
 		];
@@ -179,7 +182,7 @@ function awdev_render_settings_page(): void {
 							name="awdev_update_server"
 							value="<?php echo esc_url( $server ); ?>"
 							class="awdev-url-input"
-							placeholder="https://wp-plugins-updates.awdev.space/api"
+							placeholder="https://example.com/api"
 						/>
 					</div>
 				</div>
@@ -211,7 +214,7 @@ function awdev_render_settings_page(): void {
 							<tr>
 								<td><strong><?php echo esc_html( $info['name'] ); ?></strong><br><code><?php echo esc_html( $basename ); ?></code></td>
 								<td><code><?php echo esc_html( $info['api_slug'] ); ?></code></td>
-								<td><a href="<?php echo esc_url( $statuses[ $basename ]['api_url'] ?? '#' ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $statuses[ $basename ]['api_url'] ?? '–' ); ?></a></td>
+								<td><a href="<?php echo esc_url( $statuses[ $basename ]['api_url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $statuses[ $basename ]['api_url'] ); ?></a></td>
 								<td><?php echo esc_html( $statuses[ $basename ]['version'] ); ?></td>
 								<td><span class="awdev-badge awdev-badge-builtin"><?php esc_html_e( 'Built-in', 'awdev-plugin-updater' ); ?></span></td>
 							</tr>
@@ -219,14 +222,10 @@ function awdev_render_settings_page(): void {
 
 							<?php foreach ( $managed as $basename => $slug ) : ?>
 								<?php if ( isset( $built_in[ $basename ] ) ) continue; ?>
-							<tr class="awdev-dynamic-row" data-basename="<?php echo esc_attr( $basename ); ?>">
-								<td>
-									<input type="text" name="awdev_managed_plugins[<?php echo esc_attr( $basename ); ?>][basename]" value="<?php echo esc_attr( $basename ); ?>" class="awdev-input-basename" placeholder="folder/plugin.php" />
-								</td>
-								<td>
-									<input type="text" name="awdev_managed_plugins[<?php echo esc_attr( $basename ); ?>][slug]" value="<?php echo esc_attr( $slug ); ?>" class="awdev-input-slug" placeholder="my-plugin" />
-								</td>
-								<td><a href="<?php echo esc_url( $statuses[ $basename ]['api_url'] ?? '#' ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $statuses[ $basename ]['api_url'] ?? '–' ); ?></a></td>
+							<tr class="awdev-dynamic-row">
+								<td><input type="text" name="awdev_managed_plugins[<?php echo esc_attr( $basename ); ?>][basename]" value="<?php echo esc_attr( $basename ); ?>" class="awdev-input-basename" placeholder="folder/plugin.php" /></td>
+								<td><input type="text" name="awdev_managed_plugins[<?php echo esc_attr( $basename ); ?>][slug]" value="<?php echo esc_attr( $slug ); ?>" class="awdev-input-slug" placeholder="my-plugin" /></td>
+								<td><a href="<?php echo esc_url( $statuses[ $basename ]['api_url'] ); ?>" target="_blank" rel="noopener"><?php echo esc_html( $statuses[ $basename ]['api_url'] ); ?></a></td>
 								<td><?php echo esc_html( $statuses[ $basename ]['version'] ); ?></td>
 								<td>
 									<span class="awdev-badge awdev-badge-custom"><?php esc_html_e( 'Custom', 'awdev-plugin-updater' ); ?></span>
@@ -251,7 +250,7 @@ function awdev_render_settings_page(): void {
 			</div>
 		</form>
 
-		<!-- Cache Management Card (outside form) -->
+		<!-- Cache Management Card -->
 		<div class="awdev-card">
 			<div class="awdev-card-header">
 				<span class="dashicons dashicons-performance"></span>
@@ -269,28 +268,6 @@ function awdev_render_settings_page(): void {
 						<?php esc_html_e( 'Flush Update Cache', 'awdev-plugin-updater' ); ?>
 					</button>
 				</form>
-			</div>
-		</div>
-
-		<!-- About Card -->
-		<div class="awdev-card">
-			<div class="awdev-card-header">
-				<span class="dashicons dashicons-info-outline"></span>
-				<h2><?php esc_html_e( 'About & Server Setup', 'awdev-plugin-updater' ); ?></h2>
-			</div>
-			<div class="awdev-card-body">
-				<p class="awdev-card-description"><?php esc_html_e( 'Each plugin needs a corresponding PHP endpoint on your update server that returns JSON:', 'awdev-plugin-updater' ); ?></p>
-				<pre class="awdev-code-block">{
-  "slug":         "your-plugin-folder",
-  "name":         "Your Plugin Name",
-  "version":      "1.2.3",
-  "download_url": "https://wp-plugins-updates.awdev.space/zips/your-plugin.zip",
-  "details_url":  "https://alexanderwagnerdev.com/plugins/your-plugin",
-  "changelog":    "&lt;h4&gt;1.2.3&lt;\/h4&gt;&lt;ul&gt;&lt;li&gt;Fixed XYZ&lt;\/li&gt;&lt;\/ul&gt;",
-  "tested":       "6.9",
-  "requires":     "6.0",
-  "requires_php": "7.4"
-}</pre>
 			</div>
 		</div>
 
