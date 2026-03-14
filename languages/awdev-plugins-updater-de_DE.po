@@ -27,23 +27,23 @@ msgstr "AWDev Plugins Updater"
 
 #: includes/settings.php
 msgid "Self-hosted update manager for AlexanderWagnerDev plugins"
-msgstr "Self-hosted Update-Manager f\u00fcr AlexanderWagnerDev Plugins"
+msgstr "Self-hosted Update-Manager für AlexanderWagnerDev Plugins"
 
 #: includes/settings.php
 msgid "Active"
 msgstr "Aktiv"
 
 #: includes/settings.php
-msgid "\u2713 Update cache flushed."
-msgstr "\u2713 Update-Cache geleert."
+msgid "✓ Update cache flushed."
+msgstr "✓ Update-Cache geleert."
 
 #: includes/settings.php
-msgid "\u2713 Plugin cache cleared. WordPress will re-check on next load."
-msgstr "\u2713 Plugin-Cache geleert. WordPress pr\u00fcft beim n\u00e4chsten Laden erneut."
+msgid "✓ Plugin cache cleared. WordPress will re-check on next load."
+msgstr "✓ Plugin-Cache geleert. WordPress prüft beim nächsten Laden erneut."
 
 #: includes/settings.php
-msgid "\u2713 Settings saved."
-msgstr "\u2713 Einstellungen gespeichert."
+msgid "✓ Settings saved."
+msgstr "✓ Einstellungen gespeichert."
 
 #: includes/settings.php
 msgid "Managed Plugins"
@@ -91,7 +91,7 @@ msgstr "Entfernen"
 
 #: includes/settings.php
 msgid "Re-check update"
-msgstr "Update erneut pr\u00fcfen"
+msgstr "Update erneut prüfen"
 
 #: includes/settings.php
 msgid "Update"
@@ -99,7 +99,7 @@ msgstr "Aktualisieren"
 
 #: includes/settings.php
 msgid "Add Plugin"
-msgstr "Plugin hinzuf\u00fcgen"
+msgstr "Plugin hinzufügen"
 
 #: includes/settings.php
 msgid "Save Settings"
@@ -111,7 +111,7 @@ msgstr "Cache-Verwaltung"
 
 #: includes/settings.php
 msgid "Update data is cached for 6 hours per plugin. Flush the cache to force WordPress to re-check all endpoints immediately."
-msgstr "Update-Daten werden 6 Stunden pro Plugin gecacht. Cache leeren, um WordPress zur sofortigen Neupr\u00fcfung aller Endpunkte zu zwingen."
+msgstr "Update-Daten werden 6 Stunden pro Plugin gecacht. Cache leeren, um WordPress zur sofortigen Neuprüfung aller Endpunkte zu zwingen."
 
 #: includes/settings.php
 msgid "Flush Update Cache"
