@@ -1,6 +1,5 @@
 /*
  * AWDev Plugins Updater - Settings Page Styles
- * Uses CSS custom properties so DarkAdmin can override without extra rules.
  * Author: AlexanderWagnerDev
  */
 
@@ -22,12 +21,14 @@
   --awdev-badge-cu-fg: #92400e;
   --awdev-active-bg:   #d1fadf;
   --awdev-active-fg:   #12532e;
+  --awdev-update-bg:   #fff3cd;
+  --awdev-update-fg:   #856404;
 }
 
 /*
  * DarkAdmin compatibility.
- * Scoped under .awdev-settings-wrap to win specificity over DarkAdmin's
- * body.adm-dark-active element-level !important rules.
+ * Scoped under body.adm-dark-active .awdev-settings-wrap to beat DarkAdmin's
+ * element-level !important rules via higher specificity.
  */
 body.adm-dark-active .awdev-settings-wrap {
   --awdev-bg:          #2c3338;
@@ -46,37 +47,52 @@ body.adm-dark-active .awdev-settings-wrap {
   --awdev-badge-cu-fg: #fcd34d;
   --awdev-active-bg:   rgba(18,83,46,.32);
   --awdev-active-fg:   #6ee7a0;
+  --awdev-update-bg:   rgba(133,100,4,.25);
+  --awdev-update-fg:   #fde68a;
 }
 
-/* Force dark background/text on all awdev elements when DarkAdmin is active */
+/* Explicit element overrides for DarkAdmin compatibility */
+body.adm-dark-active .awdev-settings-wrap,
 body.adm-dark-active .awdev-settings-wrap .awdev-page-header,
-body.adm-dark-active .awdev-settings-wrap .awdev-card,
+body.adm-dark-active .awdev-settings-wrap .awdev-card {
+  background-color: var(--awdev-bg) !important;
+  color: var(--awdev-text) !important;
+  border-color: var(--awdev-border) !important;
+}
 body.adm-dark-active .awdev-settings-wrap .awdev-card-header,
-body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table th,
+body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table th {
+  background-color: var(--awdev-bg-alt) !important;
+  color: var(--awdev-text-muted) !important;
+  border-color: var(--awdev-border) !important;
+}
 body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table td {
   background-color: var(--awdev-bg) !important;
   color: var(--awdev-text) !important;
   border-color: var(--awdev-border) !important;
 }
-
-body.adm-dark-active .awdev-settings-wrap .awdev-card-header {
-  background-color: var(--awdev-bg-alt) !important;
-}
-
-body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table th {
-  background-color: var(--awdev-bg-alt) !important;
-  color: var(--awdev-text-muted) !important;
-}
-
 body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table tr:nth-child(even) td {
   background-color: var(--awdev-bg-row) !important;
 }
-
-body.adm-dark-active .awdev-settings-wrap h1,
-body.adm-dark-active .awdev-settings-wrap h2 {
+body.adm-dark-active .awdev-settings-wrap h1.awdev-page-title,
+body.adm-dark-active .awdev-settings-wrap .awdev-card-header h2 {
   color: var(--awdev-text) !important;
 }
+body.adm-dark-active .awdev-settings-wrap .awdev-page-subtitle,
+body.adm-dark-active .awdev-settings-wrap .awdev-card-description,
+body.adm-dark-active .awdev-settings-wrap .awdev-last-checked,
+body.adm-dark-active .awdev-settings-wrap .awdev-footer {
+  color: var(--awdev-text-muted) !important;
+}
+body.adm-dark-active .awdev-settings-wrap .awdev-footer a,
+body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table a,
+body.adm-dark-active .awdev-settings-wrap .awdev-header-icon,
+body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
+  color: var(--awdev-link) !important;
+}
 
+/* =============================================================================
+   LAYOUT
+   ============================================================================= */
 .awdev-settings-wrap {
   max-width: 960px;
   margin-top: 16px;
@@ -220,17 +236,19 @@ body.adm-dark-active .awdev-settings-wrap h2 {
 .awdev-plugin-table strong {
   color: var(--awdev-text) !important;
 }
-.awdev-plugin-table code {
-  background: var(--awdev-code-bg) !important;
-  padding: 2px 6px;
-  border-radius: 4px;
-  font-size: 11px;
-  color: var(--awdev-code-color) !important;
-}
 .awdev-plugin-table a {
   color: var(--awdev-link) !important;
   font-size: 11px;
   word-break: break-all;
+}
+.awdev-version-new {
+  display: inline-block;
+  font-weight: 700;
+  color: var(--awdev-update-fg) !important;
+  background: var(--awdev-update-bg) !important;
+  border-radius: 4px;
+  padding: 1px 6px;
+  font-size: 12px;
 }
 .awdev-last-checked {
   font-size: 11px;
@@ -243,6 +261,77 @@ body.adm-dark-active .awdev-settings-wrap h2 {
   width: 100%;
   font-size: 12px !important;
   padding: 4px 6px !important;
+}
+
+/* =============================================================================
+   AUTO-UPDATE TOGGLE
+   ============================================================================= */
+.awdev-toggle {
+  position: relative;
+  display: inline-block;
+  width: 34px;
+  height: 20px;
+  vertical-align: middle;
+}
+.awdev-toggle input {
+  opacity: 0;
+  width: 0;
+  height: 0;
+  position: absolute;
+}
+.awdev-toggle-slider {
+  position: absolute;
+  cursor: pointer;
+  inset: 0;
+  background-color: #ccc;
+  border-radius: 20px;
+  transition: background-color .2s;
+}
+.awdev-toggle-slider::before {
+  content: '';
+  position: absolute;
+  width: 14px;
+  height: 14px;
+  left: 3px;
+  top: 3px;
+  background: #fff;
+  border-radius: 50%;
+  transition: transform .2s;
+}
+.awdev-toggle input:checked + .awdev-toggle-slider {
+  background-color: #2271b1;
+}
+.awdev-toggle input:checked + .awdev-toggle-slider::before {
+  transform: translateX(14px);
+}
+
+/* =============================================================================
+   ACTION BUTTONS
+   ============================================================================= */
+.awdev-check-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  padding: 2px 6px !important;
+  min-height: 26px !important;
+}
+.awdev-check-btn .dashicons {
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
+  margin: 0 !important;
+}
+.awdev-update-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 4px !important;
+  padding: 2px 8px !important;
+  min-height: 26px !important;
+  margin-left: 4px !important;
+}
+.awdev-update-btn .dashicons {
+  font-size: 14px !important;
+  width: 14px !important;
+  height: 14px !important;
 }
 
 /* =============================================================================
