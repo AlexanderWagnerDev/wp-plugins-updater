@@ -1,0 +1,61 @@
+name: Build Plugin ZIP
+
+on:
+  push:
+    branches:
+      - main
+  release:
+    types:
+      - published
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build:
+    name: Build & package
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Create plugin ZIP
+        run: |
+          ZIP_NAME="awdev-plugin-updater.zip"
+          ZIP_PATH="/tmp/${ZIP_NAME}"
+
+          find . \
+            -not -path './.git/*' \
+            -not -path './.git' \
+            -not -path './.github/*' \
+            -not -path './.github' \
+            -not -name '*.md' \
+            -not -name 'LICENSE' \
+            -not -name '*.zip' \
+            -not -name '*.png' \
+            -not -name '*.jpg' \
+            -not -name '*.jpeg' \
+            -not -name '*.gif' \
+            -not -name '*.webp' \
+            -not -name '*.svg' \
+            -type f \
+          | sed 's|^\./||' \
+          | zip "$ZIP_PATH" -@
+
+          echo "ZIP_PATH=${ZIP_PATH}" >> $GITHUB_ENV
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v7
+        with:
+          archive: false
+          name: awdev-plugin-updater
+          path: ${{ env.ZIP_PATH }}
+          retention-days: 14
+
+      - name: Upload ZIP to GitHub Release
+        if: github.event_name == 'release'
+        uses: softprops/action-gh-release@v2
+        with:
+          files: ${{ env.ZIP_PATH }}
