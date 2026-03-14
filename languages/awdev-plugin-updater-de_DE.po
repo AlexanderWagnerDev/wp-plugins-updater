@@ -58,10 +58,6 @@ msgid "Plugin"
 msgstr "Plugin"
 
 #: includes/settings.php
-msgid "API Slug"
-msgstr "API-Slug"
-
-#: includes/settings.php
 msgid "Installed"
 msgstr "Installiert"
 

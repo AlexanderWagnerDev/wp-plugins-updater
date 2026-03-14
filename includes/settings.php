@@ -207,7 +207,6 @@ function awdev_render_settings_page(): void {
 						<thead>
 							<tr>
 								<th><?php esc_html_e( 'Plugin', 'awdev-plugin-updater' ); ?></th>
-								<th><?php esc_html_e( 'API Slug', 'awdev-plugin-updater' ); ?></th>
 								<th><?php esc_html_e( 'Installed', 'awdev-plugin-updater' ); ?></th>
 								<th><?php esc_html_e( 'Remote Version', 'awdev-plugin-updater' ); ?></th>
 								<th><?php esc_html_e( 'Type', 'awdev-plugin-updater' ); ?></th>
@@ -216,8 +215,7 @@ function awdev_render_settings_page(): void {
 						<tbody>
 							<?php foreach ( $built_in as $basename => $info ) : ?>
 							<tr>
-								<td><strong><?php echo esc_html( $info['name'] ); ?></strong><br><code><?php echo esc_html( $basename ); ?></code></td>
-								<td><code><?php echo esc_html( $info['api_slug'] ); ?></code></td>
+								<td><strong><?php echo esc_html( $info['name'] ); ?></strong></td>
 								<td><?php echo esc_html( $statuses[ $basename ]['local_version'] ); ?></td>
 								<td>
 									<?php echo esc_html( $statuses[ $basename ]['remote_version'] ); ?><br>
@@ -231,7 +229,6 @@ function awdev_render_settings_page(): void {
 								<?php if ( isset( $built_in[ $basename ] ) ) continue; ?>
 							<tr class="awdev-dynamic-row">
 								<td><input type="text" name="awdev_managed_plugins[<?php echo esc_attr( $basename ); ?>][basename]" value="<?php echo esc_attr( $basename ); ?>" class="awdev-input-basename" placeholder="folder/plugin.php" /></td>
-								<td><input type="text" name="awdev_managed_plugins[<?php echo esc_attr( $basename ); ?>][slug]" value="<?php echo esc_attr( $slug ); ?>" class="awdev-input-slug" placeholder="my-plugin" /></td>
 								<td><?php echo esc_html( $statuses[ $basename ]['local_version'] ); ?></td>
 								<td>
 									<?php echo esc_html( $statuses[ $basename ]['remote_version'] ); ?><br>
