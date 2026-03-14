@@ -52,7 +52,7 @@ jobs:
           archive: false
           name: awdev-plugin-updater
           path: ${{ env.ZIP_PATH }}
-          retention-days: 14
+          retention-days: 1
 
       - name: Upload ZIP to GitHub Release
         if: github.event_name == 'release'
