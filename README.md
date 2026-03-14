@@ -36,7 +36,7 @@ Open *Settings → AWDev Updater* and click **Add Plugin**:
 
 ## Changelog
 
-### 1.0.0
+### 0.0.1
 - Initial release
 - Native WordPress update hook integration
 - Settings page with configurable API URL, managed plugin table and cache flush
@@ -80,3 +80,16 @@ Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — o
 
 - **Plugin Basename** — z.B. `mein-plugin/mein-plugin.php`
 - **API Slug** — der Bezeichner für den Update-Endpunkt
+
+## Changelog
+
+### 0.0.1
+- Initial release
+- Native WordPress update hook integration
+- Settings page with configurable API URL, managed plugin table and cache flush
+- Built-in DarkAdmin support
+- Translations: `de_DE`, `de_AT`, `en_US`
+
+## License
+
+GPLv2 or later — see [LICENSE](LICENSE)
