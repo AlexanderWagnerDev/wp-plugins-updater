@@ -1,0 +1,134 @@
+# German translation for AWDev Plugin Updater
+# Copyright (C) 2026 AlexanderWagnerDev
+# This file is distributed under the GPLv2 or later.
+msgid ""
+msgstr ""
+"Project-Id-Version: AWDev Plugin Updater 1.0.0\n"
+"Report-Msgid-Bugs-To: https://github.com/AlexanderWagnerDev/wp-plugins-updater/issues\n"
+"POT-Creation-Date: 2026-03-14T22:00:00+01:00\n"
+"PO-Revision-Date: 2026-03-14T22:00:00+01:00\n"
+"Last-Translator: Alexander Wagner <info@alexanderwagnerdev.com>\n"
+"Language-Team: German\n"
+"Language: de_DE\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: AWDev\n"
+"Domain: awdev-plugin-updater\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
+
+#: awdev-plugin-updater.php
+msgid "Settings"
+msgstr "Einstellungen"
+
+#: includes/settings.php
+msgid "AWDev Plugin Updater"
+msgstr "AWDev Plugin Updater"
+
+#: includes/settings.php
+msgid "AWDev Updater"
+msgstr "AWDev Updater"
+
+#: includes/settings.php
+msgid "Self-hosted update manager for AlexanderWagnerDev plugins"
+msgstr "Self-hosted Update-Manager f\u00fcr AlexanderWagnerDev Plugins"
+
+#: includes/settings.php
+msgid "Active"
+msgstr "Aktiv"
+
+#: includes/settings.php
+msgid "\u2713 Update cache flushed. WordPress will re-check all plugins on the next update cycle."
+msgstr "\u2713 Update-Cache geleert. WordPress pr\u00fcft alle Plugins beim n\u00e4chsten Update-Zyklus erneut."
+
+#: includes/settings.php
+msgid "\u2713 Settings saved."
+msgstr "\u2713 Einstellungen gespeichert."
+
+#: includes/settings.php
+msgid "Update Server"
+msgstr "Update-Server"
+
+#: includes/settings.php
+msgid "The base URL of your self-hosted update API. Each plugin endpoint is resolved as {server}/{slug}.php"
+msgstr "Die Basis-URL deiner self-hosted Update-API. Jeder Plugin-Endpunkt wird als {server}/{slug}.php aufgel\u00f6st."
+
+#: includes/settings.php
+msgid "API Base URL"
+msgstr "API-Basis-URL"
+
+#: includes/settings.php
+msgid "Must start with https://"
+msgstr "Muss mit https:// beginnen"
+
+#: includes/settings.php
+msgid "Managed Plugins"
+msgstr "Verwaltete Plugins"
+
+#: includes/settings.php
+msgid "All AlexanderWagnerDev plugins that receive updates from the self-hosted server."
+msgstr "Alle AlexanderWagnerDev Plugins, die Updates vom self-hosted Server erhalten."
+
+#: includes/settings.php
+msgid "Plugin"
+msgstr "Plugin"
+
+#: includes/settings.php
+msgid "API Slug"
+msgstr "API-Slug"
+
+#: includes/settings.php
+msgid "Endpoint"
+msgstr "Endpunkt"
+
+#: includes/settings.php
+msgid "Remote Version"
+msgstr "Remote-Version"
+
+#: includes/settings.php
+msgid "Type"
+msgstr "Typ"
+
+#: includes/settings.php
+msgid "Built-in"
+msgstr "Integriert"
+
+#: includes/settings.php
+msgid "Custom"
+msgstr "Benutzerdefiniert"
+
+#: includes/settings.php
+msgid "Remove"
+msgstr "Entfernen"
+
+#: includes/settings.php
+msgid "Add Plugin"
+msgstr "Plugin hinzuf\u00fcgen"
+
+#: includes/settings.php
+msgid "Save Settings"
+msgstr "Einstellungen speichern"
+
+#: includes/settings.php
+msgid "Cache Management"
+msgstr "Cache-Verwaltung"
+
+#: includes/settings.php
+msgid "Update data is cached for 6 hours per plugin. Flush the cache to force WordPress to re-check all endpoints immediately."
+msgstr "Update-Daten werden 6 Stunden pro Plugin gecacht. Cache leeren, um WordPress zur sofortigen Neupr\u00fcfung aller Endpunkte zu zwingen."
+
+#: includes/settings.php
+msgid "Flush Update Cache"
+msgstr "Update-Cache leeren"
+
+#: includes/settings.php
+msgid "About & Server Setup"
+msgstr "\u00dcber & Server-Setup"
+
+#: includes/settings.php
+msgid "Each plugin needs a corresponding PHP endpoint on your update server that returns JSON:"
+msgstr "Jedes Plugin ben\u00f6tigt einen entsprechenden PHP-Endpunkt auf deinem Update-Server, der JSON zur\u00fcckgibt:"
+
+#: includes/settings.php
+msgid "Not allowed."
+msgstr "Nicht erlaubt."
