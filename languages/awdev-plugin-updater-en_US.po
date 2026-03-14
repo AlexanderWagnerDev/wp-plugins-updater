@@ -38,12 +38,12 @@ msgid "Active"
 msgstr "Active"
 
 #: includes/settings.php
-msgid "\u2713 Update cache flushed. WordPress will re-check all plugins on the next update cycle."
-msgstr "\u2713 Update cache flushed. WordPress will re-check all plugins on the next update cycle."
+msgid "✓ Update cache flushed. WordPress will re-check all plugins on the next update cycle."
+msgstr "✓ Update cache flushed. WordPress will re-check all plugins on the next update cycle."
 
 #: includes/settings.php
-msgid "\u2713 Settings saved."
-msgstr "\u2713 Settings saved."
+msgid "✓ Settings saved."
+msgstr "✓ Settings saved."
 
 #: includes/settings.php
 msgid "Update Server"
@@ -120,14 +120,6 @@ msgstr "Update data is cached for 6 hours per plugin. Flush the cache to force W
 #: includes/settings.php
 msgid "Flush Update Cache"
 msgstr "Flush Update Cache"
-
-#: includes/settings.php
-msgid "About & Server Setup"
-msgstr "About & Server Setup"
-
-#: includes/settings.php
-msgid "Each plugin needs a corresponding PHP endpoint on your update server that returns JSON:"
-msgstr "Each plugin needs a corresponding PHP endpoint on your update server that returns JSON:"
 
 #: includes/settings.php
 msgid "Not allowed."
