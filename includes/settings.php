@@ -182,7 +182,7 @@ function awdev_render_settings_page(): void {
 							name="awdev_update_server"
 							value="<?php echo esc_url( $server ); ?>"
 							class="awdev-url-input"
-							placeholder="https://example.com/api"
+							placeholder="<?php echo esc_attr( AWDEV_UPDATE_SERVER ); ?>"
 						/>
 					</div>
 				</div>
