@@ -34,16 +34,16 @@ msgid "Active"
 msgstr "Active"
 
 #: includes/settings.php
-msgid "\u2713 Update cache flushed."
-msgstr "\u2713 Update cache flushed."
+msgid "✓ Update cache flushed."
+msgstr "✓ Update cache flushed."
 
 #: includes/settings.php
-msgid "\u2713 Plugin cache cleared. WordPress will re-check on next load."
-msgstr "\u2713 Plugin cache cleared. WordPress will re-check on next load."
+msgid "✓ Plugin cache cleared. WordPress will re-check on next load."
+msgstr "✓ Plugin cache cleared. WordPress will re-check on next load."
 
 #: includes/settings.php
-msgid "\u2713 Settings saved."
-msgstr "\u2713 Settings saved."
+msgid "✓ Settings saved."
+msgstr "✓ Settings saved."
 
 #: includes/settings.php
 msgid "Managed Plugins"
