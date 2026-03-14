@@ -51,7 +51,7 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
-= 1.0.0 =
+= 0.0.1 =
 * Initial release.
 * Native WordPress update hook integration.
 * Settings page with configurable API URL, managed plugin table and cache flush.
@@ -97,7 +97,7 @@ Nur für AlexanderWagnerDev-Plugins die in diesem Updater registriert sind. Alle
 Ja. Die Einstellungsseite unterstützt DarkAdmin vollständig und passt sich automatisch dem Dark Mode an.
 
 === Changelog ===
-= 1.0.0 =
+= 0.0.1 =
 * Erste Veröffentlichung.
 * Native WordPress-Update-Hook-Integration.
 * Einstellungsseite mit konfigurierbarer API-URL, Plugin-Tabelle und Cache-Flush.
