@@ -1,16 +1,18 @@
 <?php
 /**
  * Self-hosted update API endpoint for: DarkAdmin - Dark Mode for Adminpanel
- * Deploy this file to: https://updates.alexanderwagnerdev.com/api/darkadmin.php
+ * Deploy to: https://wp-plugins-updates.awdev.space/api/darkadmin.php
  *
- * Update 'version' and 'download_url' on every new release.
+ * Update 'version' and place the new ZIP at the download_url path on each release.
  */
 header( 'Content-Type: application/json; charset=utf-8' );
+header( 'Cache-Control: no-store' );
 
 echo json_encode( [
 	'slug'         => 'darkadmin-dark-mode-for-adminpanel',
+	'name'         => 'DarkAdmin – Dark Mode for Adminpanel',
 	'version'      => '0.0.6',
-	'download_url' => 'https://updates.alexanderwagnerdev.com/zips/darkadmin-dark-mode-for-adminpanel.zip',
+	'download_url' => 'https://wp-plugins-updates.awdev.space/zips/darkadmin-dark-mode-for-adminpanel.zip',
 	'details_url'  => 'https://alexanderwagnerdev.com/plugins/darkadmin',
 	'changelog'    => '<h4>0.0.6</h4><ul><li>Initial self-hosted release</li></ul>',
 	'tested'       => '6.9',

@@ -1,54 +1,57 @@
 # AWDev Plugin Updater
 
-A self-hosted WordPress plugin updater for [AlexanderWagnerDev](https://alexanderwagnerdev.com) plugins. Instead of relying on WordPress.org, updates are fetched from a custom domain — giving full control over versioning and distribution.
+A self-hosted WordPress plugin updater for [AlexanderWagnerDev](https://alexanderwagnerdev.com) plugins. Updates are served from `wp-plugins-updates.awdev.space` instead of WordPress.org — giving full control over versioning and distribution.
 
-## How It Works
+## Features
 
-1. This plugin registers a WordPress update hook per managed plugin.
-2. On each WordPress update check, it queries a self-hosted JSON endpoint (e.g. `https://updates.alexanderwagnerdev.com/api/darkadmin.php`).
-3. If a newer version is found, WordPress shows the update notification in the admin backend.
-4. The ZIP is downloaded directly from your own server.
-
-## Adding a New Plugin
-
-Open `wp-plugins-updater.php` and add a new line inside the `init` action:
-
-```php
-new AWDev_Updater(
-    'your-plugin-folder/your-plugin.php',
-    'https://updates.alexanderwagnerdev.com/api/your-plugin.php'
-);
-```
-
-Then deploy a corresponding API endpoint to your update server (see `server/` folder for examples).
-
-## Update Server Endpoint
-
-Each endpoint returns a JSON object:
-
-```json
-{
-    "slug":         "your-plugin-folder",
-    "version":      "1.2.3",
-    "download_url": "https://updates.alexanderwagnerdev.com/zips/your-plugin.zip",
-    "details_url":  "https://alexanderwagnerdev.com/plugins/your-plugin",
-    "changelog":    "<h4>1.2.3</h4><ul><li>Fixed XYZ</li></ul>",
-    "tested":       "6.9",
-    "requires":     "6.0",
-    "requires_php": "7.4"
-}
-```
+- ✅ Full WordPress Settings Page (under *Settings → AWDev Updater*)
+- ✅ Consistent UI with DarkAdmin design system (Dark Mode compatible)
+- ✅ DarkAdmin built-in — auto-registered when installed
+- ✅ Add/remove additional plugins dynamically via Settings UI
+- ✅ Manual cache flush button
+- ✅ Configurable API base URL
+- ✅ "View version details" popup support in WP update screen
+- ✅ Automatic folder name fix after ZIP extraction
 
 ## Folder Structure
 
 ```
 wp-plugins-updater/
-├── wp-plugins-updater.php       <- Main plugin file
+├── wp-plugins-updater.php       ← Main plugin file
 ├── includes/
-│   └── class-awdev-updater.php  <- Reusable updater class
+│   ├── class-awdev-updater.php  ← Reusable updater class (one instance per plugin)
+│   └── settings.php             ← Settings page, admin hooks, cache flush
+├── assets/
+│   ├── css/settings.css         ← Settings page styles (DarkAdmin-compatible)
+│   └── js/settings.js           ← Dynamic add/remove plugin rows
 └── server/
-    └── darkadmin.php            <- Example API endpoint (deploy to update server)
+    └── darkadmin.php            ← Example API endpoint (deploy to update server)
 ```
+
+## Update Server JSON Format
+
+Each endpoint at `https://wp-plugins-updates.awdev.space/api/{slug}.php` must return:
+
+```json
+{
+  "slug":         "your-plugin-folder",
+  "name":         "Your Plugin Name",
+  "version":      "1.2.3",
+  "download_url": "https://wp-plugins-updates.awdev.space/zips/your-plugin.zip",
+  "details_url":  "https://alexanderwagnerdev.com/plugins/your-plugin",
+  "changelog":    "<h4>1.2.3</h4><ul><li>Fixed XYZ</li></ul>",
+  "tested":       "6.9",
+  "requires":     "6.0",
+  "requires_php": "7.4"
+}
+```
+
+## Release Workflow
+
+1. Update `version` in your plugin's main PHP file
+2. Build the ZIP and upload to `/zips/` on the update server
+3. Update `version` in the API endpoint (`server/{slug}.php`)
+4. WordPress detects the update automatically within 6 hours (or flush cache manually)
 
 ## License
 
