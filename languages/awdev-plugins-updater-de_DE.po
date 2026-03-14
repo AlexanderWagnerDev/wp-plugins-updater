@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AWDev Plugins Updater 0.0.1\n"
 "Report-Msgid-Bugs-To: https://github.com/AlexanderWagnerDev/wp-plugins-updater/issues\n"
-"POT-Creation-Date: 2026-03-14T23:00:00+01:00\n"
-"PO-Revision-Date: 2026-03-14T23:00:00+01:00\n"
+"POT-Creation-Date: 2026-03-15T00:00:00+01:00\n"
+"PO-Revision-Date: 2026-03-15T00:00:00+01:00\n"
 "Last-Translator: Alexander Wagner <info@alexanderwagnerdev.com>\n"
 "Language-Team: Alexander Wagner <info@alexanderwagnerdev.com>\n"
 "Language: de_DE\n"
@@ -27,19 +27,23 @@ msgstr "AWDev Plugins Updater"
 
 #: includes/settings.php
 msgid "Self-hosted update manager for AlexanderWagnerDev plugins"
-msgstr "Self-hosted Update-Manager für AlexanderWagnerDev Plugins"
+msgstr "Self-hosted Update-Manager f\u00fcr AlexanderWagnerDev Plugins"
 
 #: includes/settings.php
 msgid "Active"
 msgstr "Aktiv"
 
 #: includes/settings.php
-msgid "✓ Update cache flushed. WordPress will re-check all plugins on the next update cycle."
-msgstr "✓ Update-Cache geleert. WordPress prüft alle Plugins beim nächsten Update-Zyklus erneut."
+msgid "\u2713 Update cache flushed."
+msgstr "\u2713 Update-Cache geleert."
 
 #: includes/settings.php
-msgid "✓ Settings saved."
-msgstr "✓ Einstellungen gespeichert."
+msgid "\u2713 Plugin cache cleared. WordPress will re-check on next load."
+msgstr "\u2713 Plugin-Cache geleert. WordPress pr\u00fcft beim n\u00e4chsten Laden erneut."
+
+#: includes/settings.php
+msgid "\u2713 Settings saved."
+msgstr "\u2713 Einstellungen gespeichert."
 
 #: includes/settings.php
 msgid "Managed Plugins"
@@ -58,8 +62,16 @@ msgid "Installed"
 msgstr "Installiert"
 
 #: includes/settings.php
-msgid "Remote Version"
-msgstr "Remote-Version"
+msgid "Remote"
+msgstr "Remote"
+
+#: includes/settings.php
+msgid "Auto-Update"
+msgstr "Auto-Update"
+
+#: includes/settings.php
+msgid "Actions"
+msgstr "Aktionen"
 
 #: includes/settings.php
 msgid "Type"
@@ -78,8 +90,16 @@ msgid "Remove"
 msgstr "Entfernen"
 
 #: includes/settings.php
+msgid "Re-check update"
+msgstr "Update erneut pr\u00fcfen"
+
+#: includes/settings.php
+msgid "Update"
+msgstr "Aktualisieren"
+
+#: includes/settings.php
 msgid "Add Plugin"
-msgstr "Plugin hinzufügen"
+msgstr "Plugin hinzuf\u00fcgen"
 
 #: includes/settings.php
 msgid "Save Settings"
@@ -91,7 +111,7 @@ msgstr "Cache-Verwaltung"
 
 #: includes/settings.php
 msgid "Update data is cached for 6 hours per plugin. Flush the cache to force WordPress to re-check all endpoints immediately."
-msgstr "Update-Daten werden 6 Stunden pro Plugin gecacht. Cache leeren, um WordPress zur sofortigen Neuprüfung aller Endpunkte zu zwingen."
+msgstr "Update-Daten werden 6 Stunden pro Plugin gecacht. Cache leeren, um WordPress zur sofortigen Neupr\u00fcfung aller Endpunkte zu zwingen."
 
 #: includes/settings.php
 msgid "Flush Update Cache"

@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AWDev Plugins Updater 0.0.1\n"
 "Report-Msgid-Bugs-To: https://github.com/AlexanderWagnerDev/wp-plugins-updater/issues\n"
-"POT-Creation-Date: 2026-03-14T23:00:00+01:00\n"
-"PO-Revision-Date: 2026-03-14T23:00:00+01:00\n"
+"POT-Creation-Date: 2026-03-15T00:00:00+01:00\n"
+"PO-Revision-Date: 2026-03-15T00:00:00+01:00\n"
 "Last-Translator: Alexander Wagner <info@alexanderwagnerdev.com>\n"
 "Language-Team: Alexander Wagner <info@alexanderwagnerdev.com>\n"
 "Language: en_US\n"
@@ -34,12 +34,16 @@ msgid "Active"
 msgstr "Active"
 
 #: includes/settings.php
-msgid "✓ Update cache flushed. WordPress will re-check all plugins on the next update cycle."
-msgstr "✓ Update cache flushed. WordPress will re-check all plugins on the next update cycle."
+msgid "\u2713 Update cache flushed."
+msgstr "\u2713 Update cache flushed."
 
 #: includes/settings.php
-msgid "✓ Settings saved."
-msgstr "✓ Settings saved."
+msgid "\u2713 Plugin cache cleared. WordPress will re-check on next load."
+msgstr "\u2713 Plugin cache cleared. WordPress will re-check on next load."
+
+#: includes/settings.php
+msgid "\u2713 Settings saved."
+msgstr "\u2713 Settings saved."
 
 #: includes/settings.php
 msgid "Managed Plugins"
@@ -58,8 +62,16 @@ msgid "Installed"
 msgstr "Installed"
 
 #: includes/settings.php
-msgid "Remote Version"
-msgstr "Remote Version"
+msgid "Remote"
+msgstr "Remote"
+
+#: includes/settings.php
+msgid "Auto-Update"
+msgstr "Auto-Update"
+
+#: includes/settings.php
+msgid "Actions"
+msgstr "Actions"
 
 #: includes/settings.php
 msgid "Type"
@@ -76,6 +88,14 @@ msgstr "Custom"
 #: includes/settings.php
 msgid "Remove"
 msgstr "Remove"
+
+#: includes/settings.php
+msgid "Re-check update"
+msgstr "Re-check update"
+
+#: includes/settings.php
+msgid "Update"
+msgstr "Update"
 
 #: includes/settings.php
 msgid "Add Plugin"
