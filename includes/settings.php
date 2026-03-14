@@ -25,11 +25,6 @@ add_action( 'admin_init', function () {
 		'sanitize_callback' => 'awdev_sanitize_managed_plugins',
 		'default'           => [],
 	] );
-	register_setting( 'awdev_settings', 'awdev_update_server', [
-		'type'              => 'string',
-		'sanitize_callback' => 'esc_url_raw',
-		'default'           => AWDEV_UPDATE_SERVER,
-	] );
 } );
 
 function awdev_sanitize_managed_plugins( $input ): array {
@@ -104,7 +99,6 @@ function awdev_render_settings_page(): void {
 		return;
 	}
 
-	$server  = get_option( 'awdev_update_server', AWDEV_UPDATE_SERVER );
 	$managed = (array) get_option( 'awdev_managed_plugins', [] );
 
 	$built_in = [
@@ -125,7 +119,7 @@ function awdev_render_settings_page(): void {
 		$data = get_transient( $key );
 		$statuses[ $basename ] = [
 			'version' => $data ? ( $data->version ?? '–' ) : '–',
-			'api_url' => $server . '/' . sanitize_key( $slug ) . '.php',
+			'api_url' => AWDEV_UPDATE_SERVER . '/' . sanitize_key( $slug ) . '.php',
 		];
 	}
 
@@ -160,33 +154,6 @@ function awdev_render_settings_page(): void {
 
 		<form method="post" action="options.php">
 			<?php settings_fields( 'awdev_settings' ); ?>
-
-			<!-- Update Server Card -->
-			<div class="awdev-card">
-				<div class="awdev-card-header">
-					<span class="dashicons dashicons-admin-site-alt3"></span>
-					<h2><?php esc_html_e( 'Update Server', 'awdev-plugin-updater' ); ?></h2>
-				</div>
-				<div class="awdev-card-body">
-					<p class="awdev-card-description">
-						<?php esc_html_e( 'The base URL of your self-hosted update API. Each plugin endpoint is resolved as {server}/{slug}.php', 'awdev-plugin-updater' ); ?>
-					</p>
-					<div class="awdev-field-row">
-						<div class="awdev-field-info">
-							<label for="awdev_update_server" class="awdev-field-title"><?php esc_html_e( 'API Base URL', 'awdev-plugin-updater' ); ?></label>
-							<span class="awdev-field-desc"><?php esc_html_e( 'Must start with https://', 'awdev-plugin-updater' ); ?></span>
-						</div>
-						<input
-							type="url"
-							id="awdev_update_server"
-							name="awdev_update_server"
-							value="<?php echo esc_url( $server ); ?>"
-							class="awdev-url-input"
-							placeholder="<?php echo esc_attr( AWDEV_UPDATE_SERVER ); ?>"
-						/>
-					</div>
-				</div>
-			</div>
 
 			<!-- Managed Plugins Card -->
 			<div class="awdev-card">
