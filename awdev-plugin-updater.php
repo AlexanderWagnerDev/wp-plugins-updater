@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AWDEV_UPDATER_VERSION', '1.0.0' );
+define( 'AWDEV_UPDATER_VERSION', '0.0.1' );
 define( 'AWDEV_UPDATER_URL', plugin_dir_url( __FILE__ ) );
 define( 'AWDEV_UPDATER_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AWDEV_UPDATE_SERVER', 'https://wp-plugins-updates.awdev.space/api' );
