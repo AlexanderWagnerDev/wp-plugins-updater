@@ -4,7 +4,7 @@
 ![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-21759b)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777bb4)
 
-A self-hosted WordPress plugin updater for [AlexanderWagnerDev](https://alexanderwagnerdev.com) plugins. Updates are served from `wp-plugins-updates.awdev.space` instead of WordPress.org — giving full control over versioning and distribution.
+A self-hosted WordPress plugin updater for [AlexanderWagnerDev](https://alexanderwagnerdev.com) plugins. Updates are served from own API instead of WordPress.org — giving full control over versioning and distribution.
 
 ## Features
 
