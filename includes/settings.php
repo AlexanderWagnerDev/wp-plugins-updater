@@ -105,9 +105,10 @@ function awdev_get_local_version( string $basename ): string {
 /**
  * Return human-readable "last checked" time from the transient timeout.
  * The timeout is set to now + 6h, so last_checked = timeout - 6h.
+ * Uses the dirname-based slug (matching AWDev_Updater::$plugin_slug).
  */
-function awdev_get_last_checked( string $slug ): string {
-	$key     = '_transient_timeout_awdev_upd_' . sanitize_key( $slug );
+function awdev_get_last_checked( string $dirname_slug ): string {
+	$key     = '_transient_timeout_awdev_upd_' . sanitize_key( $dirname_slug );
 	$timeout = (int) get_option( $key, 0 );
 	if ( ! $timeout ) {
 		return __( 'Never', 'awdev-plugins-updater' );
@@ -125,6 +126,32 @@ function awdev_get_last_checked( string $slug ): string {
 	$hours = (int) ( $diff / HOUR_IN_SECONDS );
 	/* translators: %d = number of hours */
 	return sprintf( _n( '%d hour ago', '%d hours ago', $hours, 'awdev-plugins-updater' ), $hours );
+}
+
+/**
+ * Fetch remote version directly from API if transient is not yet populated.
+ * This ensures the settings page always shows the latest available version.
+ */
+function awdev_get_remote_version( string $api_url, string $dirname_slug ): string {
+	$key  = 'awdev_upd_' . sanitize_key( $dirname_slug );
+	$data = get_transient( $key );
+
+	if ( $data === false ) {
+		$response = wp_remote_get( $api_url, [
+			'timeout'    => 10,
+			'user-agent' => 'AWDev-Plugin-Updater/' . AWDEV_UPDATER_VERSION . '; ' . get_bloginfo( 'url' ),
+		] );
+
+		if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
+			$data = json_decode( wp_remote_retrieve_body( $response ) );
+			set_transient( $key, $data, 6 * HOUR_IN_SECONDS );
+		} else {
+			set_transient( $key, false, HOUR_IN_SECONDS );
+			return '–';
+		}
+	}
+
+	return ( $data && isset( $data->version ) ) ? $data->version : '–';
 }
 
 /**
@@ -150,13 +177,15 @@ function awdev_render_settings_page(): void {
 
 	$statuses = [];
 	foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
-		$slug = $managed[ $basename ] ?? ( $built_in[ $basename ]['api_slug'] ?? '' );
-		$key  = 'awdev_upd_' . sanitize_key( $slug );
-		$data = get_transient( $key );
+		// AWDev_Updater uses dirname(basename) as the transient slug key, not the api_slug.
+		$dirname_slug = sanitize_key( dirname( $basename ) );
+		$api_slug     = $managed[ $basename ] ?? ( $built_in[ $basename ]['api_slug'] ?? $dirname_slug );
+		$api_url      = AWDEV_UPDATE_SERVER . '/' . sanitize_key( $api_slug ) . '.php';
+
 		$statuses[ $basename ] = [
-			'remote_version' => $data ? ( $data->version ?? '–' ) : '–',
+			'remote_version' => awdev_get_remote_version( $api_url, $dirname_slug ),
 			'local_version'  => awdev_get_local_version( $basename ),
-			'last_checked'   => awdev_get_last_checked( $slug ),
+			'last_checked'   => awdev_get_last_checked( $dirname_slug ),
 		];
 	}
 

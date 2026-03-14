@@ -26,12 +26,10 @@
 
 /*
  * DarkAdmin compatibility.
- * DarkAdmin defines --adm-* on :root and applies colors via !important selectors.
- * To prevent DarkAdmin's !important rules from overriding our element styles,
- * we scope all awdev elements tightly and use !important where needed.
- * We also re-map our CSS vars to DarkAdmin's tokens when dark mode is active.
+ * Scoped under .awdev-settings-wrap to win specificity over DarkAdmin's
+ * body.adm-dark-active element-level !important rules.
  */
-body.adm-dark-active {
+body.adm-dark-active .awdev-settings-wrap {
   --awdev-bg:          #2c3338;
   --awdev-bg-alt:      #1d2327;
   --awdev-bg-row:      #32393f;
@@ -48,6 +46,35 @@ body.adm-dark-active {
   --awdev-badge-cu-fg: #fcd34d;
   --awdev-active-bg:   rgba(18,83,46,.32);
   --awdev-active-fg:   #6ee7a0;
+}
+
+/* Force dark background/text on all awdev elements when DarkAdmin is active */
+body.adm-dark-active .awdev-settings-wrap .awdev-page-header,
+body.adm-dark-active .awdev-settings-wrap .awdev-card,
+body.adm-dark-active .awdev-settings-wrap .awdev-card-header,
+body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table th,
+body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table td {
+  background-color: var(--awdev-bg) !important;
+  color: var(--awdev-text) !important;
+  border-color: var(--awdev-border) !important;
+}
+
+body.adm-dark-active .awdev-settings-wrap .awdev-card-header {
+  background-color: var(--awdev-bg-alt) !important;
+}
+
+body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table th {
+  background-color: var(--awdev-bg-alt) !important;
+  color: var(--awdev-text-muted) !important;
+}
+
+body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table tr:nth-child(even) td {
+  background-color: var(--awdev-bg-row) !important;
+}
+
+body.adm-dark-active .awdev-settings-wrap h1,
+body.adm-dark-active .awdev-settings-wrap h2 {
+  color: var(--awdev-text) !important;
 }
 
 .awdev-settings-wrap {
