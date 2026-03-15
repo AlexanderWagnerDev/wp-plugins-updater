@@ -44,27 +44,17 @@ add_action( 'admin_post_awdev_save_settings', function () {
 	}
 	check_admin_referer( 'awdev_save_settings' );
 
-	// DEBUG: show exactly what was received and what ends up in DB.
-	$post_hours = isset( $_POST['awdev_cache_hours'] ) ? (int) wp_unslash( $_POST['awdev_cache_hours'] ) : 'NOT_SET';
+	$post_hours = isset( $_POST['awdev_cache_hours'] ) ? (int) wp_unslash( $_POST['awdev_cache_hours'] ) : 6;
 
 	// Save global auto-update toggle.
 	$global = isset( $_POST['awdev_auto_updates_global'] );
 	awdev_force_option( 'awdev_auto_updates_global', $global );
 
 	// Save cache hours.
-	$cache_hours = is_int( $post_hours ) ? $post_hours : 6;
+	$cache_hours = $post_hours;
 	if ( $cache_hours < 1 )   { $cache_hours = 1; }
 	if ( $cache_hours > 168 ) { $cache_hours = 168; }
 	awdev_force_option( 'awdev_cache_hours', $cache_hours );
-
-	// Read back immediately from DB (bypass cache).
-	global $wpdb;
-	$db_value = $wpdb->get_var(
-		$wpdb->prepare(
-			"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s",
-			'awdev_cache_hours'
-		)
-	);
 
 	// Save per-plugin auto-update toggles.
 	$raw = isset( $_POST['awdev_auto_updates'] ) && is_array( $_POST['awdev_auto_updates'] )
@@ -89,13 +79,22 @@ add_action( 'admin_post_awdev_save_settings', function () {
 	}
 	awdev_force_option( 'awdev_auto_updates', $auto_updates );
 
+	// Read back from DB directly for debug.
+	global $wpdb;
+	$db_value = (int) $wpdb->get_var(
+		$wpdb->prepare(
+			"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s",
+			'awdev_cache_hours'
+		)
+	);
+
 	wp_redirect( add_query_arg(
 		[
 			'page'             => AWDEV_SETTINGS_SLUG,
 			'settings-updated' => '1',
-			'post-hours'       => is_int( $post_hours ) ? $post_hours : 0,
+			'post-hours'       => $post_hours,
 			'saved-hours'      => $cache_hours,
-			'db-hours'         => (int) $db_value,
+			'db-hours'         => $db_value,
 		],
 		admin_url( 'options-general.php' )
 	) );
@@ -374,6 +373,7 @@ function awdev_render_settings_page(): void {
 		</div>
 		<?php endif; ?>
 
+		<!-- Settings Form: only contains toggle + cache hours + save button. No nested forms. -->
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="awdev_save_settings" />
 			<?php wp_nonce_field( 'awdev_save_settings' ); ?>
@@ -427,128 +427,129 @@ function awdev_render_settings_page(): void {
 				</div>
 			</div>
 
-			<!-- Managed Plugins Card -->
-			<div class="awdev-card">
-				<div class="awdev-card-header">
-					<span class="dashicons dashicons-plugins-checked"></span>
-					<h2><?php esc_html_e( 'Managed Plugins', 'awdev-plugins-updater' ); ?></h2>
-				</div>
-				<div class="awdev-card-body">
-					<p class="awdev-card-description">
-						<?php esc_html_e( 'All AlexanderWagnerDev plugins that receive updates from the self-hosted server.', 'awdev-plugins-updater' ); ?>
-					</p>
-
-					<table class="awdev-plugin-table">
-						<thead>
-							<tr>
-								<th><?php esc_html_e( 'Plugin', 'awdev-plugins-updater' ); ?></th>
-								<th><?php esc_html_e( 'Installed', 'awdev-plugins-updater' ); ?></th>
-								<th><?php esc_html_e( 'Remote', 'awdev-plugins-updater' ); ?></th>
-								<th><?php esc_html_e( 'Auto-Update', 'awdev-plugins-updater' ); ?></th>
-								<th><?php esc_html_e( 'Actions', 'awdev-plugins-updater' ); ?></th>
-								<th><?php esc_html_e( 'Type', 'awdev-plugins-updater' ); ?></th>
-							</tr>
-						</thead>
-						<tbody>
-							<?php foreach ( $built_in as $basename => $info ) :
-								$st = $statuses[ $basename ];
-							?>
-							<tr>
-								<td><strong><?php echo esc_html( $info['name'] ); ?></strong></td>
-								<td><?php echo esc_html( $st['local_version'] ); ?></td>
-								<td>
-									<?php if ( $st['needs_update'] ) : ?>
-										<span class="awdev-version-new"><?php echo esc_html( $st['remote_version'] ); ?></span>
-									<?php else : ?>
-										<?php echo esc_html( $st['remote_version'] ); ?>
-									<?php endif; ?>
-									<span class="awdev-last-checked"><?php echo esc_html( $st['last_checked'] ); ?></span>
-								</td>
-								<td>
-									<label class="awdev-toggle">
-										<input type="checkbox"
-											class="awdev-per-plugin-toggle"
-											name="awdev_auto_updates[<?php echo esc_attr( $basename ); ?>]"
-											value="1"
-											<?php checked( $st['auto_update'] ); ?>
-										/>
-										<span class="awdev-toggle-slider"></span>
-									</label>
-								</td>
-								<td>
-									<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
-										<input type="hidden" name="action" value="awdev_check_plugin" />
-										<input type="hidden" name="dirname_slug" value="<?php echo esc_attr( $st['dirname_slug'] ); ?>" />
-										<?php wp_nonce_field( 'awdev_check_plugin' ); ?>
-										<button type="submit" class="button button-small awdev-check-btn" title="<?php esc_attr_e( 'Re-check update', 'awdev-plugins-updater' ); ?>">
-											<span class="dashicons dashicons-update"></span>
-										</button>
-									</form>
-									<?php if ( $st['needs_update'] ) : ?>
-										<a href="<?php echo esc_url( admin_url( 'update.php?action=upgrade-plugin&plugin=' . urlencode( $basename ) . '&_wpnonce=' . wp_create_nonce( 'upgrade-plugin_' . $basename ) ) ); ?>" class="button button-small button-primary awdev-update-btn">
-											<span class="dashicons dashicons-arrow-up-alt"></span>
-											<?php esc_html_e( 'Update', 'awdev-plugins-updater' ); ?>
-										</a>
-									<?php endif; ?>
-								</td>
-								<td><span class="awdev-badge awdev-badge-builtin"><?php esc_html_e( 'AWDev', 'awdev-plugins-updater' ); ?></span></td>
-							</tr>
-							<?php endforeach; ?>
-
-							<?php foreach ( $managed as $basename => $slug ) :
-								if ( isset( $built_in[ $basename ] ) ) continue;
-								$st          = $statuses[ $basename ];
-								$plugin_name = sanitize_text_field( dirname( $basename ) );
-							?>
-							<tr class="awdev-dynamic-row">
-								<td><strong><?php echo esc_html( $plugin_name ); ?></strong></td>
-								<td><?php echo esc_html( $st['local_version'] ); ?></td>
-								<td>
-									<?php if ( $st['needs_update'] ) : ?>
-										<span class="awdev-version-new"><?php echo esc_html( $st['remote_version'] ); ?></span>
-									<?php else : ?>
-										<?php echo esc_html( $st['remote_version'] ); ?>
-									<?php endif; ?>
-									<span class="awdev-last-checked"><?php echo esc_html( $st['last_checked'] ); ?></span>
-								</td>
-								<td>
-									<label class="awdev-toggle">
-										<input type="checkbox"
-											class="awdev-per-plugin-toggle"
-											name="awdev_auto_updates[<?php echo esc_attr( $basename ); ?>]"
-											value="1"
-											<?php checked( $st['auto_update'] ); ?>
-										/>
-										<span class="awdev-toggle-slider"></span>
-									</label>
-								</td>
-								<td>
-									<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
-										<input type="hidden" name="action" value="awdev_check_plugin" />
-										<input type="hidden" name="dirname_slug" value="<?php echo esc_attr( $st['dirname_slug'] ); ?>" />
-										<?php wp_nonce_field( 'awdev_check_plugin' ); ?>
-										<button type="submit" class="button button-small awdev-check-btn" title="<?php esc_attr_e( 'Re-check update', 'awdev-plugins-updater' ); ?>">
-											<span class="dashicons dashicons-update"></span>
-										</button>
-									</form>
-									<?php if ( $st['needs_update'] ) : ?>
-										<a href="<?php echo esc_url( admin_url( 'update.php?action=upgrade-plugin&plugin=' . urlencode( $basename ) . '&_wpnonce=' . wp_create_nonce( 'upgrade-plugin_' . $basename ) ) ); ?>" class="button button-small button-primary awdev-update-btn">
-											<span class="dashicons dashicons-arrow-up-alt"></span>
-											<?php esc_html_e( 'Update', 'awdev-plugins-updater' ); ?>
-										</a>
-									<?php endif; ?>
-								</td>
-								<td>
-									<span class="awdev-badge awdev-badge-custom"><?php esc_html_e( 'AWDev', 'awdev-plugins-updater' ); ?></span>
-								</td>
-							</tr>
-							<?php endforeach; ?>
-						</tbody>
-					</table>
-				</div>
-			</div>
-
 		</form>
+		<!-- END settings form -->
+
+		<!-- Managed Plugins Card: each row has its own self-contained form -->
+		<div class="awdev-card">
+			<div class="awdev-card-header">
+				<span class="dashicons dashicons-plugins-checked"></span>
+				<h2><?php esc_html_e( 'Managed Plugins', 'awdev-plugins-updater' ); ?></h2>
+			</div>
+			<div class="awdev-card-body">
+				<p class="awdev-card-description">
+					<?php esc_html_e( 'All AlexanderWagnerDev plugins that receive updates from the self-hosted server.', 'awdev-plugins-updater' ); ?>
+				</p>
+
+				<table class="awdev-plugin-table">
+					<thead>
+						<tr>
+							<th><?php esc_html_e( 'Plugin', 'awdev-plugins-updater' ); ?></th>
+							<th><?php esc_html_e( 'Installed', 'awdev-plugins-updater' ); ?></th>
+							<th><?php esc_html_e( 'Remote', 'awdev-plugins-updater' ); ?></th>
+							<th><?php esc_html_e( 'Auto-Update', 'awdev-plugins-updater' ); ?></th>
+							<th><?php esc_html_e( 'Actions', 'awdev-plugins-updater' ); ?></th>
+							<th><?php esc_html_e( 'Type', 'awdev-plugins-updater' ); ?></th>
+						</tr>
+					</thead>
+					<tbody>
+						<?php foreach ( $built_in as $basename => $info ) :
+							$st = $statuses[ $basename ];
+						?>
+						<tr>
+							<td><strong><?php echo esc_html( $info['name'] ); ?></strong></td>
+							<td><?php echo esc_html( $st['local_version'] ); ?></td>
+							<td>
+								<?php if ( $st['needs_update'] ) : ?>
+									<span class="awdev-version-new"><?php echo esc_html( $st['remote_version'] ); ?></span>
+								<?php else : ?>
+									<?php echo esc_html( $st['remote_version'] ); ?>
+								<?php endif; ?>
+								<span class="awdev-last-checked"><?php echo esc_html( $st['last_checked'] ); ?></span>
+							</td>
+							<td>
+								<label class="awdev-toggle">
+									<input type="checkbox"
+										class="awdev-per-plugin-toggle"
+										name="awdev_auto_updates[<?php echo esc_attr( $basename ); ?>]"
+										value="1"
+										<?php checked( $st['auto_update'] ); ?>
+									/>
+									<span class="awdev-toggle-slider"></span>
+								</label>
+							</td>
+							<td>
+								<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
+									<input type="hidden" name="action" value="awdev_check_plugin" />
+									<input type="hidden" name="dirname_slug" value="<?php echo esc_attr( $st['dirname_slug'] ); ?>" />
+									<?php wp_nonce_field( 'awdev_check_plugin' ); ?>
+									<button type="submit" class="button button-small awdev-check-btn" title="<?php esc_attr_e( 'Re-check update', 'awdev-plugins-updater' ); ?>">
+										<span class="dashicons dashicons-update"></span>
+									</button>
+								</form>
+								<?php if ( $st['needs_update'] ) : ?>
+									<a href="<?php echo esc_url( admin_url( 'update.php?action=upgrade-plugin&plugin=' . urlencode( $basename ) . '&_wpnonce=' . wp_create_nonce( 'upgrade-plugin_' . $basename ) ) ); ?>" class="button button-small button-primary awdev-update-btn">
+										<span class="dashicons dashicons-arrow-up-alt"></span>
+										<?php esc_html_e( 'Update', 'awdev-plugins-updater' ); ?>
+									</a>
+								<?php endif; ?>
+							</td>
+							<td><span class="awdev-badge awdev-badge-builtin"><?php esc_html_e( 'AWDev', 'awdev-plugins-updater' ); ?></span></td>
+						</tr>
+						<?php endforeach; ?>
+
+						<?php foreach ( $managed as $basename => $slug ) :
+							if ( isset( $built_in[ $basename ] ) ) continue;
+							$st          = $statuses[ $basename ];
+							$plugin_name = sanitize_text_field( dirname( $basename ) );
+						?>
+						<tr class="awdev-dynamic-row">
+							<td><strong><?php echo esc_html( $plugin_name ); ?></strong></td>
+							<td><?php echo esc_html( $st['local_version'] ); ?></td>
+							<td>
+								<?php if ( $st['needs_update'] ) : ?>
+									<span class="awdev-version-new"><?php echo esc_html( $st['remote_version'] ); ?></span>
+								<?php else : ?>
+									<?php echo esc_html( $st['remote_version'] ); ?>
+								<?php endif; ?>
+								<span class="awdev-last-checked"><?php echo esc_html( $st['last_checked'] ); ?></span>
+							</td>
+							<td>
+								<label class="awdev-toggle">
+									<input type="checkbox"
+										class="awdev-per-plugin-toggle"
+										name="awdev_auto_updates[<?php echo esc_attr( $basename ); ?>]"
+										value="1"
+										<?php checked( $st['auto_update'] ); ?>
+									/>
+									<span class="awdev-toggle-slider"></span>
+								</label>
+							</td>
+							<td>
+								<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
+									<input type="hidden" name="action" value="awdev_check_plugin" />
+									<input type="hidden" name="dirname_slug" value="<?php echo esc_attr( $st['dirname_slug'] ); ?>" />
+									<?php wp_nonce_field( 'awdev_check_plugin' ); ?>
+									<button type="submit" class="button button-small awdev-check-btn" title="<?php esc_attr_e( 'Re-check update', 'awdev-plugins-updater' ); ?>">
+										<span class="dashicons dashicons-update"></span>
+									</button>
+								</form>
+								<?php if ( $st['needs_update'] ) : ?>
+									<a href="<?php echo esc_url( admin_url( 'update.php?action=upgrade-plugin&plugin=' . urlencode( $basename ) . '&_wpnonce=' . wp_create_nonce( 'upgrade-plugin_' . $basename ) ) ); ?>" class="button button-small button-primary awdev-update-btn">
+										<span class="dashicons dashicons-arrow-up-alt"></span>
+										<?php esc_html_e( 'Update', 'awdev-plugins-updater' ); ?>
+									</a>
+								<?php endif; ?>
+							</td>
+							<td>
+								<span class="awdev-badge awdev-badge-custom"><?php esc_html_e( 'AWDev', 'awdev-plugins-updater' ); ?></span>
+							</td>
+						</tr>
+						<?php endforeach; ?>
+					</tbody>
+				</table>
+			</div>
+		</div>
 
 		<!-- Cache Management Card -->
 		<div class="awdev-card">
