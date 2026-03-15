@@ -461,7 +461,7 @@ function awdev_render_settings_page(): void {
 										</a>
 									<?php endif; ?>
 								</td>
-								<td><span class="awdev-badge awdev-badge-builtin"><?php esc_html_e( 'Built-in', 'awdev-plugins-updater' ); ?></span></td>
+								<td><span class="awdev-badge awdev-badge-builtin"><?php esc_html_e( 'AWDev', 'awdev-plugins-updater' ); ?></span></td>
 							</tr>
 							<?php endforeach; ?>
 
