@@ -49,6 +49,10 @@ msgid "All AlexanderWagnerDev plugins that receive updates from the self-hosted 
 msgstr ""
 
 #: includes/settings.php
+msgid "Auto-Update (all plugins)"
+msgstr ""
+
+#: includes/settings.php
 msgid "Plugin"
 msgstr ""
 
