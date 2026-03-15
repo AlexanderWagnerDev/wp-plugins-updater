@@ -50,7 +50,7 @@ add_action( 'plugins_loaded', function () {
 
 	$built_in = [
 		// Self-update: folder = awdev-plugins-updater, main file = awdev-plugin-updater.php
-		'awdev-plugins-updater/awdev-plugin-updater.php' => 'awdev-plugin-updater',
+		'awdev-plugins-updater/awdev-plugins-updater.php' => 'awdev-plugins-updater',
 		// DarkAdmin - Dark Mode for Adminpanel.
 		'darkadmin/darkadmin.php' => 'darkadmin',
 	];
