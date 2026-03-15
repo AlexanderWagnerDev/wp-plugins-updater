@@ -25,7 +25,7 @@ class AWDev_Updater {
 
 	/**
 	 * Fetch update metadata from the self-hosted API endpoint.
-	 * Cached as a WordPress transient for 6 hours.
+	 * Cache duration is configurable via awdev_cache_hours option (default: 6).
 	 */
 	public function get_remote_data(): ?object {
 		$key    = 'awdev_upd_' . sanitize_key( $this->plugin_slug );
@@ -45,8 +45,12 @@ class AWDev_Updater {
 			return null;
 		}
 
-		$data = json_decode( wp_remote_retrieve_body( $response ) );
-		set_transient( $key, $data, 6 * HOUR_IN_SECONDS );
+		$data         = json_decode( wp_remote_retrieve_body( $response ) );
+		$cache_hours  = (int) get_option( 'awdev_cache_hours', 6 );
+		if ( $cache_hours < 1 ) {
+			$cache_hours = 1;
+		}
+		set_transient( $key, $data, $cache_hours * HOUR_IN_SECONDS );
 
 		return $data;
 	}

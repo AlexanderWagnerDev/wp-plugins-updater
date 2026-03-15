@@ -35,6 +35,11 @@ add_action( 'admin_init', function () {
 		'sanitize_callback' => 'rest_sanitize_boolean',
 		'default'           => true,
 	] );
+	register_setting( 'awdev_settings', 'awdev_cache_hours', [
+		'type'              => 'integer',
+		'sanitize_callback' => 'awdev_sanitize_cache_hours',
+		'default'           => 6,
+	] );
 } );
 
 function awdev_sanitize_managed_plugins( $input ): array {
@@ -64,6 +69,17 @@ function awdev_sanitize_auto_updates( $input ): array {
 		}
 	}
 	return $clean;
+}
+
+function awdev_sanitize_cache_hours( $input ): int {
+	$val = (int) $input;
+	if ( $val < 1 ) {
+		$val = 1;
+	}
+	if ( $val > 168 ) {
+		$val = 168;
+	}
+	return $val;
 }
 
 /**
@@ -194,12 +210,16 @@ function awdev_get_local_version( string $basename ): string {
  * Return human-readable "last checked" time from the transient timeout.
  */
 function awdev_get_last_checked( string $dirname_slug ): string {
+	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
+	if ( $cache_hours < 1 ) {
+		$cache_hours = 1;
+	}
 	$key     = '_transient_timeout_awdev_upd_' . sanitize_key( $dirname_slug );
 	$timeout = (int) get_option( $key, 0 );
 	if ( ! $timeout ) {
 		return __( 'Never', 'awdev-plugins-updater' );
 	}
-	$checked = $timeout - ( 6 * HOUR_IN_SECONDS );
+	$checked = $timeout - ( $cache_hours * HOUR_IN_SECONDS );
 	$diff    = time() - $checked;
 	if ( $diff < 60 ) {
 		return __( 'Just now', 'awdev-plugins-updater' );
@@ -226,8 +246,12 @@ function awdev_get_remote_version( string $api_url, string $dirname_slug ): stri
 		] );
 
 		if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
-			$data = json_decode( wp_remote_retrieve_body( $response ) );
-			set_transient( $key, $data, 6 * HOUR_IN_SECONDS );
+			$data        = json_decode( wp_remote_retrieve_body( $response ) );
+			$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
+			if ( $cache_hours < 1 ) {
+				$cache_hours = 1;
+			}
+			set_transient( $key, $data, $cache_hours * HOUR_IN_SECONDS );
 		} else {
 			set_transient( $key, false, HOUR_IN_SECONDS );
 			return '–';
@@ -248,6 +272,7 @@ function awdev_render_settings_page(): void {
 	$managed       = (array) get_option( 'awdev_managed_plugins', [] );
 	$auto_updates  = (array) get_option( 'awdev_auto_updates', [] );
 	$global_auto   = get_option( 'awdev_auto_updates_global' );
+	$cache_hours   = (int) get_option( 'awdev_cache_hours', 6 );
 
 	// Correct basenames matching the actual folder/file names on disk.
 	$built_in = [
@@ -425,9 +450,10 @@ function awdev_render_settings_page(): void {
 							<?php foreach ( $managed as $basename => $slug ) :
 								if ( isset( $built_in[ $basename ] ) ) continue;
 								$st = $statuses[ $basename ];
+								$plugin_name = sanitize_text_field( dirname( $basename ) );
 							?>
 							<tr class="awdev-dynamic-row">
-								<td><input type="text" name="awdev_managed_plugins[<?php echo esc_attr( $basename ); ?>]" value="<?php echo esc_attr( $slug ); ?>" class="awdev-input-basename" placeholder="api-slug" /></td>
+								<td><strong><?php echo esc_html( $plugin_name ); ?></strong></td>
 								<td><?php echo esc_html( $st['local_version'] ); ?></td>
 								<td>
 									<?php if ( $st['needs_update'] ) : ?>
@@ -465,19 +491,40 @@ function awdev_render_settings_page(): void {
 									<?php endif; ?>
 								</td>
 								<td>
-									<span class="awdev-badge awdev-badge-custom"><?php esc_html_e( 'Custom', 'awdev-plugins-updater' ); ?></span>
-									<button type="button" class="awdev-remove-row button-link" title="<?php esc_attr_e( 'Remove', 'awdev-plugins-updater' ); ?>"><span class="dashicons dashicons-trash"></span></button>
+									<span class="awdev-badge awdev-badge-custom"><?php esc_html_e( 'AWDev', 'awdev-plugins-updater' ); ?></span>
 								</td>
 							</tr>
 							<?php endforeach; ?>
 						</tbody>
 					</table>
+				</div>
+			</div>
 
-					<div class="awdev-add-row">
-						<button type="button" id="awdev-add-plugin" class="button">
-							<span class="dashicons dashicons-plus-alt2"></span>
-							<?php esc_html_e( 'Add Plugin', 'awdev-plugins-updater' ); ?>
-						</button>
+			<!-- Auto-Update Settings Card -->
+			<div class="awdev-card">
+				<div class="awdev-card-header">
+					<span class="dashicons dashicons-clock"></span>
+					<h2><?php esc_html_e( 'Auto-Update Settings', 'awdev-plugins-updater' ); ?></h2>
+				</div>
+				<div class="awdev-card-body">
+					<p class="awdev-card-description">
+						<?php esc_html_e( 'Configure how often the updater checks for new plugin versions. The cache duration controls the interval between remote API requests.', 'awdev-plugins-updater' ); ?>
+					</p>
+					<div class="awdev-settings-row">
+						<label for="awdev_cache_hours" class="awdev-settings-label">
+							<?php esc_html_e( 'Check interval (hours)', 'awdev-plugins-updater' ); ?>
+						</label>
+						<input
+							type="number"
+							id="awdev_cache_hours"
+							name="awdev_cache_hours"
+							value="<?php echo esc_attr( $cache_hours ); ?>"
+							min="1"
+							max="168"
+							step="1"
+							class="small-text"
+						/>
+						<span class="description"><?php esc_html_e( 'Min: 1h &mdash; Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
 					</div>
 				</div>
 			</div>
@@ -515,7 +562,12 @@ function awdev_render_settings_page(): void {
 			</div>
 			<div class="awdev-card-body">
 				<p class="awdev-card-description">
-					<?php esc_html_e( 'Update data is cached for 6 hours per plugin. Flush the cache to force WordPress to re-check all endpoints immediately.', 'awdev-plugins-updater' ); ?>
+					<?php
+					printf(
+						esc_html__( 'Update data is cached for %d hour(s) per plugin. Flush the cache to force WordPress to re-check all endpoints immediately.', 'awdev-plugins-updater' ),
+						(int) get_option( 'awdev_cache_hours', 6 )
+					);
+					?>
 				</p>
 				<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 					<input type="hidden" name="action" value="awdev_flush_cache" />
