@@ -293,9 +293,9 @@ function awdev_render_settings_page(): void {
 			'name'     => 'AWDev Plugins Updater',
 			'api_slug' => 'awdev-plugins-updater',
 		],
-		'darkadmin/darkadmin.php' => [
+		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => [
 			'name'     => 'DarkAdmin – Dark Mode for Adminpanel',
-			'api_slug' => 'darkadmin',
+			'api_slug' => 'darkadmin-dark-mode-for-adminpanel',
 		],
 	];
 
@@ -335,8 +335,8 @@ function awdev_render_settings_page(): void {
 	}
 
 	// Read-only GET flags — no nonce needed (no state change).
-	$cache_flushed  = isset( $_GET['cache-flushed'] );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$plugin_checked = isset( $_GET['plugin-checked'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$cache_flushed  = isset( $_GET['cache-flushed'] );   // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$plugin_checked = isset( $_GET['plugin-checked'] );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$settings_saved = isset( $_GET['settings-updated'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	?>
 	<div class="wrap awdev-settings-wrap">

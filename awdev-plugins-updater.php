@@ -45,8 +45,8 @@ add_action( 'plugins_loaded', function () {
 	$managed = (array) get_option( 'awdev_managed_plugins', [] );
 
 	$built_in = [
-		'awdev-plugins-updater/awdev-plugins-updater.php' => 'awdev-plugins-updater',
-		'darkadmin/darkadmin.php'                         => 'darkadmin',
+		'awdev-plugins-updater/awdev-plugins-updater.php'                     => 'awdev-plugins-updater',
+		'darkadmin-dark-mode-for-adminpanel/darkadmin.php'                    => 'darkadmin-dark-mode-for-adminpanel',
 	];
 
 	foreach ( $built_in as $basename => $api_slug ) {
