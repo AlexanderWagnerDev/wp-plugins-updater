@@ -108,14 +108,77 @@ class AWDev_Updater {
 
 	/**
 	 * Fix extracted folder name after update installation.
-	 * Prevents mismatches when the ZIP root dir has a hash-suffixed name.
+	 *
+	 * Handles two scenarios:
+	 * 1. Single-plugin update (Plugins list / AWDev Updater button):
+	 *    hook_extra['plugin'] is set → match by basename directly.
+	 * 2. Bulk update via update-core.php or WP auto-update:
+	 *    hook_extra['plugin'] is NOT set → fall back to matching by the
+	 *    extracted source folder name, which contains the plugin slug
+	 *    (e.g. "wp-darkadmin-plugin-main" contains "darkadmin-dark-mode-for-adminpanel"
+	 *    is NOT reliable, so we match if the corrected target path does not yet
+	 *    exist and the source basename starts with a known GitHub repo pattern).
+	 *
 	 * Uses WP_Filesystem to avoid direct rename() call.
 	 */
 	public function fix_folder_name( string $source, string $remote_source, object $upgrader, array $hook_extra ): string {
-		if ( ( $hook_extra['plugin'] ?? '' ) !== $this->plugin_basename ) {
+		// Scenario 1: explicit basename match (single plugin update).
+		$extra_plugin = $hook_extra['plugin'] ?? '';
+		if ( $extra_plugin !== '' ) {
+			if ( $extra_plugin !== $this->plugin_basename ) {
+				return $source;
+			}
+			return $this->rename_source( $source, $remote_source );
+		}
+
+		// Scenario 2: bulk / auto update – hook_extra['plugin'] is empty.
+		// Match by checking whether the extracted source dir, when renamed,
+		// would produce our expected plugin slug folder. We do this by
+		// verifying the source path sits inside remote_source and the
+		// corrected target does not already exist (avoid collision).
+		$corrected = trailingslashit( $remote_source ) . $this->plugin_slug . '/';
+
+		// Only act if the source is actually inside remote_source and is
+		// NOT already correctly named.
+		if ( $source === $corrected ) {
 			return $source;
 		}
 
+		$source_parent = trailingslashit( dirname( untrailingslashit( $source ) ) );
+		if ( $source_parent !== trailingslashit( $remote_source ) ) {
+			// Source is not a direct child of remote_source – not ours.
+			return $source;
+		}
+
+		// Check that the source folder name looks like it belongs to this
+		// plugin: it should contain the plugin slug OR the GitHub repo name
+		// derived from the download URL.
+		$source_dirname = basename( untrailingslashit( $source ) );
+		$data           = $this->get_remote_data();
+		$download_url   = $data->download_url ?? '';
+
+		// Derive the GitHub repo name from the download URL if available
+		// (e.g. https://github.com/Owner/my-repo/archive/refs/heads/main.zip → my-repo).
+		$repo_name = '';
+		if ( $download_url && preg_match( '#github\.com/[^/]+/([^/]+)/archive/#', $download_url, $m ) ) {
+			$repo_name = strtolower( $m[1] );
+		}
+
+		$slug_in_source = ( stripos( $source_dirname, $this->plugin_slug ) !== false );
+		$repo_in_source = ( $repo_name !== '' && stripos( $source_dirname, $repo_name ) !== false );
+
+		if ( ! $slug_in_source && ! $repo_in_source ) {
+			// Folder name doesn't relate to this plugin – leave it alone.
+			return $source;
+		}
+
+		return $this->rename_source( $source, $remote_source );
+	}
+
+	/**
+	 * Perform the actual WP_Filesystem rename to the correct plugin slug folder.
+	 */
+	private function rename_source( string $source, string $remote_source ): string {
 		$corrected = trailingslashit( $remote_source ) . $this->plugin_slug . '/';
 
 		if ( $source === $corrected ) {
