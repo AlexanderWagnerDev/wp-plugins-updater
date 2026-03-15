@@ -251,7 +251,7 @@ function awdev_render_settings_page(): void {
 
 	// Correct basenames matching the actual folder/file names on disk.
 	$built_in = [
-		'awdev-plugins-updater/awdev-plugin-updater.php' => [
+		'awdev-plugins-updater/awdev-plugins-updater.php' => [
 			'name'     => 'AWDev Plugins Updater',
 			'api_slug' => 'awdev-plugin-updater',
 		],
@@ -351,7 +351,7 @@ function awdev_render_settings_page(): void {
 
 					<!-- Global auto-update toggle -->
 					<div class="awdev-global-toggle-row">
-						<label class="awdev-toggle" id="awdev-global-toggle-label">
+						<label class="awdev-toggle">
 							<input type="checkbox"
 								id="awdev-global-auto-update"
 								name="awdev_auto_updates_global"
