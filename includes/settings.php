@@ -19,68 +19,55 @@ add_action( 'admin_menu', function () {
 	);
 } );
 
-add_action( 'admin_init', function () {
-	register_setting( 'awdev_settings', 'awdev_managed_plugins', [
-		'type'              => 'array',
-		'sanitize_callback' => 'awdev_sanitize_managed_plugins',
-		'default'           => [],
-	] );
-	register_setting( 'awdev_settings', 'awdev_auto_updates', [
-		'type'              => 'array',
-		'sanitize_callback' => 'awdev_sanitize_auto_updates',
-		'default'           => [],
-	] );
-	register_setting( 'awdev_settings', 'awdev_auto_updates_global', [
-		'type'              => 'boolean',
-		'sanitize_callback' => 'rest_sanitize_boolean',
-		'default'           => true,
-	] );
-	register_setting( 'awdev_settings', 'awdev_cache_hours', [
-		'type'              => 'integer',
-		'sanitize_callback' => 'awdev_sanitize_cache_hours',
-		'default'           => 6,
-	] );
-} );
+/**
+ * Handle main settings form save via custom admin_post action.
+ */
+add_action( 'admin_post_awdev_save_settings', function () {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_die( esc_html__( 'Not allowed.', 'awdev-plugins-updater' ) );
+	}
+	check_admin_referer( 'awdev_save_settings' );
 
-function awdev_sanitize_managed_plugins( $input ): array {
-	if ( ! is_array( $input ) ) {
-		return [];
-	}
-	$clean = [];
-	foreach ( $input as $basename => $slug ) {
-		$b = sanitize_text_field( $basename );
-		$s = sanitize_key( $slug );
-		if ( $b && $s ) {
-			$clean[ $b ] = $s;
-		}
-	}
-	return $clean;
-}
+	// Save global auto-update toggle.
+	$global = isset( $_POST['awdev_auto_updates_global'] ) ? true : false;
+	update_option( 'awdev_auto_updates_global', $global );
 
-function awdev_sanitize_auto_updates( $input ): array {
-	if ( ! is_array( $input ) ) {
-		return [];
-	}
-	$clean = [];
-	foreach ( $input as $basename => $val ) {
-		$b = sanitize_text_field( $basename );
+	// Save cache hours.
+	$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? (int) $_POST['awdev_cache_hours'] : 6;
+	if ( $cache_hours < 1 )   { $cache_hours = 1; }
+	if ( $cache_hours > 168 ) { $cache_hours = 168; }
+	update_option( 'awdev_cache_hours', $cache_hours );
+
+	// Save per-plugin auto-update toggles.
+	$raw          = isset( $_POST['awdev_auto_updates'] ) && is_array( $_POST['awdev_auto_updates'] )
+		? $_POST['awdev_auto_updates']
+		: [];
+	$auto_updates = [];
+	foreach ( $raw as $basename => $val ) {
+		$b = sanitize_text_field( wp_unslash( $basename ) );
 		if ( $b ) {
-			$clean[ $b ] = (bool) $val;
+			$auto_updates[ $b ] = (bool) $val;
 		}
 	}
-	return $clean;
-}
+	// Ensure unchecked per-plugin toggles are stored as false.
+	$managed  = (array) get_option( 'awdev_managed_plugins', [] );
+	$built_in_keys = [
+		'awdev-plugins-updater/awdev-plugins-updater.php',
+		'darkadmin/darkadmin.php',
+	];
+	foreach ( array_merge( $built_in_keys, array_keys( $managed ) ) as $basename ) {
+		if ( ! isset( $auto_updates[ $basename ] ) ) {
+			$auto_updates[ $basename ] = false;
+		}
+	}
+	update_option( 'awdev_auto_updates', $auto_updates );
 
-function awdev_sanitize_cache_hours( $input ): int {
-	$val = (int) $input;
-	if ( $val < 1 ) {
-		$val = 1;
-	}
-	if ( $val > 168 ) {
-		$val = 168;
-	}
-	return $val;
-}
+	wp_redirect( add_query_arg(
+		[ 'page' => AWDEV_SETTINGS_SLUG, 'settings-updated' => '1' ],
+		admin_url( 'options-general.php' )
+	) );
+	exit;
+} );
 
 /**
  * Auto-update hook: respect per-plugin toggle; global toggle overrides all when off.
@@ -360,8 +347,9 @@ function awdev_render_settings_page(): void {
 		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Settings saved.', 'awdev-plugins-updater' ); ?></p></div>
 		<?php endif; ?>
 
-		<form method="post" action="options.php">
-			<?php settings_fields( 'awdev_settings' ); ?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
+			<input type="hidden" name="action" value="awdev_save_settings" />
+			<?php wp_nonce_field( 'awdev_save_settings' ); ?>
 
 			<!-- Auto-Update Settings Card -->
 			<div class="awdev-card">
@@ -531,7 +519,7 @@ function awdev_render_settings_page(): void {
 			</div>
 
 			<div class="awdev-submit-row">
-				<?php submit_button( __( 'Save Settings', 'awdev-plugins-updater' ), 'primary', 'submit', false ); ?>
+				<button type="submit" class="button button-primary"><?php esc_html_e( 'Save Settings', 'awdev-plugins-updater' ); ?></button>
 				<?php if ( ! empty( $pending_updates ) ) :
 					$plugins_param = implode( ',', array_map( 'urlencode', $pending_updates ) );
 					$bulk_url      = admin_url(
