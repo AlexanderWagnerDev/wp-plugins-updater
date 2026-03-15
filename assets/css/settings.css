@@ -27,8 +27,6 @@
 
 /*
  * DarkAdmin compatibility.
- * Scoped under body.adm-dark-active .awdev-settings-wrap to beat DarkAdmin's
- * element-level !important rules via higher specificity.
  */
 body.adm-dark-active .awdev-settings-wrap {
   --awdev-bg:          #2c3338;
@@ -264,12 +262,12 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
 }
 
 /* =============================================================================
-   AUTO-UPDATE TOGGLE
+   AUTO-UPDATE TOGGLE (slider)
    ============================================================================= */
 .awdev-toggle {
   position: relative;
   display: inline-block;
-  width: 34px;
+  width: 36px;
   height: 20px;
   vertical-align: middle;
 }
@@ -296,13 +294,20 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
   top: 3px;
   background: #fff;
   border-radius: 50%;
+  box-shadow: 0 1px 2px rgba(0,0,0,.25);
   transition: transform .2s;
 }
 .awdev-toggle input:checked + .awdev-toggle-slider {
   background-color: #2271b1;
 }
 .awdev-toggle input:checked + .awdev-toggle-slider::before {
-  transform: translateX(14px);
+  transform: translateX(16px);
+}
+body.adm-dark-active .awdev-settings-wrap .awdev-toggle-slider {
+  background-color: #50575e !important;
+}
+body.adm-dark-active .awdev-settings-wrap .awdev-toggle input:checked + .awdev-toggle-slider {
+  background-color: #72aee6 !important;
 }
 
 /* =============================================================================
@@ -332,6 +337,26 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
   font-size: 14px !important;
   width: 14px !important;
   height: 14px !important;
+}
+.awdev-update-all-btn {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 6px !important;
+  padding: 4px 14px !important;
+  font-weight: 600 !important;
+  background-color: #2271b1 !important;
+  border-color: #2271b1 !important;
+  color: #fff !important;
+}
+.awdev-update-all-btn:hover {
+  background-color: #135e96 !important;
+  border-color: #135e96 !important;
+  color: #fff !important;
+}
+.awdev-update-all-btn .dashicons {
+  font-size: 15px !important;
+  width: 15px !important;
+  height: 15px !important;
 }
 
 /* =============================================================================
@@ -387,6 +412,7 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
    ============================================================================= */
 .awdev-submit-row {
   display: flex;
+  align-items: center;
   gap: 10px;
   margin: 4px 0 20px;
 }

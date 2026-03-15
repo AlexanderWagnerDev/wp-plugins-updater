@@ -117,7 +117,6 @@ add_action( 'admin_post_awdev_flush_cache', function () {
 		)
 	);
 
-	// Also clear the WP core update_plugins transient so WP re-checks immediately.
 	delete_site_transient( 'update_plugins' );
 
 	wp_redirect( add_query_arg( [ 'page' => AWDEV_SETTINGS_SLUG, 'cache-flushed' => '1' ], admin_url( 'options-general.php' ) ) );
@@ -145,7 +144,11 @@ add_action( 'admin_post_awdev_check_plugin', function () {
 
 /**
  * Resolve local installed version for a plugin basename.
- * Tries multiple common basename patterns if the exact one is not found.
+ *
+ * Strategy:
+ * 1. Direct match on exact basename.
+ * 2. Match by raw dirname (e.g. "my-plugin" === dirname of key).
+ * 3. Match by sanitize_key(dirname) — handles hyphens/underscores/case differences.
  */
 function awdev_get_local_version( string $basename ): string {
 	if ( ! function_exists( 'get_plugins' ) ) {
@@ -153,15 +156,24 @@ function awdev_get_local_version( string $basename ): string {
 	}
 	$plugins = get_plugins();
 
-	// Direct match.
+	// 1. Direct match.
 	if ( isset( $plugins[ $basename ] ) ) {
 		return $plugins[ $basename ]['Version'];
 	}
 
-	// Try matching by folder name only (in case main file name differs).
-	$folder = dirname( $basename );
+	$folder     = dirname( $basename );
+	$folder_key = sanitize_key( $folder );
+
 	foreach ( $plugins as $key => $data ) {
-		if ( dirname( $key ) === $folder ) {
+		$key_folder = dirname( $key );
+
+		// 2. Raw folder name match.
+		if ( $key_folder === $folder ) {
+			return $data['Version'];
+		}
+
+		// 3. sanitize_key folder match (covers hyphens vs underscores, uppercase).
+		if ( sanitize_key( $key_folder ) === $folder_key ) {
 			return $data['Version'];
 		}
 	}
@@ -171,7 +183,6 @@ function awdev_get_local_version( string $basename ): string {
 
 /**
  * Return human-readable "last checked" time from the transient timeout.
- * Uses the dirname-based slug (matching AWDev_Updater::$plugin_slug).
  */
 function awdev_get_last_checked( string $dirname_slug ): string {
 	$key     = '_transient_timeout_awdev_upd_' . sanitize_key( $dirname_slug );
@@ -194,7 +205,6 @@ function awdev_get_last_checked( string $dirname_slug ): string {
 
 /**
  * Fetch remote version from API, using transient cache.
- * Keyed by dirname_slug to match AWDev_Updater::$plugin_slug.
  */
 function awdev_get_remote_version( string $api_url, string $dirname_slug ): string {
 	$key  = 'awdev_upd_' . sanitize_key( $dirname_slug );
@@ -240,23 +250,45 @@ function awdev_render_settings_page(): void {
 		],
 	];
 
-	$statuses = [];
+	// Default auto-update to TRUE for built-in plugins on first load (option not yet set).
+	$auto_updates_saved = get_option( 'awdev_auto_updates' );
+	if ( $auto_updates_saved === false ) {
+		$defaults = [];
+		foreach ( array_keys( $built_in ) as $basename ) {
+			$defaults[ $basename ] = true;
+		}
+		update_option( 'awdev_auto_updates', $defaults );
+		$auto_updates = $defaults;
+	}
+
+	$statuses     = [];
+	$pending_updates = []; // basenames that have a pending update available
+
 	foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
 		$dirname_slug = sanitize_key( dirname( $basename ) );
 		$api_slug     = $managed[ $basename ] ?? ( $built_in[ $basename ]['api_slug'] ?? $dirname_slug );
 		$api_url      = AWDEV_UPDATE_SERVER . '/' . sanitize_key( $api_slug ) . '.php';
 
+		$local  = awdev_get_local_version( $basename );
+		$remote = awdev_get_remote_version( $api_url, $dirname_slug );
+		$needs_update = ( $local !== '–' && $remote !== '–' && version_compare( $remote, $local, '>' ) );
+
 		$statuses[ $basename ] = [
 			'dirname_slug'   => $dirname_slug,
-			'remote_version' => awdev_get_remote_version( $api_url, $dirname_slug ),
-			'local_version'  => awdev_get_local_version( $basename ),
+			'remote_version' => $remote,
+			'local_version'  => $local,
 			'last_checked'   => awdev_get_last_checked( $dirname_slug ),
-			'auto_update'    => $auto_updates[ $basename ] ?? false,
+			'auto_update'    => $auto_updates[ $basename ] ?? true,
+			'needs_update'   => $needs_update,
 		];
+
+		if ( $needs_update ) {
+			$pending_updates[] = $basename;
+		}
 	}
 
-	$cache_flushed    = isset( $_GET['cache-flushed'] );
-	$plugin_checked   = isset( $_GET['plugin-checked'] );
+	$cache_flushed  = isset( $_GET['cache-flushed'] );
+	$plugin_checked = isset( $_GET['plugin-checked'] );
 	?>
 	<div class="wrap awdev-settings-wrap">
 
@@ -317,13 +349,12 @@ function awdev_render_settings_page(): void {
 						<tbody>
 							<?php foreach ( $built_in as $basename => $info ) :
 								$st = $statuses[ $basename ];
-								$needs_update = ( $st['local_version'] !== '–' && $st['remote_version'] !== '–' && version_compare( $st['remote_version'], $st['local_version'], '>' ) );
 							?>
 							<tr>
 								<td><strong><?php echo esc_html( $info['name'] ); ?></strong></td>
 								<td><?php echo esc_html( $st['local_version'] ); ?></td>
 								<td>
-									<?php if ( $needs_update ) : ?>
+									<?php if ( $st['needs_update'] ) : ?>
 										<span class="awdev-version-new"><?php echo esc_html( $st['remote_version'] ); ?></span>
 									<?php else : ?>
 										<?php echo esc_html( $st['remote_version'] ); ?>
@@ -349,7 +380,7 @@ function awdev_render_settings_page(): void {
 											<span class="dashicons dashicons-update"></span>
 										</button>
 									</form>
-									<?php if ( $needs_update ) : ?>
+									<?php if ( $st['needs_update'] ) : ?>
 										<a href="<?php echo esc_url( admin_url( 'update.php?action=upgrade-plugin&plugin=' . urlencode( $basename ) . '&_wpnonce=' . wp_create_nonce( 'upgrade-plugin_' . $basename ) ) ); ?>" class="button button-small button-primary awdev-update-btn">
 											<span class="dashicons dashicons-arrow-up-alt"></span>
 											<?php esc_html_e( 'Update', 'awdev-plugins-updater' ); ?>
@@ -363,13 +394,16 @@ function awdev_render_settings_page(): void {
 							<?php foreach ( $managed as $basename => $slug ) :
 								if ( isset( $built_in[ $basename ] ) ) continue;
 								$st = $statuses[ $basename ];
-								$needs_update = ( $st['local_version'] !== '–' && $st['remote_version'] !== '–' && version_compare( $st['remote_version'], $st['local_version'], '>' ) );
 							?>
 							<tr class="awdev-dynamic-row">
 								<td><input type="text" name="awdev_managed_plugins[<?php echo esc_attr( $basename ); ?>]" value="<?php echo esc_attr( $slug ); ?>" class="awdev-input-basename" placeholder="api-slug" /></td>
 								<td><?php echo esc_html( $st['local_version'] ); ?></td>
 								<td>
-									<?php echo esc_html( $st['remote_version'] ); ?>
+									<?php if ( $st['needs_update'] ) : ?>
+										<span class="awdev-version-new"><?php echo esc_html( $st['remote_version'] ); ?></span>
+									<?php else : ?>
+										<?php echo esc_html( $st['remote_version'] ); ?>
+									<?php endif; ?>
 									<span class="awdev-last-checked"><?php echo esc_html( $st['last_checked'] ); ?></span>
 								</td>
 								<td>
@@ -391,7 +425,7 @@ function awdev_render_settings_page(): void {
 											<span class="dashicons dashicons-update"></span>
 										</button>
 									</form>
-									<?php if ( $needs_update ) : ?>
+									<?php if ( $st['needs_update'] ) : ?>
 										<a href="<?php echo esc_url( admin_url( 'update.php?action=upgrade-plugin&plugin=' . urlencode( $basename ) . '&_wpnonce=' . wp_create_nonce( 'upgrade-plugin_' . $basename ) ) ); ?>" class="button button-small button-primary awdev-update-btn">
 											<span class="dashicons dashicons-arrow-up-alt"></span>
 											<?php esc_html_e( 'Update', 'awdev-plugins-updater' ); ?>
@@ -418,6 +452,31 @@ function awdev_render_settings_page(): void {
 
 			<div class="awdev-submit-row">
 				<?php submit_button( __( 'Save Settings', 'awdev-plugins-updater' ), 'primary', 'submit', false ); ?>
+				<?php if ( ! empty( $pending_updates ) ) :
+					// Build update.php URL for the first pending plugin; WP will chain the rest.
+					$first  = reset( $pending_updates );
+					$others = array_slice( $pending_updates, 1 );
+					// Build a comma-joined list of all basenames for WP bulk upgrade.
+					$plugins_param = implode( ',', array_map( 'urlencode', $pending_updates ) );
+					$bulk_url = admin_url(
+						'update.php?action=update-selected&plugins=' . $plugins_param
+						. '&_wpnonce=' . wp_create_nonce( 'bulk-update-plugins' )
+					);
+				?>
+				<a href="<?php echo esc_url( $bulk_url ); ?>" class="button button-primary awdev-update-all-btn">
+					<span class="dashicons dashicons-update"></span>
+					<?php
+					$count = count( $pending_updates );
+					echo esc_html(
+						sprintf(
+							/* translators: %d: number of plugins with available updates */
+							_n( 'Update %d plugin', 'Update all %d plugins', $count, 'awdev-plugins-updater' ),
+							$count
+						)
+					);
+					?>
+				</a>
+				<?php endif; ?>
 			</div>
 		</form>
 
