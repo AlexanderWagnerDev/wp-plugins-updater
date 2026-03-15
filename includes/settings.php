@@ -549,8 +549,8 @@ function awdev_render_settings_page(): void {
 			<div class="awdev-card-body">
 				<p class="awdev-card-description">
 					<?php
-					/* translators: %d = configured cache duration in hours */
 					printf(
+						/* translators: %d = configured cache duration in hours */
 						esc_html__( 'Update data is cached for %d hour(s) per plugin. Flush the cache to force an immediate re-check.', 'awdev-plugins-updater' ),
 						(int) get_option( 'awdev_cache_hours', 6 )
 					);
