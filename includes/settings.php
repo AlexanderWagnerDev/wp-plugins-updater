@@ -269,16 +269,16 @@ function awdev_render_settings_page(): void {
 		return;
 	}
 
-	$managed       = (array) get_option( 'awdev_managed_plugins', [] );
-	$auto_updates  = (array) get_option( 'awdev_auto_updates', [] );
-	$global_auto   = get_option( 'awdev_auto_updates_global' );
-	$cache_hours   = (int) get_option( 'awdev_cache_hours', 6 );
+	$managed      = (array) get_option( 'awdev_managed_plugins', [] );
+	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
+	$global_auto  = get_option( 'awdev_auto_updates_global' );
+	$cache_hours  = (int) get_option( 'awdev_cache_hours', 6 );
 
 	// Correct basenames matching the actual folder/file names on disk.
 	$built_in = [
 		'awdev-plugins-updater/awdev-plugins-updater.php' => [
 			'name'     => 'AWDev Plugins Updater',
-			'api_slug' => 'awdev-plugin-updater',
+			'api_slug' => 'awdev-plugins-updater',
 		],
 		'darkadmin/darkadmin.php' => [
 			'name'     => 'DarkAdmin – Dark Mode for Adminpanel',
@@ -363,15 +363,15 @@ function awdev_render_settings_page(): void {
 		<form method="post" action="options.php">
 			<?php settings_fields( 'awdev_settings' ); ?>
 
-			<!-- Managed Plugins Card -->
+			<!-- Auto-Update Settings Card -->
 			<div class="awdev-card">
 				<div class="awdev-card-header">
-					<span class="dashicons dashicons-plugins-checked"></span>
-					<h2><?php esc_html_e( 'Managed Plugins', 'awdev-plugins-updater' ); ?></h2>
+					<span class="dashicons dashicons-clock"></span>
+					<h2><?php esc_html_e( 'Auto-Update Settings', 'awdev-plugins-updater' ); ?></h2>
 				</div>
 				<div class="awdev-card-body">
 					<p class="awdev-card-description">
-						<?php esc_html_e( 'All AlexanderWagnerDev plugins that receive updates from the self-hosted server.', 'awdev-plugins-updater' ); ?>
+						<?php esc_html_e( 'Configure how often the updater checks for new plugin versions. The cache duration controls the interval between remote API requests.', 'awdev-plugins-updater' ); ?>
 					</p>
 
 					<!-- Global auto-update toggle -->
@@ -389,6 +389,36 @@ function awdev_render_settings_page(): void {
 							<?php esc_html_e( 'Auto-Update (all plugins)', 'awdev-plugins-updater' ); ?>
 						</span>
 					</div>
+
+					<div class="awdev-settings-row">
+						<label for="awdev_cache_hours" class="awdev-settings-label">
+							<?php esc_html_e( 'Check interval (hours)', 'awdev-plugins-updater' ); ?>
+						</label>
+						<input
+							type="number"
+							id="awdev_cache_hours"
+							name="awdev_cache_hours"
+							value="<?php echo esc_attr( $cache_hours ); ?>"
+							min="1"
+							max="168"
+							step="1"
+							class="small-text"
+						/>
+						<span class="description"><?php esc_html_e( 'Min: 1h — Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
+					</div>
+				</div>
+			</div>
+
+			<!-- Managed Plugins Card -->
+			<div class="awdev-card">
+				<div class="awdev-card-header">
+					<span class="dashicons dashicons-plugins-checked"></span>
+					<h2><?php esc_html_e( 'Managed Plugins', 'awdev-plugins-updater' ); ?></h2>
+				</div>
+				<div class="awdev-card-body">
+					<p class="awdev-card-description">
+						<?php esc_html_e( 'All AlexanderWagnerDev plugins that receive updates from the self-hosted server.', 'awdev-plugins-updater' ); ?>
+					</p>
 
 					<table class="awdev-plugin-table">
 						<thead>
@@ -449,7 +479,7 @@ function awdev_render_settings_page(): void {
 
 							<?php foreach ( $managed as $basename => $slug ) :
 								if ( isset( $built_in[ $basename ] ) ) continue;
-								$st = $statuses[ $basename ];
+								$st          = $statuses[ $basename ];
 								$plugin_name = sanitize_text_field( dirname( $basename ) );
 							?>
 							<tr class="awdev-dynamic-row">
@@ -500,40 +530,11 @@ function awdev_render_settings_page(): void {
 				</div>
 			</div>
 
-			<!-- Auto-Update Settings Card -->
-			<div class="awdev-card">
-				<div class="awdev-card-header">
-					<span class="dashicons dashicons-clock"></span>
-					<h2><?php esc_html_e( 'Auto-Update Settings', 'awdev-plugins-updater' ); ?></h2>
-				</div>
-				<div class="awdev-card-body">
-					<p class="awdev-card-description">
-						<?php esc_html_e( 'Configure how often the updater checks for new plugin versions. The cache duration controls the interval between remote API requests.', 'awdev-plugins-updater' ); ?>
-					</p>
-					<div class="awdev-settings-row">
-						<label for="awdev_cache_hours" class="awdev-settings-label">
-							<?php esc_html_e( 'Check interval (hours)', 'awdev-plugins-updater' ); ?>
-						</label>
-						<input
-							type="number"
-							id="awdev_cache_hours"
-							name="awdev_cache_hours"
-							value="<?php echo esc_attr( $cache_hours ); ?>"
-							min="1"
-							max="168"
-							step="1"
-							class="small-text"
-						/>
-						<span class="description"><?php esc_html_e( 'Min: 1h &mdash; Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
-					</div>
-				</div>
-			</div>
-
 			<div class="awdev-submit-row">
 				<?php submit_button( __( 'Save Settings', 'awdev-plugins-updater' ), 'primary', 'submit', false ); ?>
 				<?php if ( ! empty( $pending_updates ) ) :
 					$plugins_param = implode( ',', array_map( 'urlencode', $pending_updates ) );
-					$bulk_url = admin_url(
+					$bulk_url      = admin_url(
 						'update.php?action=update-selected&plugins=' . $plugins_param
 						. '&_wpnonce=' . wp_create_nonce( 'bulk-update-plugins' )
 					);
@@ -564,7 +565,10 @@ function awdev_render_settings_page(): void {
 				<p class="awdev-card-description">
 					<?php
 					printf(
-						esc_html__( 'Update data is cached for %d hour(s) per plugin. Flush the cache to force WordPress to re-check all endpoints immediately.', 'awdev-plugins-updater' ),
+						esc_html(
+							/* translators: %d: cache duration in hours */
+							__( 'Update data is cached for %d hour(s) per plugin. Flush the cache to force WordPress to re-check all endpoints immediately.', 'awdev-plugins-updater' )
+						),
 						(int) get_option( 'awdev_cache_hours', 6 )
 					);
 					?>

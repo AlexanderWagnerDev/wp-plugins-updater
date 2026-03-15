@@ -5,8 +5,8 @@ msgid ""
 msgstr ""
 "Project-Id-Version: AWDev Plugins Updater 0.0.2\n"
 "Report-Msgid-Bugs-To: https://github.com/AlexanderWagnerDev/wp-plugins-updater/issues\n"
-"POT-Creation-Date: 2026-03-15T01:00:00+01:00\n"
-"PO-Revision-Date: 2026-03-15T01:00:00+01:00\n"
+"POT-Creation-Date: 2026-03-15T12:00:00+01:00\n"
+"PO-Revision-Date: 2026-03-15T12:00:00+01:00\n"
 "Last-Translator: Alexander Wagner <info@alexanderwagnerdev.com>\n"
 "Language-Team: Alexander Wagner <info@alexanderwagnerdev.com>\n"
 "Language: de_DE\n"
@@ -46,16 +46,32 @@ msgid "✓ Settings saved."
 msgstr "✓ Einstellungen gespeichert."
 
 #: includes/settings.php
+msgid "Auto-Update Settings"
+msgstr "Auto-Update Einstellungen"
+
+#: includes/settings.php
+msgid "Configure how often the updater checks for new plugin versions. The cache duration controls the interval between remote API requests."
+msgstr "Legt fest, wie oft der Updater auf neue Plugin-Versionen prüft. Die Cache-Dauer steuert den Abstand zwischen Remote-API-Anfragen."
+
+#: includes/settings.php
+msgid "Auto-Update (all plugins)"
+msgstr "Auto-Update (alle Plugins)"
+
+#: includes/settings.php
+msgid "Check interval (hours)"
+msgstr "Prüfintervall (Stunden)"
+
+#: includes/settings.php
+msgid "Min: 1h — Max: 168h (7 days). Default: 6h."
+msgstr "Min: 1h — Max: 168h (7 Tage). Standard: 6h."
+
+#: includes/settings.php
 msgid "Managed Plugins"
 msgstr "Verwaltete Plugins"
 
 #: includes/settings.php
 msgid "All AlexanderWagnerDev plugins that receive updates from the self-hosted server."
 msgstr "Alle AlexanderWagnerDev Plugins, die Updates vom self-hosted Server erhalten."
-
-#: includes/settings.php
-msgid "Auto-Update (all plugins)"
-msgstr "Auto-Update (alle Plugins)"
 
 #: includes/settings.php
 msgid "Plugin"
@@ -86,12 +102,8 @@ msgid "Built-in"
 msgstr "Integriert"
 
 #: includes/settings.php
-msgid "Custom"
-msgstr "Benutzerdefiniert"
-
-#: includes/settings.php
-msgid "Remove"
-msgstr "Entfernen"
+msgid "AWDev"
+msgstr "AWDev"
 
 #: includes/settings.php
 msgid "Re-check update"
@@ -109,10 +121,6 @@ msgstr[0] "%d Plugin aktualisieren"
 msgstr[1] "Alle %d Plugins aktualisieren"
 
 #: includes/settings.php
-msgid "Add Plugin"
-msgstr "Plugin hinzufügen"
-
-#: includes/settings.php
 msgid "Save Settings"
 msgstr "Einstellungen speichern"
 
@@ -121,8 +129,9 @@ msgid "Cache Management"
 msgstr "Cache-Verwaltung"
 
 #: includes/settings.php
-msgid "Update data is cached for 6 hours per plugin. Flush the cache to force WordPress to re-check all endpoints immediately."
-msgstr "Update-Daten werden 6 Stunden pro Plugin gecacht. Cache leeren, um WordPress zur sofortigen Neuprüfung aller Endpunkte zu zwingen."
+#. translators: %d: cache duration in hours
+msgid "Update data is cached for %d hour(s) per plugin. Flush the cache to force WordPress to re-check all endpoints immediately."
+msgstr "Update-Daten werden %d Stunde(n) pro Plugin gecacht. Cache leeren, um WordPress zur sofortigen Neuprüfung aller Endpunkte zu zwingen."
 
 #: includes/settings.php
 msgid "Flush Update Cache"
