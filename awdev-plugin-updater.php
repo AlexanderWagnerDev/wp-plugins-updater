@@ -3,7 +3,7 @@
  * Plugin Name: AWDev Plugins Updater
  * Plugin URI: https://github.com/AlexanderWagnerDev/wp-plugins-updater
  * Description: Self-hosted updater for AlexanderWagnerDev plugins. Manages updates from a self-hosted server instead of WordPress.org.
- * Version: 0.0.1
+ * Version: 0.0.2
  * Requires at least: 6.0
  * Tested up to: 6.9
  * Requires PHP: 7.4
@@ -19,7 +19,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AWDEV_UPDATER_VERSION', '0.0.1' );
+define( 'AWDEV_UPDATER_VERSION', '0.0.2' );
 define( 'AWDEV_UPDATER_URL', plugin_dir_url( __FILE__ ) );
 define( 'AWDEV_UPDATER_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AWDEV_UPDATE_SERVER', 'https://wp-plugins-updates.awdev.space/api' );
