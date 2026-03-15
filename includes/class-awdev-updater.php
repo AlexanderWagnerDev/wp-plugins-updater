@@ -114,13 +114,8 @@ class AWDev_Updater {
 	 *    hook_extra['plugin'] is set → match by basename directly.
 	 * 2. Bulk/auto update (update-core.php, WP cron):
 	 *    hook_extra['plugin'] is NOT set → match by source folder basename:
-	 *    the folder must start with the plugin slug OR the GitHub repo name
-	 *    (derived from download_url). Random WP suffixes like "-NKvWbz" are
-	 *    tolerated because we use stripos, not an exact match.
-	 *
-	 * The unreliable parent-path check has been removed: $remote_source can
-	 * be passed with or without trailing slash by WP core, making the
-	 * dirname() comparison fragile across WP versions.
+	 *    the folder must contain the plugin slug. Random WP suffixes like
+	 *    "-NKvWbz" are tolerated because stripos is used, not an exact match.
 	 *
 	 * Uses WP_Filesystem to avoid direct rename() call.
 	 */
@@ -141,22 +136,11 @@ class AWDev_Updater {
 		}
 
 		// Scenario 2: bulk/auto update — hook_extra['plugin'] is empty.
-		// Match solely by the extracted folder's basename.
+		// Match by checking if the extracted folder basename contains the plugin slug.
+		// Covers cases like "awdev-plugins-updater-NKvWbz" or
+		// "darkadmin-dark-mode-for-adminpanel-xFArZf" produced by WP core.
 		$source_dirname = basename( untrailingslashit( $source ) );
-
-		// Derive GitHub repo name from download_url, e.g.:
-		// https://github.com/Owner/my-repo/archive/refs/heads/main.zip → my-repo
-		$repo_name    = '';
-		$data         = $this->get_remote_data();
-		$download_url = $data->download_url ?? '';
-		if ( $download_url && preg_match( '#github\.com/[^/]+/([^/]+)/archive/#', $download_url, $m ) ) {
-			$repo_name = strtolower( $m[1] );
-		}
-
-		$slug_match = ( stripos( $source_dirname, $this->plugin_slug ) !== false );
-		$repo_match = ( $repo_name !== '' && stripos( $source_dirname, $repo_name ) !== false );
-
-		if ( ! $slug_match && ! $repo_match ) {
+		if ( stripos( $source_dirname, $this->plugin_slug ) === false ) {
 			return $source;
 		}
 
