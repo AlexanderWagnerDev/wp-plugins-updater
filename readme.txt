@@ -4,7 +4,7 @@ Tags: updater, self-hosted, plugin update, update manager, dark mode
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.0.2
+Stable tag: 0.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -19,11 +19,12 @@ Features:
 * Native WordPress update integration (no third-party libraries)
 * Settings page under Settings > AWDev Plugins Updater
 * Built-in support for DarkAdmin – Dark Mode for Adminpanel (auto-registered)
-* Per-plugin auto-update toggle — enable or disable automatic updates per plugin
+* Per-plugin auto-update toggle — saves instantly on click, no Save button needed
+* Global auto-update master toggle — instantly applies state to all per-plugin toggles
 * Manual re-check button per plugin — clears transient and fetches latest version immediately
 * One-click Update button — appears automatically when a newer remote version is available
 * Add additional plugins via the Settings UI — no code changes needed
-* 6-hour update cache per plugin (transient-based)
+* Configurable update cache interval (1h–168h, default 6h)
 * Manual full cache flush button
 * "View version details" popup support in WP update screen
 * Automatic plugin folder name fix after ZIP extraction
@@ -44,13 +45,13 @@ No. DarkAdmin is registered automatically when installed. The default server URL
 Yes. Use the Settings page to add any additional AlexanderWagnerDev plugin by providing its basename (e.g. my-plugin/my-plugin.php) and API slug.
 
 = How does the auto-update toggle work? =
-Each plugin has an Auto-Update toggle on the Settings page. When enabled, WordPress will automatically install updates for that plugin during the regular background update cycle. When disabled, updates must be applied manually.
+Each plugin has an Auto-Update toggle on the Settings page. Clicking it saves the state instantly via AJAX — no Save button needed. When enabled, WordPress will automatically install updates during the regular background update cycle.
 
 = How do I manually trigger an update check? =
-Click the re-check button (circular arrow icon) next to any plugin on the Settings page. This clears the cached version data and fetches the latest version from the server immediately. An Update button will appear if a newer version is available.
+Click the re-check button (circular arrow icon) next to any plugin on the Settings page. This clears the cached version data and fetches the latest version from the server immediately.
 
 = How often does WordPress check for updates? =
-WordPress checks approximately every 12 hours by default. The updater caches API responses for 6 hours. Use the "Flush Update Cache" button on the Settings page to force an immediate full re-check of all plugins.
+WordPress checks approximately every 12 hours by default. The updater caches API responses for the configured interval (default 6h). Use the "Flush Update Cache" button to force an immediate full re-check.
 
 = Does this replace WordPress.org updates? =
 Only for AlexanderWagnerDev plugins registered in this updater. All other plugins continue to update normally via WordPress.org.
@@ -59,6 +60,13 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
+= 0.0.3 =
+* Fixed illegal nested form elements causing "Save Settings" to submit the wrong action.
+* Per-plugin auto-update toggles now save instantly via AJAX — no Save button needed.
+* Global auto-update toggle now instantly mirrors its state to all per-plugin toggles and saves via AJAX.
+* Debug output removed from settings saved notice.
+* "Save Settings" button moved into the Auto-Update Settings card.
+
 = 0.0.2 =
 * Added per-plugin auto-update toggle.
 * Added manual re-check button per plugin.
@@ -76,60 +84,43 @@ Yes. The settings page fully supports DarkAdmin and adapts to dark mode automati
 * Translations: de_DE, de_AT, en_US.
 
 == Deutsch ==
-Der AWDev Plugins Updater ersetzt den WordPress.org-Update-Kanal für AlexanderWagnerDev-Plugins durch einen selbst gehosteten Update-Server. Damit hast du volle Kontrolle über Versionierung, Distribution und Release-Zeitpunkt — vollständig unabhängig von der WordPress.org-Review-Queue.
-
-Der Updater klinkt sich direkt in das native WordPress-Update-System ein, sodass Updates im Standard-Plugins-Screen erscheinen — genau wie bei jedem anderen Plugin.
+Der AWDev Plugins Updater ersetzt den WordPress.org-Update-Kanal für AlexanderWagnerDev-Plugins durch einen selbst gehosteten Update-Server.
 
 Funktionen:
 * Native WordPress-Update-Integration (keine Drittanbieter-Bibliotheken)
 * Einstellungsseite unter Einstellungen → AWDev Plugins Updater
 * Integrierte Unterstützung für DarkAdmin – Dark Mode for Adminpanel (automatisch registriert)
-* Auto-Update-Toggle pro Plugin — automatische Updates einzeln aktivieren oder deaktivieren
+* Auto-Update-Toggle pro Plugin — wird sofort beim Klick gespeichert, kein Speichern-Button nötig
+* Globaler Auto-Update-Hauptschalter — überträgt Zustand sofort auf alle Per-Plugin-Toggles
 * Manueller Re-Check-Button pro Plugin — leert den Transient und holt sofort die neueste Version
 * Ein-Klick-Aktualisieren-Button — erscheint automatisch wenn eine neuere Remote-Version verfügbar ist
 * Weitere Plugins über die Einstellungsseite hinzufügen — kein Code-Edit nötig
-* 6-Stunden-Update-Cache pro Plugin
+* Konfigurierbares Update-Cache-Intervall (1h–168h, Standard 6h)
 * Manueller Cache-Flush-Button
 * Dark-Mode-kompatible Einstellungsseite — passt sich automatisch via DarkAdmin an
 * Übersetzungen: de_DE, de_AT, en_US
 
 === Installation ===
 1. Neuste awdev-plugin-updater.zip von der GitHub-Releases-Seite herunterladen.
-2. Über Plugins → Neu hinzufügen → Plugin hochladen installieren oder nach /wp-content/plugins/awdev-plugin-updater/ entpacken.
-3. Plugin in WordPress unter „Plugins“ aktivieren.
-4. Einstellungen → AWDev Plugins Updater aufrufen und verwaltete Plugins prüfen.
-
-=== Häufig gestellte Fragen ===
-= Muss ich etwas konfigurieren? =
-Nein. DarkAdmin wird automatisch registriert wenn es installiert ist. Die Standard-Server-URL ist bereits voreingestellt.
-
-= Kann ich weitere Plugins hinzufügen? =
-Ja. Über die Einstellungsseite können beliebige weitere AlexanderWagnerDev-Plugins mit Basename und API-Slug eingetragen werden.
-
-= Wie funktioniert der Auto-Update-Toggle? =
-Jedes Plugin hat einen Auto-Update-Toggle auf der Einstellungsseite. Wenn aktiviert, installiert WordPress Updates für dieses Plugin automatisch im Hintergrund. Wenn deaktiviert, müssen Updates manuell eingespielt werden.
-
-= Wie löse ich manuell eine Update-Prüfung aus? =
-Den Re-Check-Button (Pfeil-Symbol) neben dem jeweiligen Plugin auf der Einstellungsseite klicken. Damit wird der gecachte Versions-Transient gelöscht und sofort die neueste Version vom Server abgerufen. Ein Aktualisieren-Button erscheint wenn eine neuere Version verfügbar ist.
-
-= Wie oft prüft WordPress auf Updates? =
-WordPress prüft standardmäßig ca. alle 12 Stunden. Der Updater cached API-Antworten 6 Stunden. Über den „Update-Cache leeren“-Button kann eine sofortige Neuprüfung aller Plugins erzwungen werden.
-
-= Ersetzt das die WordPress.org-Updates? =
-Nur für AlexanderWagnerDev-Plugins die in diesem Updater registriert sind. Alle anderen Plugins werden weiterhin normal über WordPress.org aktualisiert.
-
-= Ist das mit Dark Mode kompatibel? =
-Ja. Die Einstellungsseite unterstützt DarkAdmin vollständig und passt sich automatisch dem Dark Mode an.
+2. Über Plugins → Neu hinzufügen → Plugin hochladen installieren.
+3. Plugin aktivieren.
+4. Einstellungen → AWDev Plugins Updater aufrufen.
 
 === Changelog ===
+= 0.0.3 =
+* Fehler mit verschachtelten Formular-Elementen behoben.
+* Per-Plugin-Auto-Update-Toggles werden sofort via AJAX gespeichert.
+* Globaler Toggle spiegelt Zustand sofort auf alle Per-Plugin-Toggles.
+* Debug-Ausgaben entfernt.
+* Speichern-Button in die Auto-Update-Settings-Card verschoben.
+
 = 0.0.2 =
 * Auto-Update-Toggle pro Plugin hinzugefügt.
 * Manuellen Re-Check-Button pro Plugin hinzugefügt.
-* Ein-Klick-Aktualisieren-Button bei verfügbarer neuerer Version hinzugefügt.
-* Erkennung der lokal installierten Version korrigiert.
-* Transient-Key-Fehler für Versionsanzeige behoben.
-* Dark-Mode-Styling-Kompatibilität mit DarkAdmin behoben.
-* Remote-Version wird beim Öffnen der Einstellungsseite aktiv abgerufen.
+* Ein-Klick-Aktualisieren-Button hinzugefügt.
+* Versionserkennung korrigiert.
+* Transient-Key-Fehler behoben.
+* Dark-Mode-Kompatibilität behoben.
 
 = 0.0.1 =
 * Erste Veröffentlichung.

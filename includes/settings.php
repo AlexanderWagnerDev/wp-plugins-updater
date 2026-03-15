@@ -44,61 +44,67 @@ add_action( 'admin_post_awdev_save_settings', function () {
 	}
 	check_admin_referer( 'awdev_save_settings' );
 
-	$post_hours = isset( $_POST['awdev_cache_hours'] ) ? (int) wp_unslash( $_POST['awdev_cache_hours'] ) : 6;
-
 	// Save global auto-update toggle.
 	$global = isset( $_POST['awdev_auto_updates_global'] );
 	awdev_force_option( 'awdev_auto_updates_global', $global );
 
 	// Save cache hours.
-	$cache_hours = $post_hours;
+	$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? (int) wp_unslash( $_POST['awdev_cache_hours'] ) : 6;
 	if ( $cache_hours < 1 )   { $cache_hours = 1; }
 	if ( $cache_hours > 168 ) { $cache_hours = 168; }
 	awdev_force_option( 'awdev_cache_hours', $cache_hours );
 
-	// Save per-plugin auto-update toggles.
-	$raw = isset( $_POST['awdev_auto_updates'] ) && is_array( $_POST['awdev_auto_updates'] )
-		? $_POST['awdev_auto_updates']
-		: [];
-	$auto_updates = [];
-	foreach ( $raw as $basename => $val ) {
-		$b = sanitize_text_field( wp_unslash( $basename ) );
-		if ( $b ) {
-			$auto_updates[ $b ] = true;
-		}
-	}
-	$managed = (array) get_option( 'awdev_managed_plugins', [] );
-	$built_in_keys = [
-		'awdev-plugins-updater/awdev-plugins-updater.php',
-		'darkadmin/darkadmin.php',
-	];
-	foreach ( array_merge( $built_in_keys, array_keys( $managed ) ) as $basename ) {
-		if ( ! isset( $auto_updates[ $basename ] ) ) {
-			$auto_updates[ $basename ] = false;
-		}
-	}
-	awdev_force_option( 'awdev_auto_updates', $auto_updates );
-
-	// Read back from DB directly for debug.
-	global $wpdb;
-	$db_value = (int) $wpdb->get_var(
-		$wpdb->prepare(
-			"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s",
-			'awdev_cache_hours'
-		)
-	);
-
 	wp_redirect( add_query_arg(
-		[
-			'page'             => AWDEV_SETTINGS_SLUG,
-			'settings-updated' => '1',
-			'post-hours'       => $post_hours,
-			'saved-hours'      => $cache_hours,
-			'db-hours'         => $db_value,
-		],
+		[ 'page' => AWDEV_SETTINGS_SLUG, 'settings-updated' => '1' ],
 		admin_url( 'options-general.php' )
 	) );
 	exit;
+} );
+
+/**
+ * AJAX: instant-save a single per-plugin auto-update toggle.
+ */
+add_action( 'wp_ajax_awdev_toggle_auto_update', function () {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( 'not_allowed', 403 );
+	}
+	check_ajax_referer( 'awdev_toggle_auto_update' );
+
+	$basename = sanitize_text_field( wp_unslash( $_POST['basename'] ?? '' ) );
+	$enabled  = filter_var( $_POST['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN );
+
+	if ( ! $basename ) {
+		wp_send_json_error( 'missing_basename', 400 );
+	}
+
+	$auto_updates              = (array) get_option( 'awdev_auto_updates', [] );
+	$auto_updates[ $basename ] = $enabled;
+	awdev_force_option( 'awdev_auto_updates', $auto_updates );
+
+	wp_send_json_success( [ 'basename' => $basename, 'enabled' => $enabled ] );
+} );
+
+/**
+ * AJAX: instant-save the global auto-update toggle (also updates all per-plugin values).
+ */
+add_action( 'wp_ajax_awdev_toggle_global_auto_update', function () {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( 'not_allowed', 403 );
+	}
+	check_ajax_referer( 'awdev_toggle_auto_update' );
+
+	$enabled = filter_var( $_POST['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN );
+
+	awdev_force_option( 'awdev_auto_updates_global', $enabled );
+
+	// Mirror state to all per-plugin toggles.
+	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
+	foreach ( $auto_updates as $basename => $_ ) {
+		$auto_updates[ $basename ] = $enabled;
+	}
+	awdev_force_option( 'awdev_auto_updates', $auto_updates );
+
+	wp_send_json_success( [ 'enabled' => $enabled ] );
 } );
 
 /**
@@ -132,10 +138,14 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	wp_enqueue_script(
 		'awdev-settings-js',
 		AWDEV_UPDATER_URL . 'assets/js/settings.js',
-		[],
+		[ 'jquery' ],
 		AWDEV_UPDATER_VERSION,
 		true
 	);
+	wp_localize_script( 'awdev-settings-js', 'awdevSettings', [
+		'ajaxUrl' => admin_url( 'admin-ajax.php' ),
+		'nonce'   => wp_create_nonce( 'awdev_toggle_auto_update' ),
+	] );
 } );
 
 /**
@@ -160,7 +170,6 @@ add_action( 'admin_post_awdev_flush_cache', function () {
 			'_transient_timeout_awdev_upd_%'
 		)
 	);
-
 	delete_site_transient( 'update_plugins' );
 
 	wp_redirect( add_query_arg( [ 'page' => AWDEV_SETTINGS_SLUG, 'cache-flushed' => '1' ], admin_url( 'options-general.php' ) ) );
@@ -328,9 +337,6 @@ function awdev_render_settings_page(): void {
 
 	$cache_flushed  = isset( $_GET['cache-flushed'] );
 	$plugin_checked = isset( $_GET['plugin-checked'] );
-	$post_hours     = isset( $_GET['post-hours'] )  ? (int) $_GET['post-hours']  : null;
-	$saved_hours    = isset( $_GET['saved-hours'] ) ? (int) $_GET['saved-hours'] : null;
-	$db_hours       = isset( $_GET['db-hours'] )    ? (int) $_GET['db-hours']    : null;
 	?>
 	<div class="wrap awdev-settings-wrap">
 
@@ -360,25 +366,14 @@ function awdev_render_settings_page(): void {
 		<?php endif; ?>
 
 		<?php if ( isset( $_GET['settings-updated'] ) ) : ?>
-		<div class="notice notice-success is-dismissible">
-			<p>
-				<strong><?php esc_html_e( '✓ Settings saved.', 'awdev-plugins-updater' ); ?></strong><br>
-				<?php if ( $post_hours !== null ) : ?>
-					POST received: <code><?php echo (int) $post_hours; ?>h</code> &mdash;
-					Saved as: <code><?php echo (int) $saved_hours; ?>h</code> &mdash;
-					DB direct read: <code><?php echo (int) $db_hours; ?>h</code> &mdash;
-					get_option() now: <code><?php echo (int) get_option( 'awdev_cache_hours', -1 ); ?>h</code>
-				<?php endif; ?>
-			</p>
-		</div>
+		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Settings saved.', 'awdev-plugins-updater' ); ?></p></div>
 		<?php endif; ?>
 
-		<!-- Settings Form: only contains toggle + cache hours + save button. No nested forms. -->
+		<!-- Settings Form: toggle + cache hours + save button only. No nested forms. -->
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="awdev_save_settings" />
 			<?php wp_nonce_field( 'awdev_save_settings' ); ?>
 
-			<!-- Auto-Update Settings Card -->
 			<div class="awdev-card">
 				<div class="awdev-card-header">
 					<span class="dashicons dashicons-clock"></span>
@@ -426,11 +421,9 @@ function awdev_render_settings_page(): void {
 					</div>
 				</div>
 			</div>
-
 		</form>
-		<!-- END settings form -->
 
-		<!-- Managed Plugins Card: each row has its own self-contained form -->
+		<!-- Managed Plugins Card: outside the settings form to avoid nested forms -->
 		<div class="awdev-card">
 			<div class="awdev-card-header">
 				<span class="dashicons dashicons-plugins-checked"></span>
@@ -471,7 +464,7 @@ function awdev_render_settings_page(): void {
 								<label class="awdev-toggle">
 									<input type="checkbox"
 										class="awdev-per-plugin-toggle"
-										name="awdev_auto_updates[<?php echo esc_attr( $basename ); ?>]"
+										data-basename="<?php echo esc_attr( $basename ); ?>"
 										value="1"
 										<?php checked( $st['auto_update'] ); ?>
 									/>
@@ -518,7 +511,7 @@ function awdev_render_settings_page(): void {
 								<label class="awdev-toggle">
 									<input type="checkbox"
 										class="awdev-per-plugin-toggle"
-										name="awdev_auto_updates[<?php echo esc_attr( $basename ); ?>]"
+										data-basename="<?php echo esc_attr( $basename ); ?>"
 										value="1"
 										<?php checked( $st['auto_update'] ); ?>
 									/>
@@ -541,9 +534,7 @@ function awdev_render_settings_page(): void {
 									</a>
 								<?php endif; ?>
 							</td>
-							<td>
-								<span class="awdev-badge awdev-badge-custom"><?php esc_html_e( 'AWDev', 'awdev-plugins-updater' ); ?></span>
-							</td>
+							<td><span class="awdev-badge awdev-badge-custom"><?php esc_html_e( 'AWDev', 'awdev-plugins-updater' ); ?></span></td>
 						</tr>
 						<?php endforeach; ?>
 					</tbody>

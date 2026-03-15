@@ -4,17 +4,46 @@
 
 	document.addEventListener( 'DOMContentLoaded', function () {
 
-		// --- Global auto-update toggle: check/uncheck all per-plugin toggles ---
-		var globalToggle = document.getElementById( 'awdev-global-auto-update' );
-		if ( globalToggle ) {
-			globalToggle.addEventListener( 'change', function () {
-				document.querySelectorAll( '.awdev-per-plugin-toggle' ).forEach( function ( cb ) {
-					cb.checked = globalToggle.checked;
-				} );
+		var ajaxUrl = ( window.awdevSettings && awdevSettings.ajaxUrl ) ? awdevSettings.ajaxUrl : '';
+		var nonce   = ( window.awdevSettings && awdevSettings.nonce )   ? awdevSettings.nonce   : '';
+
+		// Send an AJAX request to instantly save a toggle state.
+		function saveToggle( action, data ) {
+			var params = new URLSearchParams();
+			params.append( 'action', action );
+			params.append( '_ajax_nonce', nonce );
+			Object.keys( data ).forEach( function ( k ) { params.append( k, data[ k ] ); } );
+
+			fetch( ajaxUrl, {
+				method  : 'POST',
+				headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body    : params.toString(),
 			} );
 		}
 
-		// --- Add plugin row ---
+		// Global auto-update toggle: update all per-plugin toggles visually and save everything.
+		var globalToggle = document.getElementById( 'awdev-global-auto-update' );
+		if ( globalToggle ) {
+			globalToggle.addEventListener( 'change', function () {
+				var enabled = globalToggle.checked;
+				document.querySelectorAll( '.awdev-per-plugin-toggle' ).forEach( function ( cb ) {
+					cb.checked = enabled;
+				} );
+				saveToggle( 'awdev_toggle_global_auto_update', { enabled: enabled ? '1' : '0' } );
+			} );
+		}
+
+		// Per-plugin toggles: save instantly on change.
+		document.querySelectorAll( '.awdev-per-plugin-toggle' ).forEach( function ( cb ) {
+			cb.addEventListener( 'change', function () {
+				saveToggle( 'awdev_toggle_auto_update', {
+					basename : cb.dataset.basename,
+					enabled  : cb.checked ? '1' : '0',
+				} );
+			} );
+		} );
+
+		// Add plugin row.
 		var addBtn = document.getElementById( 'awdev-add-plugin' );
 		if ( addBtn ) {
 			addBtn.addEventListener( 'click', function () {
@@ -28,7 +57,7 @@
 					'<td>–</td>' +
 					'<td>' +
 					  '<label class="awdev-toggle">' +
-					  '<input type="checkbox" class="awdev-per-plugin-toggle" name="awdev_auto_updates[__new_' + ts + ']" value="1" checked />' +
+					  '<input type="checkbox" class="awdev-per-plugin-toggle" data-basename="" value="1" checked />' +
 					  '<span class="awdev-toggle-slider"></span>' +
 					  '</label>' +
 					'</td>' +
@@ -42,7 +71,7 @@
 			} );
 		}
 
-		// --- Remove plugin row ---
+		// Remove plugin row.
 		document.addEventListener( 'click', function ( e ) {
 			var btn = e.target.closest( '.awdev-remove-row' );
 			if ( btn ) {

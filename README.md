@@ -11,11 +11,12 @@ Keeps [AlexanderWagnerDev](https://alexanderwagnerdev.com) plugins up to date �
 - ✅ Native WordPress update integration — updates appear in the standard Plugins screen
 - ✅ Settings page under *Settings → AWDev Plugins Updater*
 - ✅ DarkAdmin built-in — auto-registered when installed
-- ✅ Per-plugin **Auto-Update toggle** — enable/disable automatic updates per plugin
+- ✅ Per-plugin **Auto-Update toggle** — saves instantly on click, no Save button needed
+- ✅ Global **Auto-Update master toggle** — instantly applies state to all per-plugin toggles
 - ✅ **Manual re-check button** per plugin — clears transient and fetches latest version immediately
 - ✅ **One-click Update button** — appears automatically when a newer remote version is available
 - ✅ Add/remove additional plugins via the Settings UI — no code changes needed
-- ✅ 6-hour update cache per plugin (transient-based)
+- ✅ Configurable update cache interval (1h–168h, default 6h)
 - ✅ Manual full cache flush button
 - ✅ “View version details” popup in the WP update screen
 - ✅ Automatic plugin folder name fix after ZIP extraction
@@ -35,11 +36,19 @@ Open *Settings → AWDev Plugins Updater*:
 
 - **Built-in plugins** (AWDev Plugins Updater, DarkAdmin) are always registered automatically
 - Click **Add Plugin** to register additional plugins by providing the basename (e.g. `my-plugin/my-plugin.php`) and API slug
-- Use the **toggle** in the Auto-Update column to enable or disable automatic WP updates per plugin
+- Use the **toggle** in the Auto-Update column to enable or disable automatic WP updates per plugin — saves instantly
+- The **global toggle** in the Auto-Update Settings card applies to all plugins at once
 - Use the **🔄 re-check button** to force a fresh API fetch for a single plugin
 - The **Update button** appears automatically when a newer version is available on the server
 
 ## Changelog
+
+### 0.0.3
+- Fixed illegal nested `<form>` elements causing "Save Settings" to submit the wrong action
+- Per-plugin auto-update toggles now save instantly via AJAX — no Save button needed
+- Global auto-update toggle now instantly mirrors its state to all per-plugin toggles and saves via AJAX
+- Debug output removed from settings saved notice
+- "Save Settings" button moved into the Auto-Update Settings card
 
 ### 0.0.2
 - Added per-plugin auto-update toggle (stored in `awdev_auto_updates` option)
@@ -72,11 +81,12 @@ Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — o
 - ✅ Native WordPress-Update-Integration — Updates erscheinen im Standard-Plugins-Screen
 - ✅ Einstellungsseite unter *Einstellungen → AWDev Plugins Updater*
 - ✅ DarkAdmin integriert — wird automatisch registriert wenn installiert
-- ✅ **Auto-Update-Toggle** pro Plugin — automatische Updates einzeln aktivieren/deaktivieren
+- ✅ **Auto-Update-Toggle** pro Plugin — wird sofort beim Klick gespeichert, kein Speichern-Button nötig
+- ✅ **Globaler Auto-Update-Hauptschalter** — überträgt den Zustand sofort auf alle Per-Plugin-Toggles
 - ✅ **Manueller Re-Check-Button** pro Plugin — leert den Transient und holt sofort die neueste Version
 - ✅ **Ein-Klick-Update-Button** — erscheint automatisch wenn eine neuere Remote-Version verfügbar ist
 - ✅ Weitere Plugins über die Einstellungsseite hinzufügen/entfernen — kein Code-Edit nötig
-- ✅ 6-Stunden-Update-Cache pro Plugin
+- ✅ Konfigurierbares Update-Cache-Intervall (1h–168h, Standard 6h)
 - ✅ Manueller Cache-Flush-Button
 - ✅ „Versions-Details“-Popup im WordPress-Update-Screen
 - ✅ Automatische Korrektur des Plugin-Ordnernamens nach ZIP-Extraktion
@@ -96,11 +106,19 @@ Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — o
 
 - **Integrierte Plugins** (AWDev Plugins Updater, DarkAdmin) werden immer automatisch registriert
 - Auf **Plugin hinzufügen** klicken um weitere Plugins per Basename und API-Slug einzutragen
-- Den **Toggle** in der Auto-Update-Spalte nutzen um automatische WP-Updates pro Plugin zu steuern
+- Den **Toggle** in der Auto-Update-Spalte nutzen um automatische WP-Updates pro Plugin zu steuern — wird sofort gespeichert
+- Den **globalen Toggle** nutzen um alle Plugins auf einmal zu steuern
 - Den **🔄 Re-Check-Button** nutzen um einen einzelnen Plugin-Transient sofort zu leeren und neu zu laden
 - Der **Aktualisieren-Button** erscheint automatisch wenn eine neuere Version auf dem Server verfügbar ist
 
 ### Changelog
+
+#### 0.0.3
+- Fehler mit verschachtelten `<form>`-Elementen behoben — „Einstellungen speichern“ sendete vorher die falsche Aktion
+- Per-Plugin-Auto-Update-Toggles werden jetzt sofort via AJAX gespeichert — kein Speichern-Button nötig
+- Globaler Auto-Update-Toggle spiegelt Zustand sofort auf alle Per-Plugin-Toggles und speichert via AJAX
+- Debug-Ausgaben aus der Erfolgs-Meldung entfernt
+- „Einstellungen speichern“-Button in die Auto-Update-Settings-Card verschoben
 
 #### 0.0.2
 - Auto-Update-Toggle pro Plugin hinzugefügt (gespeichert in `awdev_auto_updates`)
