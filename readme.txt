@@ -4,7 +4,7 @@ Tags: updater, self-hosted, plugin update, update manager, dark mode
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.0.4
+Stable tag: 0.0.5
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -27,7 +27,7 @@ Features:
 * Configurable update cache interval (1h–168h, default 6h)
 * Manual full cache flush button
 * "View version details" popup support in WP update screen
-* Automatic plugin folder name fix after ZIP extraction
+* Automatic plugin folder name fix after ZIP extraction (including bulk updates and random-suffix folders)
 * Full Dark Mode support — settings page adapts automatically via DarkAdmin CSS variables
 * Translations: de_DE, de_AT, en_US
 
@@ -60,6 +60,11 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
+= 0.0.5 =
+* Fixed plugin folder rename failing on bulk updates (update-core.php) and WP auto-updates where hook_extra['plugin'] is not populated
+* Added fallback matching by extracted source folder name: matches against plugin slug and GitHub repo name derived from download URL
+* Extracted rename logic into private rename_source() method to avoid duplication
+
 = 0.0.4 =
 * Replaced wp_redirect() with wp_safe_redirect() throughout.
 * Added wp_unslash() and absint() for all POST input sanitization.
@@ -105,6 +110,7 @@ Funktionen:
 * Weitere Plugins über die Einstellungsseite hinzufügen
 * Konfigurierbares Update-Cache-Intervall (1h–168h, Standard 6h)
 * Manueller Cache-Flush-Button
+* Automatische Ordnernamens-Korrektur nach ZIP-Extraktion (inkl. Bulk-Updates und Zufalls-Suffix-Ordner)
 * Dark-Mode-kompatible Einstellungsseite via DarkAdmin
 * Übersetzungen: de_DE, de_AT, en_US
 
@@ -115,6 +121,11 @@ Funktionen:
 4. Einstellungen → AWDev Plugins Updater aufrufen.
 
 === Changelog ===
+= 0.0.5 =
+* Fehler bei Ordnerumbenennung bei Bulk-Updates (update-core.php) und WP Auto-Updates behoben, wenn hook_extra['plugin'] nicht gesetzt ist
+* Fallback-Matching über extrahierten Quellordnernamen: prüft Plugin-Slug und GitHub-Repo-Name aus der Download-URL
+* Rename-Logik in private rename_source()-Methode ausgelagert
+
 = 0.0.4 =
 * wp_redirect() durch wp_safe_redirect() ersetzt.
 * wp_unslash() und absint() für POST-Input hinzugefügt.

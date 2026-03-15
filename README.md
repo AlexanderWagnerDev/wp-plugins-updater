@@ -19,7 +19,7 @@ Keeps [AlexanderWagnerDev](https://alexanderwagnerdev.com) plugins up to date �
 - ✅ Configurable update cache interval (1h–168h, default 6h)
 - ✅ Manual full cache flush button
 - ✅ “View version details” popup in the WP update screen
-- ✅ Automatic plugin folder name fix after ZIP extraction
+- ✅ Automatic plugin folder name fix after ZIP extraction (including bulk updates and random-suffix folders)
 - ✅ Full Dark Mode support via DarkAdmin — settings page adapts automatically
 - ✅ Translations: `de_DE`, `de_AT`, `en_US`
 
@@ -42,6 +42,11 @@ Open *Settings → AWDev Plugins Updater*:
 - The **Update button** appears automatically when a newer version is available on the server
 
 ## Changelog
+
+### 0.0.5
+- Fixed plugin folder rename failing on bulk updates (`update-core.php`) and WP auto-updates where `hook_extra['plugin']` is not populated
+- Added fallback matching by extracted source folder name: matches against plugin slug and GitHub repo name derived from `download_url`
+- Extracted rename logic into private `rename_source()` method to avoid duplication
 
 ### 0.0.4
 - Replaced `wp_redirect()` with `wp_safe_redirect()` throughout
@@ -97,7 +102,7 @@ Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — o
 - ✅ Konfigurierbares Update-Cache-Intervall (1h–168h, Standard 6h)
 - ✅ Manueller Cache-Flush-Button
 - ✅ „Versions-Details“-Popup im WordPress-Update-Screen
-- ✅ Automatische Korrektur des Plugin-Ordnernamens nach ZIP-Extraktion
+- ✅ Automatische Korrektur des Plugin-Ordnernamens nach ZIP-Extraktion (inkl. Bulk-Updates und Zufalls-Suffix-Ordner)
 - ✅ Vollständige Dark-Mode-Unterstützung via DarkAdmin — Einstellungsseite passt sich automatisch an
 - ✅ Übersetzungen: `de_DE`, `de_AT`, `en_US`
 
@@ -120,6 +125,11 @@ Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — o
 - Der **Aktualisieren-Button** erscheint automatisch wenn eine neuere Version auf dem Server verfügbar ist
 
 ### Changelog
+
+#### 0.0.5
+- Fehler bei Ordnerumbenennung bei Bulk-Updates (`update-core.php`) und WP Auto-Updates behoben, wenn `hook_extra['plugin']` nicht gesetzt ist
+- Fallback-Matching über extrahierten Quellordnernamen: prüft Plugin-Slug und GitHub-Repo-Name aus der `download_url`
+- Rename-Logik in private `rename_source()`-Methode ausgelagert
 
 #### 0.0.4
 - `wp_redirect()` durch `wp_safe_redirect()` ersetzt
