@@ -4,7 +4,7 @@ Tags: updater, self-hosted, plugin update, update manager, dark mode
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.0.5
+Stable tag: 0.0.6
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,11 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
+= 0.0.6 =
+* Fixed language file msgid strings to exactly match the corresponding __() calls in settings.php
+* Corrected two mismatched strings: 'Configure how often...' and 'Update data is cached for...'
+* Updated Project-Id-Version in all .po and .pot files to 0.0.6
+
 = 0.0.5 =
 * Fixed plugin folder rename failing on bulk updates (update-core.php) and WP auto-updates where hook_extra['plugin'] is not populated
 * Added fallback matching by extracted source folder name: matches against plugin slug and GitHub repo name derived from download URL
@@ -121,28 +126,32 @@ Funktionen:
 4. Einstellungen → AWDev Plugins Updater aufrufen.
 
 === Changelog ===
+= 0.0.6 =
+* Sprachdatei-msgid-Strings an die exakten __()-Aufrufe in settings.php angepasst
+* Zwei nicht übereinstimmende Strings korrigiert: 'Configure how often...' und 'Update data is cached for...'
+* Project-Id-Version in allen .po- und .pot-Dateien auf 0.0.6 aktualisiert
+
 = 0.0.5 =
-* Fehler bei Ordnerumbenennung bei Bulk-Updates (update-core.php) und WP Auto-Updates behoben, wenn hook_extra['plugin'] nicht gesetzt ist
-* Fallback-Matching über extrahierten Quellordnernamen: prüft Plugin-Slug und GitHub-Repo-Name aus der Download-URL
+* Fehler bei Ordnerumbenennung bei Bulk-Updates (update-core.php) und WP Auto-Updates behoben
+* Fallback-Matching über extrahierten Quellordnernamen hinzugefügt
 * Rename-Logik in private rename_source()-Methode ausgelagert
 
 = 0.0.4 =
 * wp_redirect() durch wp_safe_redirect() ersetzt.
 * wp_unslash() und absint() für POST-Input hinzugefügt.
-* translators-Kommentare für _n() und printf() hinzugefügt.
+* translators-Kommentare hinzugefügt.
 * rename() durch WP_Filesystem::move() ersetzt.
 * phpcs:ignore für direkte DB-Queries hinzugefügt.
 
 = 0.0.3 =
 * Verschachtelte Formular-Elemente behoben.
 * Per-Plugin-Toggles speichern sofort via AJAX.
-* Globaler Toggle spiegelt Zustand sofort auf alle Per-Plugin-Toggles.
+* Globaler Toggle spiegelt Zustand sofort.
 * Debug-Ausgaben entfernt.
-* Speichern-Button in Auto-Update-Settings-Card verschoben.
 
 = 0.0.2 =
 * Auto-Update-Toggle pro Plugin hinzugefügt.
-* Manuellen Re-Check-Button pro Plugin hinzugefügt.
+* Manuellen Re-Check-Button hinzugefügt.
 * Ein-Klick-Aktualisieren-Button hinzugefügt.
 * Versionserkennung korrigiert.
 * Transient-Key-Fehler behoben.
@@ -150,7 +159,3 @@ Funktionen:
 
 = 0.0.1 =
 * Erste Veröffentlichung.
-* Native WordPress-Update-Hook-Integration.
-* Einstellungsseite mit Plugin-Tabelle und Cache-Flush.
-* Integrierte DarkAdmin-Unterstützung.
-* Übersetzungen: de_DE, de_AT, en_US.

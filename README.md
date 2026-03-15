@@ -43,6 +43,11 @@ Open *Settings → AWDev Plugins Updater*:
 
 ## Changelog
 
+### 0.0.6
+- Fixed language file `msgid` strings to exactly match the corresponding `__()` calls in `settings.php`
+- Corrected two mismatched strings: `'Configure how often...'` and `'Update data is cached for...'`
+- Updated `Project-Id-Version` in all `.po` and `.pot` files to `0.0.6`
+
 ### 0.0.5
 - Fixed plugin folder rename failing on bulk updates (`update-core.php`) and WP auto-updates where `hook_extra['plugin']` is not populated
 - Added fallback matching by extracted source folder name: matches against plugin slug and GitHub repo name derived from `download_url`
@@ -87,78 +92,39 @@ GPLv2 or later — see [LICENSE](LICENSE)
 
 ## Deutsch
 
-Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — ohne WordPress.org. Updates werden von einem selbst gehosteten Server ausgeliefert, damit jedes Release auf eigenem Zeitplan erscheint.
-
-### Funktionen
-
-- ✅ Native WordPress-Update-Integration — Updates erscheinen im Standard-Plugins-Screen
-- ✅ Einstellungsseite unter *Einstellungen → AWDev Plugins Updater*
-- ✅ DarkAdmin integriert — wird automatisch registriert wenn installiert
-- ✅ **Auto-Update-Toggle** pro Plugin — wird sofort beim Klick gespeichert, kein Speichern-Button nötig
-- ✅ **Globaler Auto-Update-Hauptschalter** — überträgt den Zustand sofort auf alle Per-Plugin-Toggles
-- ✅ **Manueller Re-Check-Button** pro Plugin — leert den Transient und holt sofort die neueste Version
-- ✅ **Ein-Klick-Update-Button** — erscheint automatisch wenn eine neuere Remote-Version verfügbar ist
-- ✅ Weitere Plugins über die Einstellungsseite hinzufügen/entfernen — kein Code-Edit nötig
-- ✅ Konfigurierbares Update-Cache-Intervall (1h–168h, Standard 6h)
-- ✅ Manueller Cache-Flush-Button
-- ✅ „Versions-Details“-Popup im WordPress-Update-Screen
-- ✅ Automatische Korrektur des Plugin-Ordnernamens nach ZIP-Extraktion (inkl. Bulk-Updates und Zufalls-Suffix-Ordner)
-- ✅ Vollständige Dark-Mode-Unterstützung via DarkAdmin — Einstellungsseite passt sich automatisch an
-- ✅ Übersetzungen: `de_DE`, `de_AT`, `en_US`
-
-### Installation
-
-1. Neuste `awdev-plugin-updater.zip` aus den [Releases](https://github.com/AlexanderWagnerDev/wp-plugins-updater/releases) herunterladen.
-2. In WordPress *Plugins → Neu hinzufügen → Plugin hochladen* aufrufen und die ZIP auswählen.
-3. Plugin aktivieren.
-4. *Einstellungen → AWDev Plugins Updater* öffnen — DarkAdmin ist bereits automatisch eingetragen.
-
-### Plugins verwalten
-
-*Einstellungen → AWDev Plugins Updater* öffnen:
-
-- **Integrierte Plugins** (AWDev Plugins Updater, DarkAdmin) werden immer automatisch registriert
-- Auf **Plugin hinzufügen** klicken um weitere Plugins per Basename und API-Slug einzutragen
-- Den **Toggle** in der Auto-Update-Spalte nutzen um automatische WP-Updates pro Plugin zu steuern — wird sofort gespeichert
-- Den **globalen Toggle** nutzen um alle Plugins auf einmal zu steuern
-- Den **🔄 Re-Check-Button** nutzen um einen einzelnen Plugin-Transient sofort zu leeren und neu zu laden
-- Der **Aktualisieren-Button** erscheint automatisch wenn eine neuere Version auf dem Server verfügbar ist
+Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — ohne WordPress.org.
 
 ### Changelog
 
+#### 0.0.6
+- Sprachdatei-`msgid`-Strings an die exakten `__()`-Aufrufe in `settings.php` angepasst
+- Zwei nicht übereinstimmende Strings korrigiert
+- `Project-Id-Version` in allen `.po`- und `.pot`-Dateien auf `0.0.6` aktualisiert
+
 #### 0.0.5
-- Fehler bei Ordnerumbenennung bei Bulk-Updates (`update-core.php`) und WP Auto-Updates behoben, wenn `hook_extra['plugin']` nicht gesetzt ist
-- Fallback-Matching über extrahierten Quellordnernamen: prüft Plugin-Slug und GitHub-Repo-Name aus der `download_url`
+- Fehler bei Ordnerumbenennung bei Bulk-Updates (`update-core.php`) und WP Auto-Updates behoben
+- Fallback-Matching über extrahierten Quellordnernamen hinzugefügt
 - Rename-Logik in private `rename_source()`-Methode ausgelagert
 
 #### 0.0.4
 - `wp_redirect()` durch `wp_safe_redirect()` ersetzt
-- `wp_unslash()` und `absint()` für POST-Input-Sanitization hinzugefügt
-- `translators`-Kommentare für alle `_n()` und `printf()` i18n-Aufrufe hinzugefügt
+- `wp_unslash()` und `absint()` für POST-Input hinzugefügt
+- `translators`-Kommentare hinzugefügt
 - `rename()` durch `WP_Filesystem::move()` ersetzt
-- `phpcs:ignore`-Annotationen für intentionale direkte DB-Queries hinzugefügt
 
 #### 0.0.3
-- Fehler mit verschachtelten `<form>`-Elementen behoben
-- Per-Plugin-Auto-Update-Toggles werden jetzt sofort via AJAX gespeichert
-- Globaler Auto-Update-Toggle spiegelt Zustand sofort auf alle Per-Plugin-Toggles
-- Debug-Ausgaben entfernt
-- Speichern-Button in die Auto-Update-Settings-Card verschoben
+- Verschachtelte `<form>`-Elemente behoben
+- Per-Plugin-Toggles speichern sofort via AJAX
+- Globaler Toggle spiegelt Zustand sofort
 
 #### 0.0.2
-- Auto-Update-Toggle pro Plugin hinzugefügt
-- Manuellen Re-Check-Button pro Plugin hinzugefügt
-- Ein-Klick-Aktualisieren-Button hinzugefügt
-- Versionserkennung korrigiert
-- Transient-Key-Fehler behoben
-- Dark-Mode-Kompatibilität behoben
+- Auto-Update-Toggle pro Plugin
+- Re-Check-Button pro Plugin
+- Ein-Klick-Update-Button
+- Diverse Fixes
 
 #### 0.0.1
 - Erste Veröffentlichung
-- Native WordPress-Update-Hook-Integration
-- Einstellungsseite mit Plugin-Tabelle und Cache-Flush
-- Integrierte DarkAdmin-Unterstützung
-- Übersetzungen: `de_DE`, `de_AT`, `en_US`
 
 ### Lizenz
 
