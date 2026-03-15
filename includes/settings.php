@@ -21,11 +21,6 @@ add_action( 'admin_menu', function () {
 
 /**
  * Persist an option reliably regardless of whether the value changed.
- * Uses direct $wpdb query to bypass WordPress object cache and same-value skip.
- *
- * @param string $option   Option name.
- * @param mixed  $value    New value.
- * @param string $autoload 'yes'|'no'
  */
 function awdev_force_option( string $option, $value, string $autoload = 'yes' ): void {
 	global $wpdb;
@@ -49,15 +44,27 @@ add_action( 'admin_post_awdev_save_settings', function () {
 	}
 	check_admin_referer( 'awdev_save_settings' );
 
+	// DEBUG: show exactly what was received and what ends up in DB.
+	$post_hours = isset( $_POST['awdev_cache_hours'] ) ? (int) wp_unslash( $_POST['awdev_cache_hours'] ) : 'NOT_SET';
+
 	// Save global auto-update toggle.
 	$global = isset( $_POST['awdev_auto_updates_global'] );
 	awdev_force_option( 'awdev_auto_updates_global', $global );
 
 	// Save cache hours.
-	$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? (int) wp_unslash( $_POST['awdev_cache_hours'] ) : 6;
+	$cache_hours = is_int( $post_hours ) ? $post_hours : 6;
 	if ( $cache_hours < 1 )   { $cache_hours = 1; }
 	if ( $cache_hours > 168 ) { $cache_hours = 168; }
 	awdev_force_option( 'awdev_cache_hours', $cache_hours );
+
+	// Read back immediately from DB (bypass cache).
+	global $wpdb;
+	$db_value = $wpdb->get_var(
+		$wpdb->prepare(
+			"SELECT option_value FROM {$wpdb->options} WHERE option_name = %s",
+			'awdev_cache_hours'
+		)
+	);
 
 	// Save per-plugin auto-update toggles.
 	$raw = isset( $_POST['awdev_auto_updates'] ) && is_array( $_POST['awdev_auto_updates'] )
@@ -70,7 +77,6 @@ add_action( 'admin_post_awdev_save_settings', function () {
 			$auto_updates[ $b ] = true;
 		}
 	}
-	// Ensure unchecked per-plugin toggles are stored as false.
 	$managed = (array) get_option( 'awdev_managed_plugins', [] );
 	$built_in_keys = [
 		'awdev-plugins-updater/awdev-plugins-updater.php',
@@ -87,7 +93,9 @@ add_action( 'admin_post_awdev_save_settings', function () {
 		[
 			'page'             => AWDEV_SETTINGS_SLUG,
 			'settings-updated' => '1',
+			'post-hours'       => is_int( $post_hours ) ? $post_hours : 0,
 			'saved-hours'      => $cache_hours,
+			'db-hours'         => (int) $db_value,
 		],
 		admin_url( 'options-general.php' )
 	) );
@@ -181,11 +189,6 @@ add_action( 'admin_post_awdev_check_plugin', function () {
 
 /**
  * Resolve local installed version for a plugin basename.
- *
- * Strategy:
- * 1. Direct match on exact basename.
- * 2. Match by raw dirname.
- * 3. Match by sanitize_key(dirname) - handles hyphens/underscores/case differences.
  */
 function awdev_get_local_version( string $basename ): string {
 	if ( ! function_exists( 'get_plugins' ) ) {
@@ -193,7 +196,6 @@ function awdev_get_local_version( string $basename ): string {
 	}
 	$plugins = get_plugins();
 
-	// 1. Direct match.
 	if ( isset( $plugins[ $basename ] ) ) {
 		return $plugins[ $basename ]['Version'];
 	}
@@ -203,13 +205,9 @@ function awdev_get_local_version( string $basename ): string {
 
 	foreach ( $plugins as $key => $data ) {
 		$key_folder = dirname( $key );
-
-		// 2. Raw folder name match.
 		if ( $key_folder === $folder ) {
 			return $data['Version'];
 		}
-
-		// 3. sanitize_key folder match.
 		if ( sanitize_key( $key_folder ) === $folder_key ) {
 			return $data['Version'];
 		}
@@ -223,9 +221,7 @@ function awdev_get_local_version( string $basename ): string {
  */
 function awdev_get_last_checked( string $dirname_slug ): string {
 	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
-	if ( $cache_hours < 1 ) {
-		$cache_hours = 1;
-	}
+	if ( $cache_hours < 1 ) { $cache_hours = 1; }
 	$key     = '_transient_timeout_awdev_upd_' . sanitize_key( $dirname_slug );
 	$timeout = (int) get_option( $key, 0 );
 	if ( ! $timeout ) {
@@ -260,9 +256,7 @@ function awdev_get_remote_version( string $api_url, string $dirname_slug ): stri
 		if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
 			$data        = json_decode( wp_remote_retrieve_body( $response ) );
 			$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
-			if ( $cache_hours < 1 ) {
-				$cache_hours = 1;
-			}
+			if ( $cache_hours < 1 ) { $cache_hours = 1; }
 			set_transient( $key, $data, $cache_hours * HOUR_IN_SECONDS );
 		} else {
 			set_transient( $key, false, HOUR_IN_SECONDS );
@@ -287,7 +281,6 @@ function awdev_render_settings_page(): void {
 	$cache_hours  = (int) get_option( 'awdev_cache_hours', 6 );
 	if ( $cache_hours < 1 ) { $cache_hours = 1; }
 
-	// Correct basenames matching the actual folder/file names on disk.
 	$built_in = [
 		'awdev-plugins-updater/awdev-plugins-updater.php' => [
 			'name'     => 'AWDev Plugins Updater',
@@ -299,7 +292,6 @@ function awdev_render_settings_page(): void {
 		],
 	];
 
-	// Initialize defaults on very first load only (option does not exist yet).
 	if ( get_option( 'awdev_auto_updates' ) === false ) {
 		$defaults = [];
 		foreach ( array_keys( $built_in ) as $basename ) {
@@ -337,7 +329,9 @@ function awdev_render_settings_page(): void {
 
 	$cache_flushed  = isset( $_GET['cache-flushed'] );
 	$plugin_checked = isset( $_GET['plugin-checked'] );
+	$post_hours     = isset( $_GET['post-hours'] )  ? (int) $_GET['post-hours']  : null;
 	$saved_hours    = isset( $_GET['saved-hours'] ) ? (int) $_GET['saved-hours'] : null;
+	$db_hours       = isset( $_GET['db-hours'] )    ? (int) $_GET['db-hours']    : null;
 	?>
 	<div class="wrap awdev-settings-wrap">
 
@@ -369,9 +363,12 @@ function awdev_render_settings_page(): void {
 		<?php if ( isset( $_GET['settings-updated'] ) ) : ?>
 		<div class="notice notice-success is-dismissible">
 			<p>
-				<?php esc_html_e( '✓ Settings saved.', 'awdev-plugins-updater' ); ?>
-				<?php if ( $saved_hours !== null ) : ?>
-					&mdash; <?php printf( esc_html__( 'Check interval set to %d hour(s). DB now reads: %d hour(s).', 'awdev-plugins-updater' ), $saved_hours, $cache_hours ); ?>
+				<strong><?php esc_html_e( '✓ Settings saved.', 'awdev-plugins-updater' ); ?></strong><br>
+				<?php if ( $post_hours !== null ) : ?>
+					POST received: <code><?php echo (int) $post_hours; ?>h</code> &mdash;
+					Saved as: <code><?php echo (int) $saved_hours; ?>h</code> &mdash;
+					DB direct read: <code><?php echo (int) $db_hours; ?>h</code> &mdash;
+					get_option() now: <code><?php echo (int) get_option( 'awdev_cache_hours', -1 ); ?>h</code>
 				<?php endif; ?>
 			</p>
 		</div>
@@ -392,7 +389,6 @@ function awdev_render_settings_page(): void {
 						<?php esc_html_e( 'Configure how often the updater checks for new plugin versions. The cache duration controls the interval between remote API requests.', 'awdev-plugins-updater' ); ?>
 					</p>
 
-					<!-- Global auto-update toggle -->
 					<div class="awdev-global-toggle-row">
 						<label class="awdev-toggle">
 							<input type="checkbox"
@@ -564,10 +560,7 @@ function awdev_render_settings_page(): void {
 				<p class="awdev-card-description">
 					<?php
 					printf(
-						esc_html(
-							/* translators: %d: cache duration in hours */
-							__( 'Update data is cached for %d hour(s) per plugin. Flush the cache to force WordPress to re-check all endpoints immediately.', 'awdev-plugins-updater' )
-						),
+						esc_html__( 'Update data is cached for %d hour(s) per plugin. Flush the cache to force WordPress to re-check all endpoints immediately.', 'awdev-plugins-updater' ),
 						(int) get_option( 'awdev_cache_hours', 6 )
 					);
 					?>
