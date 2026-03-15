@@ -97,10 +97,6 @@ msgid "Type"
 msgstr ""
 
 #: includes/settings.php
-msgid "Built-in"
-msgstr ""
-
-#: includes/settings.php
 msgid "AWDev"
 msgstr ""
 
