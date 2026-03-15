@@ -30,15 +30,13 @@ add_action( 'admin_post_awdev_save_settings', function () {
 
 	// Save global auto-update toggle.
 	$global = isset( $_POST['awdev_auto_updates_global'] );
-	delete_option( 'awdev_auto_updates_global' );
-	add_option( 'awdev_auto_updates_global', $global, '', 'yes' );
+	update_option( 'awdev_auto_updates_global', $global, 'yes' );
 
 	// Save cache hours.
 	$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? (int) wp_unslash( $_POST['awdev_cache_hours'] ) : 6;
 	if ( $cache_hours < 1 )   { $cache_hours = 1; }
 	if ( $cache_hours > 168 ) { $cache_hours = 168; }
-	delete_option( 'awdev_cache_hours' );
-	add_option( 'awdev_cache_hours', $cache_hours, '', 'yes' );
+	update_option( 'awdev_cache_hours', $cache_hours, 'yes' );
 
 	// Save per-plugin auto-update toggles.
 	$raw = isset( $_POST['awdev_auto_updates'] ) && is_array( $_POST['awdev_auto_updates'] )
@@ -62,8 +60,7 @@ add_action( 'admin_post_awdev_save_settings', function () {
 			$auto_updates[ $basename ] = false;
 		}
 	}
-	delete_option( 'awdev_auto_updates' );
-	add_option( 'awdev_auto_updates', $auto_updates, '', 'yes' );
+	update_option( 'awdev_auto_updates', $auto_updates, 'yes' );
 
 	wp_redirect( add_query_arg(
 		[ 'page' => AWDEV_SETTINGS_SLUG, 'settings-updated' => '1' ],
@@ -263,7 +260,7 @@ function awdev_render_settings_page(): void {
 	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
 	$global_auto  = get_option( 'awdev_auto_updates_global', true );
 	$cache_hours  = (int) get_option( 'awdev_cache_hours', 6 );
-	if ( $cache_hours < 1 ) { $cache_hours = 6; }
+	if ( $cache_hours < 1 ) { $cache_hours = 1; }
 
 	// Correct basenames matching the actual folder/file names on disk.
 	$built_in = [
