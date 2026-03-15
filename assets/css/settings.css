@@ -25,9 +25,7 @@
   --awdev-update-fg:   #856404;
 }
 
-/*
- * DarkAdmin compatibility.
- */
+/* DarkAdmin compatibility */
 body.adm-dark-active .awdev-settings-wrap {
   --awdev-bg:          #2c3338;
   --awdev-bg-alt:      #1d2327;
@@ -49,7 +47,6 @@ body.adm-dark-active .awdev-settings-wrap {
   --awdev-update-fg:   #fde68a;
 }
 
-/* Explicit element overrides for DarkAdmin compatibility */
 body.adm-dark-active .awdev-settings-wrap,
 body.adm-dark-active .awdev-settings-wrap .awdev-page-header,
 body.adm-dark-active .awdev-settings-wrap .awdev-card {
@@ -78,7 +75,8 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header h2 {
 body.adm-dark-active .awdev-settings-wrap .awdev-page-subtitle,
 body.adm-dark-active .awdev-settings-wrap .awdev-card-description,
 body.adm-dark-active .awdev-settings-wrap .awdev-last-checked,
-body.adm-dark-active .awdev-settings-wrap .awdev-footer {
+body.adm-dark-active .awdev-settings-wrap .awdev-footer,
+body.adm-dark-active .awdev-settings-wrap .awdev-global-toggle-label {
   color: var(--awdev-text-muted) !important;
 }
 body.adm-dark-active .awdev-settings-wrap .awdev-footer a,
@@ -202,6 +200,25 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
 }
 
 /* =============================================================================
+   GLOBAL AUTO-UPDATE TOGGLE ROW
+   ============================================================================= */
+.awdev-global-toggle-row {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 16px;
+  padding: 10px 14px;
+  background: var(--awdev-bg-alt) !important;
+  border: 1px solid var(--awdev-border) !important;
+  border-radius: 6px;
+}
+.awdev-global-toggle-label {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--awdev-text) !important;
+}
+
+/* =============================================================================
    PLUGIN TABLE
    ============================================================================= */
 .awdev-plugin-table {
@@ -270,6 +287,7 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
   width: 36px;
   height: 20px;
   vertical-align: middle;
+  flex-shrink: 0;
 }
 .awdev-toggle input {
   opacity: 0;

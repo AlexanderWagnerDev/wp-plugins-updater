@@ -30,6 +30,11 @@ add_action( 'admin_init', function () {
 		'sanitize_callback' => 'awdev_sanitize_auto_updates',
 		'default'           => [],
 	] );
+	register_setting( 'awdev_settings', 'awdev_auto_updates_global', [
+		'type'              => 'boolean',
+		'sanitize_callback' => 'rest_sanitize_boolean',
+		'default'           => true,
+	] );
 } );
 
 function awdev_sanitize_managed_plugins( $input ): array {
@@ -62,9 +67,13 @@ function awdev_sanitize_auto_updates( $input ): array {
 }
 
 /**
- * Auto-update hook: allow automatic updates for plugins that have it enabled.
+ * Auto-update hook: respect per-plugin toggle; global toggle overrides all when off.
  */
 add_filter( 'auto_update_plugin', function ( $update, $item ) {
+	$global = (bool) get_option( 'awdev_auto_updates_global', true );
+	if ( ! $global ) {
+		return false;
+	}
 	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
 	if ( isset( $item->plugin ) && isset( $auto_updates[ $item->plugin ] ) ) {
 		return (bool) $auto_updates[ $item->plugin ];
@@ -147,8 +156,8 @@ add_action( 'admin_post_awdev_check_plugin', function () {
  *
  * Strategy:
  * 1. Direct match on exact basename.
- * 2. Match by raw dirname (e.g. "my-plugin" === dirname of key).
- * 3. Match by sanitize_key(dirname) — handles hyphens/underscores/case differences.
+ * 2. Match by raw dirname.
+ * 3. Match by sanitize_key(dirname) - handles hyphens/underscores/case differences.
  */
 function awdev_get_local_version( string $basename ): string {
 	if ( ! function_exists( 'get_plugins' ) ) {
@@ -172,7 +181,7 @@ function awdev_get_local_version( string $basename ): string {
 			return $data['Version'];
 		}
 
-		// 3. sanitize_key folder match (covers hyphens vs underscores, uppercase).
+		// 3. sanitize_key folder match.
 		if ( sanitize_key( $key_folder ) === $folder_key ) {
 			return $data['Version'];
 		}
@@ -236,23 +245,28 @@ function awdev_render_settings_page(): void {
 		return;
 	}
 
-	$managed      = (array) get_option( 'awdev_managed_plugins', [] );
-	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
+	$managed       = (array) get_option( 'awdev_managed_plugins', [] );
+	$auto_updates  = (array) get_option( 'awdev_auto_updates', [] );
+	$global_auto   = get_option( 'awdev_auto_updates_global' );
 
+	// Correct basenames matching the actual folder/file names on disk.
 	$built_in = [
-		'awdev-plugin-updater/awdev-plugin-updater.php' => [
+		'awdev-plugins-updater/awdev-plugin-updater.php' => [
 			'name'     => 'AWDev Plugins Updater',
 			'api_slug' => 'awdev-plugin-updater',
 		],
-		'wp-darkadmin-plugin/darkadmin.php' => [
+		'darkadmin/darkadmin.php' => [
 			'name'     => 'DarkAdmin – Dark Mode for Adminpanel',
 			'api_slug' => 'darkadmin',
 		],
 	];
 
-	// Default auto-update to TRUE for built-in plugins on first load (option not yet set).
-	$auto_updates_saved = get_option( 'awdev_auto_updates' );
-	if ( $auto_updates_saved === false ) {
+	// Default: set global auto-update ON and per-plugin ON for built-ins on first load.
+	if ( $global_auto === false ) {
+		$global_auto = true;
+		update_option( 'awdev_auto_updates_global', true );
+	}
+	if ( get_option( 'awdev_auto_updates' ) === false ) {
 		$defaults = [];
 		foreach ( array_keys( $built_in ) as $basename ) {
 			$defaults[ $basename ] = true;
@@ -261,16 +275,16 @@ function awdev_render_settings_page(): void {
 		$auto_updates = $defaults;
 	}
 
-	$statuses     = [];
-	$pending_updates = []; // basenames that have a pending update available
+	$statuses        = [];
+	$pending_updates = [];
 
 	foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
 		$dirname_slug = sanitize_key( dirname( $basename ) );
 		$api_slug     = $managed[ $basename ] ?? ( $built_in[ $basename ]['api_slug'] ?? $dirname_slug );
 		$api_url      = AWDEV_UPDATE_SERVER . '/' . sanitize_key( $api_slug ) . '.php';
 
-		$local  = awdev_get_local_version( $basename );
-		$remote = awdev_get_remote_version( $api_url, $dirname_slug );
+		$local        = awdev_get_local_version( $basename );
+		$remote       = awdev_get_remote_version( $api_url, $dirname_slug );
 		$needs_update = ( $local !== '–' && $remote !== '–' && version_compare( $remote, $local, '>' ) );
 
 		$statuses[ $basename ] = [
@@ -335,6 +349,22 @@ function awdev_render_settings_page(): void {
 						<?php esc_html_e( 'All AlexanderWagnerDev plugins that receive updates from the self-hosted server.', 'awdev-plugins-updater' ); ?>
 					</p>
 
+					<!-- Global auto-update toggle -->
+					<div class="awdev-global-toggle-row">
+						<label class="awdev-toggle" id="awdev-global-toggle-label">
+							<input type="checkbox"
+								id="awdev-global-auto-update"
+								name="awdev_auto_updates_global"
+								value="1"
+								<?php checked( (bool) $global_auto ); ?>
+							/>
+							<span class="awdev-toggle-slider"></span>
+						</label>
+						<span class="awdev-global-toggle-label">
+							<?php esc_html_e( 'Auto-Update (all plugins)', 'awdev-plugins-updater' ); ?>
+						</span>
+					</div>
+
 					<table class="awdev-plugin-table">
 						<thead>
 							<tr>
@@ -364,6 +394,7 @@ function awdev_render_settings_page(): void {
 								<td>
 									<label class="awdev-toggle">
 										<input type="checkbox"
+											class="awdev-per-plugin-toggle"
 											name="awdev_auto_updates[<?php echo esc_attr( $basename ); ?>]"
 											value="1"
 											<?php checked( $st['auto_update'] ); ?>
@@ -409,6 +440,7 @@ function awdev_render_settings_page(): void {
 								<td>
 									<label class="awdev-toggle">
 										<input type="checkbox"
+											class="awdev-per-plugin-toggle"
 											name="awdev_auto_updates[<?php echo esc_attr( $basename ); ?>]"
 											value="1"
 											<?php checked( $st['auto_update'] ); ?>
@@ -453,10 +485,6 @@ function awdev_render_settings_page(): void {
 			<div class="awdev-submit-row">
 				<?php submit_button( __( 'Save Settings', 'awdev-plugins-updater' ), 'primary', 'submit', false ); ?>
 				<?php if ( ! empty( $pending_updates ) ) :
-					// Build update.php URL for the first pending plugin; WP will chain the rest.
-					$first  = reset( $pending_updates );
-					$others = array_slice( $pending_updates, 1 );
-					// Build a comma-joined list of all basenames for WP bulk upgrade.
 					$plugins_param = implode( ',', array_map( 'urlencode', $pending_updates ) );
 					$bulk_url = admin_url(
 						'update.php?action=update-selected&plugins=' . $plugins_param
@@ -469,7 +497,6 @@ function awdev_render_settings_page(): void {
 					$count = count( $pending_updates );
 					echo esc_html(
 						sprintf(
-							/* translators: %d: number of plugins with available updates */
 							_n( 'Update %d plugin', 'Update all %d plugins', $count, 'awdev-plugins-updater' ),
 							$count
 						)

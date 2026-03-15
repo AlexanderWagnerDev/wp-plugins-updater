@@ -41,18 +41,18 @@ require_once AWDEV_UPDATER_PATH . 'includes/settings.php';
 /**
  * Register all managed AlexanderWagnerDev plugins.
  *
- * Built-in plugins are always registered automatically.
- * This plugin registers itself so it receives self-updates from the update server.
- * Additional plugins can be added via the Settings page.
+ * The folder on disk is "awdev-plugins-updater" but the main file is
+ * "awdev-plugin-updater.php", so the correct WP basename is:
+ * awdev-plugins-updater/awdev-plugin-updater.php
  */
 add_action( 'plugins_loaded', function () {
 	$managed = (array) get_option( 'awdev_managed_plugins', [] );
 
 	$built_in = [
-		// Self-update: this plugin updates itself via the update server.
-		'awdev-plugin-updater/awdev-plugin-updater.php' => 'awdev-plugin-updater',
+		// Self-update: folder = awdev-plugins-updater, main file = awdev-plugin-updater.php
+		'awdev-plugins-updater/awdev-plugin-updater.php' => 'awdev-plugin-updater',
 		// DarkAdmin - Dark Mode for Adminpanel.
-		'wp-darkadmin-plugin/darkadmin.php' => 'darkadmin',
+		'darkadmin/darkadmin.php' => 'darkadmin',
 	];
 
 	foreach ( $built_in as $basename => $api_slug ) {
