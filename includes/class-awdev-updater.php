@@ -109,6 +109,7 @@ class AWDev_Updater {
 	/**
 	 * Fix extracted folder name after update installation.
 	 * Prevents mismatches when the ZIP root dir has a hash-suffixed name.
+	 * Uses WP_Filesystem to avoid direct rename() call.
 	 */
 	public function fix_folder_name( string $source, string $remote_source, object $upgrader, array $hook_extra ): string {
 		if ( ( $hook_extra['plugin'] ?? '' ) !== $this->plugin_basename ) {
@@ -117,7 +118,17 @@ class AWDev_Updater {
 
 		$corrected = trailingslashit( $remote_source ) . $this->plugin_slug . '/';
 
-		if ( $source !== $corrected && rename( $source, $corrected ) ) {
+		if ( $source === $corrected ) {
+			return $source;
+		}
+
+		global $wp_filesystem;
+		if ( ! $wp_filesystem ) {
+			require_once ABSPATH . 'wp-admin/includes/file.php';
+			WP_Filesystem();
+		}
+
+		if ( $wp_filesystem && $wp_filesystem->move( $source, $corrected ) ) {
 			return $corrected;
 		}
 

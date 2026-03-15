@@ -24,7 +24,7 @@ add_action( 'admin_menu', function () {
  */
 function awdev_force_option( string $option, $value, string $autoload = 'yes' ): void {
 	global $wpdb;
-	$wpdb->query(
+	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->prepare(
 			"DELETE FROM {$wpdb->options} WHERE option_name = %s",
 			$option
@@ -36,7 +36,7 @@ function awdev_force_option( string $option, $value, string $autoload = 'yes' ):
 }
 
 /**
- * Handle main settings form save via custom admin_post action.
+ * Handle main settings form save.
  */
 add_action( 'admin_post_awdev_save_settings', function () {
 	if ( ! current_user_can( 'manage_options' ) ) {
@@ -44,17 +44,15 @@ add_action( 'admin_post_awdev_save_settings', function () {
 	}
 	check_admin_referer( 'awdev_save_settings' );
 
-	// Save global auto-update toggle.
 	$global = isset( $_POST['awdev_auto_updates_global'] );
 	awdev_force_option( 'awdev_auto_updates_global', $global );
 
-	// Save cache hours.
-	$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? (int) wp_unslash( $_POST['awdev_cache_hours'] ) : 6;
+	$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? absint( wp_unslash( $_POST['awdev_cache_hours'] ) ) : 6;
 	if ( $cache_hours < 1 )   { $cache_hours = 1; }
 	if ( $cache_hours > 168 ) { $cache_hours = 168; }
 	awdev_force_option( 'awdev_cache_hours', $cache_hours );
 
-	wp_redirect( add_query_arg(
+	wp_safe_redirect( add_query_arg(
 		[ 'page' => AWDEV_SETTINGS_SLUG, 'settings-updated' => '1' ],
 		admin_url( 'options-general.php' )
 	) );
@@ -71,7 +69,7 @@ add_action( 'wp_ajax_awdev_toggle_auto_update', function () {
 	check_ajax_referer( 'awdev_toggle_auto_update' );
 
 	$basename = sanitize_text_field( wp_unslash( $_POST['basename'] ?? '' ) );
-	$enabled  = filter_var( $_POST['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN );
+	$enabled  = filter_var( wp_unslash( $_POST['enabled'] ?? false ), FILTER_VALIDATE_BOOLEAN );
 
 	if ( ! $basename ) {
 		wp_send_json_error( 'missing_basename', 400 );
@@ -85,7 +83,7 @@ add_action( 'wp_ajax_awdev_toggle_auto_update', function () {
 } );
 
 /**
- * AJAX: instant-save the global auto-update toggle (also updates all per-plugin values).
+ * AJAX: instant-save the global auto-update toggle and mirror to all per-plugin entries.
  */
 add_action( 'wp_ajax_awdev_toggle_global_auto_update', function () {
 	if ( ! current_user_can( 'manage_options' ) ) {
@@ -93,11 +91,10 @@ add_action( 'wp_ajax_awdev_toggle_global_auto_update', function () {
 	}
 	check_ajax_referer( 'awdev_toggle_auto_update' );
 
-	$enabled = filter_var( $_POST['enabled'] ?? false, FILTER_VALIDATE_BOOLEAN );
+	$enabled = filter_var( wp_unslash( $_POST['enabled'] ?? false ), FILTER_VALIDATE_BOOLEAN );
 
 	awdev_force_option( 'awdev_auto_updates_global', $enabled );
 
-	// Mirror state to all per-plugin toggles.
 	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
 	foreach ( $auto_updates as $basename => $_ ) {
 		$auto_updates[ $basename ] = $enabled;
@@ -149,7 +146,7 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 } );
 
 /**
- * Handle manual cache flush via POST action.
+ * Handle manual cache flush.
  */
 add_action( 'admin_post_awdev_flush_cache', function () {
 	if ( ! current_user_can( 'manage_options' ) ) {
@@ -158,13 +155,13 @@ add_action( 'admin_post_awdev_flush_cache', function () {
 	check_admin_referer( 'awdev_flush_cache' );
 
 	global $wpdb;
-	$wpdb->query(
+	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->prepare(
 			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
 			'_transient_awdev_upd_%'
 		)
 	);
-	$wpdb->query(
+	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
 		$wpdb->prepare(
 			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
 			'_transient_timeout_awdev_upd_%'
@@ -172,12 +169,12 @@ add_action( 'admin_post_awdev_flush_cache', function () {
 	);
 	delete_site_transient( 'update_plugins' );
 
-	wp_redirect( add_query_arg( [ 'page' => AWDEV_SETTINGS_SLUG, 'cache-flushed' => '1' ], admin_url( 'options-general.php' ) ) );
+	wp_safe_redirect( add_query_arg( [ 'page' => AWDEV_SETTINGS_SLUG, 'cache-flushed' => '1' ], admin_url( 'options-general.php' ) ) );
 	exit;
 } );
 
 /**
- * Handle manual single-plugin update check via POST action.
+ * Handle manual single-plugin re-check.
  */
 add_action( 'admin_post_awdev_check_plugin', function () {
 	if ( ! current_user_can( 'manage_options' ) ) {
@@ -191,7 +188,7 @@ add_action( 'admin_post_awdev_check_plugin', function () {
 		delete_site_transient( 'update_plugins' );
 	}
 
-	wp_redirect( add_query_arg( [ 'page' => AWDEV_SETTINGS_SLUG, 'plugin-checked' => '1' ], admin_url( 'options-general.php' ) ) );
+	wp_safe_redirect( add_query_arg( [ 'page' => AWDEV_SETTINGS_SLUG, 'plugin-checked' => '1' ], admin_url( 'options-general.php' ) ) );
 	exit;
 } );
 
@@ -242,9 +239,11 @@ function awdev_get_last_checked( string $dirname_slug ): string {
 	}
 	if ( $diff < HOUR_IN_SECONDS ) {
 		$mins = (int) ( $diff / 60 );
+		/* translators: %d = number of minutes */
 		return sprintf( _n( '%d minute ago', '%d minutes ago', $mins, 'awdev-plugins-updater' ), $mins );
 	}
 	$hours = (int) ( $diff / HOUR_IN_SECONDS );
+	/* translators: %d = number of hours */
 	return sprintf( _n( '%d hour ago', '%d hours ago', $hours, 'awdev-plugins-updater' ), $hours );
 }
 
@@ -335,8 +334,10 @@ function awdev_render_settings_page(): void {
 		}
 	}
 
-	$cache_flushed  = isset( $_GET['cache-flushed'] );
-	$plugin_checked = isset( $_GET['plugin-checked'] );
+	// Read-only GET flags — no nonce needed (no state change).
+	$cache_flushed  = isset( $_GET['cache-flushed'] );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$plugin_checked = isset( $_GET['plugin-checked'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$settings_saved = isset( $_GET['settings-updated'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	?>
 	<div class="wrap awdev-settings-wrap">
 
@@ -365,11 +366,10 @@ function awdev_render_settings_page(): void {
 		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Plugin cache cleared. WordPress will re-check on next load.', 'awdev-plugins-updater' ); ?></p></div>
 		<?php endif; ?>
 
-		<?php if ( isset( $_GET['settings-updated'] ) ) : ?>
+		<?php if ( $settings_saved ) : ?>
 		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Settings saved.', 'awdev-plugins-updater' ); ?></p></div>
 		<?php endif; ?>
 
-		<!-- Settings Form: toggle + cache hours + save button only. No nested forms. -->
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
 			<input type="hidden" name="action" value="awdev_save_settings" />
 			<?php wp_nonce_field( 'awdev_save_settings' ); ?>
@@ -381,7 +381,7 @@ function awdev_render_settings_page(): void {
 				</div>
 				<div class="awdev-card-body">
 					<p class="awdev-card-description">
-						<?php esc_html_e( 'Configure how often the updater checks for new plugin versions. The cache duration controls the interval between remote API requests.', 'awdev-plugins-updater' ); ?>
+						<?php esc_html_e( 'Configure how often the updater checks for new plugin versions.', 'awdev-plugins-updater' ); ?>
 					</p>
 
 					<div class="awdev-global-toggle-row">
@@ -423,7 +423,6 @@ function awdev_render_settings_page(): void {
 			</div>
 		</form>
 
-		<!-- Managed Plugins Card: outside the settings form to avoid nested forms -->
 		<div class="awdev-card">
 			<div class="awdev-card-header">
 				<span class="dashicons dashicons-plugins-checked"></span>
@@ -542,7 +541,6 @@ function awdev_render_settings_page(): void {
 			</div>
 		</div>
 
-		<!-- Cache Management Card -->
 		<div class="awdev-card">
 			<div class="awdev-card-header">
 				<span class="dashicons dashicons-performance"></span>
@@ -551,8 +549,9 @@ function awdev_render_settings_page(): void {
 			<div class="awdev-card-body">
 				<p class="awdev-card-description">
 					<?php
+					/* translators: %d = configured cache duration in hours */
 					printf(
-						esc_html__( 'Update data is cached for %d hour(s) per plugin. Flush the cache to force WordPress to re-check all endpoints immediately.', 'awdev-plugins-updater' ),
+						esc_html__( 'Update data is cached for %d hour(s) per plugin. Flush the cache to force an immediate re-check.', 'awdev-plugins-updater' ),
 						(int) get_option( 'awdev_cache_hours', 6 )
 					);
 					?>

@@ -8,7 +8,7 @@ Stable tag: 0.0.3
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Keeps AlexanderWagnerDev plugins up to date — without WordPress.org. Updates are served from a self-hosted server, so every release ships on your own schedule.
+Self-hosted update manager for AlexanderWagnerDev plugins. No WordPress.org required.
 
 == Description ==
 AWDev Plugins Updater replaces the WordPress.org update channel for AlexanderWagnerDev plugins with a self-hosted update server. This gives full control over versioning, distribution and release timing — completely independent of the WordPress.org review queue.
@@ -65,7 +65,11 @@ Yes. The settings page fully supports DarkAdmin and adapts to dark mode automati
 * Per-plugin auto-update toggles now save instantly via AJAX — no Save button needed.
 * Global auto-update toggle now instantly mirrors its state to all per-plugin toggles and saves via AJAX.
 * Debug output removed from settings saved notice.
-* "Save Settings" button moved into the Auto-Update Settings card.
+* Replaced direct rename() with WP_Filesystem::move() for folder fix after ZIP extraction.
+* Replaced wp_redirect() with wp_safe_redirect() throughout.
+* Added wp_unslash() and absint() for all POST input sanitization.
+* Added translators comments for all _n() calls.
+* Added phpcs:ignore for intentional direct DB queries (cache flush, option force-write).
 
 = 0.0.2 =
 * Added per-plugin auto-update toggle.
@@ -89,15 +93,15 @@ Der AWDev Plugins Updater ersetzt den WordPress.org-Update-Kanal für AlexanderW
 Funktionen:
 * Native WordPress-Update-Integration (keine Drittanbieter-Bibliotheken)
 * Einstellungsseite unter Einstellungen → AWDev Plugins Updater
-* Integrierte Unterstützung für DarkAdmin – Dark Mode for Adminpanel (automatisch registriert)
-* Auto-Update-Toggle pro Plugin — wird sofort beim Klick gespeichert, kein Speichern-Button nötig
+* Integrierte Unterstützung für DarkAdmin (automatisch registriert)
+* Auto-Update-Toggle pro Plugin — wird sofort beim Klick gespeichert
 * Globaler Auto-Update-Hauptschalter — überträgt Zustand sofort auf alle Per-Plugin-Toggles
-* Manueller Re-Check-Button pro Plugin — leert den Transient und holt sofort die neueste Version
-* Ein-Klick-Aktualisieren-Button — erscheint automatisch wenn eine neuere Remote-Version verfügbar ist
-* Weitere Plugins über die Einstellungsseite hinzufügen — kein Code-Edit nötig
+* Manueller Re-Check-Button pro Plugin
+* Ein-Klick-Aktualisieren-Button bei verfügbarer neuerer Version
+* Weitere Plugins über die Einstellungsseite hinzufügen
 * Konfigurierbares Update-Cache-Intervall (1h–168h, Standard 6h)
 * Manueller Cache-Flush-Button
-* Dark-Mode-kompatible Einstellungsseite — passt sich automatisch via DarkAdmin an
+* Dark-Mode-kompatible Einstellungsseite via DarkAdmin
 * Übersetzungen: de_DE, de_AT, en_US
 
 === Installation ===
@@ -108,11 +112,13 @@ Funktionen:
 
 === Changelog ===
 = 0.0.3 =
-* Fehler mit verschachtelten Formular-Elementen behoben.
-* Per-Plugin-Auto-Update-Toggles werden sofort via AJAX gespeichert.
+* Verschachtelte Formular-Elemente behoben.
+* Per-Plugin-Toggles speichern sofort via AJAX.
 * Globaler Toggle spiegelt Zustand sofort auf alle Per-Plugin-Toggles.
 * Debug-Ausgaben entfernt.
-* Speichern-Button in die Auto-Update-Settings-Card verschoben.
+* rename() durch WP_Filesystem::move() ersetzt.
+* wp_redirect() durch wp_safe_redirect() ersetzt.
+* wp_unslash() und absint() für POST-Input hinzugefügt.
 
 = 0.0.2 =
 * Auto-Update-Toggle pro Plugin hinzugefügt.
