@@ -20,6 +20,22 @@ add_action( 'admin_menu', function () {
 } );
 
 /**
+ * Persist an option reliably regardless of whether the value changed.
+ * update_option() silently skips when old === new (loose comparison),
+ * so we delete first to guarantee the write always goes through.
+ *
+ * @param string $option   Option name.
+ * @param mixed  $value    New value.
+ * @param string $autoload 'yes'|'no'
+ */
+function awdev_force_option( string $option, $value, string $autoload = 'yes' ): void {
+	global $wpdb;
+	$wpdb->delete( $wpdb->options, [ 'option_name' => $option ] );
+	wp_cache_delete( $option, 'options' );
+	add_option( $option, $value, '', $autoload );
+}
+
+/**
  * Handle main settings form save via custom admin_post action.
  */
 add_action( 'admin_post_awdev_save_settings', function () {
@@ -30,13 +46,13 @@ add_action( 'admin_post_awdev_save_settings', function () {
 
 	// Save global auto-update toggle.
 	$global = isset( $_POST['awdev_auto_updates_global'] );
-	update_option( 'awdev_auto_updates_global', $global, 'yes' );
+	awdev_force_option( 'awdev_auto_updates_global', $global );
 
 	// Save cache hours.
 	$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? (int) wp_unslash( $_POST['awdev_cache_hours'] ) : 6;
 	if ( $cache_hours < 1 )   { $cache_hours = 1; }
 	if ( $cache_hours > 168 ) { $cache_hours = 168; }
-	update_option( 'awdev_cache_hours', $cache_hours, 'yes' );
+	awdev_force_option( 'awdev_cache_hours', $cache_hours );
 
 	// Save per-plugin auto-update toggles.
 	$raw = isset( $_POST['awdev_auto_updates'] ) && is_array( $_POST['awdev_auto_updates'] )
@@ -60,7 +76,7 @@ add_action( 'admin_post_awdev_save_settings', function () {
 			$auto_updates[ $basename ] = false;
 		}
 	}
-	update_option( 'awdev_auto_updates', $auto_updates, 'yes' );
+	awdev_force_option( 'awdev_auto_updates', $auto_updates );
 
 	wp_redirect( add_query_arg(
 		[ 'page' => AWDEV_SETTINGS_SLUG, 'settings-updated' => '1' ],
