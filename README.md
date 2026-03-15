@@ -43,6 +43,14 @@ Open *Settings → AWDev Plugins Updater*:
 
 ## Changelog
 
+### 0.0.4
+- Replaced `wp_redirect()` with `wp_safe_redirect()` throughout
+- Added `wp_unslash()` and `absint()` for all POST input sanitization
+- Added `translators` comments for all `_n()` and `printf()` i18n calls
+- Replaced direct `rename()` with `WP_Filesystem::move()` for folder fix after ZIP extraction
+- Added `phpcs:ignore` annotations for intentional direct DB queries
+- Shortened `readme.txt` short description to comply with 150-char limit
+
 ### 0.0.3
 - Fixed illegal nested `<form>` elements causing "Save Settings" to submit the wrong action
 - Per-plugin auto-update toggles now save instantly via AJAX — no Save button needed
@@ -113,26 +121,32 @@ Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — o
 
 ### Changelog
 
+#### 0.0.4
+- `wp_redirect()` durch `wp_safe_redirect()` ersetzt
+- `wp_unslash()` und `absint()` für POST-Input-Sanitization hinzugefügt
+- `translators`-Kommentare für alle `_n()` und `printf()` i18n-Aufrufe hinzugefügt
+- `rename()` durch `WP_Filesystem::move()` ersetzt
+- `phpcs:ignore`-Annotationen für intentionale direkte DB-Queries hinzugefügt
+
 #### 0.0.3
-- Fehler mit verschachtelten `<form>`-Elementen behoben — „Einstellungen speichern“ sendete vorher die falsche Aktion
-- Per-Plugin-Auto-Update-Toggles werden jetzt sofort via AJAX gespeichert — kein Speichern-Button nötig
-- Globaler Auto-Update-Toggle spiegelt Zustand sofort auf alle Per-Plugin-Toggles und speichert via AJAX
-- Debug-Ausgaben aus der Erfolgs-Meldung entfernt
-- „Einstellungen speichern“-Button in die Auto-Update-Settings-Card verschoben
+- Fehler mit verschachtelten `<form>`-Elementen behoben
+- Per-Plugin-Auto-Update-Toggles werden jetzt sofort via AJAX gespeichert
+- Globaler Auto-Update-Toggle spiegelt Zustand sofort auf alle Per-Plugin-Toggles
+- Debug-Ausgaben entfernt
+- Speichern-Button in die Auto-Update-Settings-Card verschoben
 
 #### 0.0.2
-- Auto-Update-Toggle pro Plugin hinzugefügt (gespeichert in `awdev_auto_updates`)
+- Auto-Update-Toggle pro Plugin hinzugefügt
 - Manuellen Re-Check-Button pro Plugin hinzugefügt
-- Ein-Klick-Aktualisieren-Button bei verfügbarer neuerer Version hinzugefügt
-- Erkennung der lokal installierten Version korrigiert (Ordner-Fallback)
-- Transient-Key-Fehler für DarkAdmin-Versionsanzeige behoben
-- Dark-Mode-Styling-Kompatibilität mit DarkAdmin behoben
-- Remote-Version wird beim Öffnen der Einstellungsseite aktiv abgerufen wenn kein Transient vorhanden
+- Ein-Klick-Aktualisieren-Button hinzugefügt
+- Versionserkennung korrigiert
+- Transient-Key-Fehler behoben
+- Dark-Mode-Kompatibilität behoben
 
 #### 0.0.1
 - Erste Veröffentlichung
 - Native WordPress-Update-Hook-Integration
-- Einstellungsseite mit konfigurierbarer API-URL, Plugin-Tabelle und Cache-Flush
+- Einstellungsseite mit Plugin-Tabelle und Cache-Flush
 - Integrierte DarkAdmin-Unterstützung
 - Übersetzungen: `de_DE`, `de_AT`, `en_US`
 

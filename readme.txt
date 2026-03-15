@@ -4,7 +4,7 @@ Tags: updater, self-hosted, plugin update, update manager, dark mode
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.0.3
+Stable tag: 0.0.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,16 +60,20 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
+= 0.0.4 =
+* Replaced wp_redirect() with wp_safe_redirect() throughout.
+* Added wp_unslash() and absint() for all POST input sanitization.
+* Added translators comments for all _n() and printf() i18n calls.
+* Replaced direct rename() with WP_Filesystem::move() for folder fix after ZIP extraction.
+* Added phpcs:ignore for intentional direct DB queries.
+* Shortened readme.txt short description to comply with 150-char limit.
+
 = 0.0.3 =
 * Fixed illegal nested form elements causing "Save Settings" to submit the wrong action.
 * Per-plugin auto-update toggles now save instantly via AJAX — no Save button needed.
 * Global auto-update toggle now instantly mirrors its state to all per-plugin toggles and saves via AJAX.
 * Debug output removed from settings saved notice.
-* Replaced direct rename() with WP_Filesystem::move() for folder fix after ZIP extraction.
-* Replaced wp_redirect() with wp_safe_redirect() throughout.
-* Added wp_unslash() and absint() for all POST input sanitization.
-* Added translators comments for all _n() calls.
-* Added phpcs:ignore for intentional direct DB queries (cache flush, option force-write).
+* "Save Settings" button moved into the Auto-Update Settings card.
 
 = 0.0.2 =
 * Added per-plugin auto-update toggle.
@@ -111,14 +115,19 @@ Funktionen:
 4. Einstellungen → AWDev Plugins Updater aufrufen.
 
 === Changelog ===
+= 0.0.4 =
+* wp_redirect() durch wp_safe_redirect() ersetzt.
+* wp_unslash() und absint() für POST-Input hinzugefügt.
+* translators-Kommentare für _n() und printf() hinzugefügt.
+* rename() durch WP_Filesystem::move() ersetzt.
+* phpcs:ignore für direkte DB-Queries hinzugefügt.
+
 = 0.0.3 =
 * Verschachtelte Formular-Elemente behoben.
 * Per-Plugin-Toggles speichern sofort via AJAX.
 * Globaler Toggle spiegelt Zustand sofort auf alle Per-Plugin-Toggles.
 * Debug-Ausgaben entfernt.
-* rename() durch WP_Filesystem::move() ersetzt.
-* wp_redirect() durch wp_safe_redirect() ersetzt.
-* wp_unslash() und absint() für POST-Input hinzugefügt.
+* Speichern-Button in Auto-Update-Settings-Card verschoben.
 
 = 0.0.2 =
 * Auto-Update-Toggle pro Plugin hinzugefügt.
