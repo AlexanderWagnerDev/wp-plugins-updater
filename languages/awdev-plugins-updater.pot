@@ -12,7 +12,7 @@ msgstr ""
 "X-Generator: AWDev\n"
 "Domain: awdev-plugins-updater\n"
 
-#: awdev-plugin-updater.php
+#: awdev-plugins-updater.php
 msgid "Settings"
 msgstr ""
 

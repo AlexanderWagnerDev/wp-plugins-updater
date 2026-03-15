@@ -17,7 +17,7 @@ msgstr ""
 "Domain: awdev-plugins-updater\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
-#: awdev-plugin-updater.php
+#: awdev-plugins-updater.php
 msgid "Settings"
 msgstr "Einstellungen"
 
