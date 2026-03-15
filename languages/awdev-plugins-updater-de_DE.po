@@ -3,10 +3,10 @@
 # This file is distributed under the GPLv2 or later.
 msgid ""
 msgstr ""
-"Project-Id-Version: AWDev Plugins Updater 0.0.1\n"
+"Project-Id-Version: AWDev Plugins Updater 0.0.2\n"
 "Report-Msgid-Bugs-To: https://github.com/AlexanderWagnerDev/wp-plugins-updater/issues\n"
-"POT-Creation-Date: 2026-03-15T00:00:00+01:00\n"
-"PO-Revision-Date: 2026-03-15T00:00:00+01:00\n"
+"POT-Creation-Date: 2026-03-15T01:00:00+01:00\n"
+"PO-Revision-Date: 2026-03-15T01:00:00+01:00\n"
 "Last-Translator: Alexander Wagner <info@alexanderwagnerdev.com>\n"
 "Language-Team: Alexander Wagner <info@alexanderwagnerdev.com>\n"
 "Language: de_DE\n"
@@ -96,6 +96,13 @@ msgstr "Update erneut prüfen"
 #: includes/settings.php
 msgid "Update"
 msgstr "Aktualisieren"
+
+#: includes/settings.php
+#. translators: %d: number of plugins with available updates
+msgid "Update %d plugin"
+msgid_plural "Update all %d plugins"
+msgstr[0] "%d Plugin aktualisieren"
+msgstr[1] "Alle %d Plugins aktualisieren"
 
 #: includes/settings.php
 msgid "Add Plugin"
