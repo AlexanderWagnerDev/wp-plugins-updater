@@ -49,10 +49,8 @@ add_action( 'plugins_loaded', function () {
 	$managed = (array) get_option( 'awdev_managed_plugins', [] );
 
 	$built_in = [
-		// Self-update: folder = awdev-plugins-updater, main file = awdev-plugins-updater.php
-		'awdev-plugins-updater/awdev-plugins-updater.php' => 'awdev-plugin-updater',
-		// DarkAdmin - Dark Mode for Adminpanel.
-		'darkadmin/darkadmin.php' => 'darkadmin',
+		'awdev-plugins-updater/awdev-plugins-updater.php' => 'awdev-plugins-updater',
+		'darkadmin/darkadmin.php'                         => 'darkadmin',
 	];
 
 	foreach ( $built_in as $basename => $api_slug ) {
