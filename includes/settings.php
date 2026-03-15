@@ -21,8 +21,7 @@ add_action( 'admin_menu', function () {
 
 /**
  * Persist an option reliably regardless of whether the value changed.
- * update_option() silently skips when old === new (loose comparison),
- * so we delete first to guarantee the write always goes through.
+ * Uses direct $wpdb query to bypass WordPress object cache and same-value skip.
  *
  * @param string $option   Option name.
  * @param mixed  $value    New value.
@@ -30,8 +29,14 @@ add_action( 'admin_menu', function () {
  */
 function awdev_force_option( string $option, $value, string $autoload = 'yes' ): void {
 	global $wpdb;
-	$wpdb->delete( $wpdb->options, [ 'option_name' => $option ] );
+	$wpdb->query(
+		$wpdb->prepare(
+			"DELETE FROM {$wpdb->options} WHERE option_name = %s",
+			$option
+		)
+	);
 	wp_cache_delete( $option, 'options' );
+	wp_cache_delete( 'alloptions', 'options' );
 	add_option( $option, $value, '', $autoload );
 }
 
@@ -79,7 +84,11 @@ add_action( 'admin_post_awdev_save_settings', function () {
 	awdev_force_option( 'awdev_auto_updates', $auto_updates );
 
 	wp_redirect( add_query_arg(
-		[ 'page' => AWDEV_SETTINGS_SLUG, 'settings-updated' => '1' ],
+		[
+			'page'             => AWDEV_SETTINGS_SLUG,
+			'settings-updated' => '1',
+			'saved-hours'      => $cache_hours,
+		],
 		admin_url( 'options-general.php' )
 	) );
 	exit;
@@ -328,6 +337,7 @@ function awdev_render_settings_page(): void {
 
 	$cache_flushed  = isset( $_GET['cache-flushed'] );
 	$plugin_checked = isset( $_GET['plugin-checked'] );
+	$saved_hours    = isset( $_GET['saved-hours'] ) ? (int) $_GET['saved-hours'] : null;
 	?>
 	<div class="wrap awdev-settings-wrap">
 
@@ -357,7 +367,14 @@ function awdev_render_settings_page(): void {
 		<?php endif; ?>
 
 		<?php if ( isset( $_GET['settings-updated'] ) ) : ?>
-		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Settings saved.', 'awdev-plugins-updater' ); ?></p></div>
+		<div class="notice notice-success is-dismissible">
+			<p>
+				<?php esc_html_e( '✓ Settings saved.', 'awdev-plugins-updater' ); ?>
+				<?php if ( $saved_hours !== null ) : ?>
+					&mdash; <?php printf( esc_html__( 'Check interval set to %d hour(s). DB now reads: %d hour(s).', 'awdev-plugins-updater' ), $saved_hours, $cache_hours ); ?>
+				<?php endif; ?>
+			</p>
+		</div>
 		<?php endif; ?>
 
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
@@ -406,6 +423,10 @@ function awdev_render_settings_page(): void {
 							class="small-text"
 						/>
 						<span class="description"><?php esc_html_e( 'Min: 1h — Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
+					</div>
+
+					<div class="awdev-submit-row">
+						<button type="submit" class="button button-primary"><?php esc_html_e( 'Save Settings', 'awdev-plugins-updater' ); ?></button>
 					</div>
 				</div>
 			</div>
@@ -531,29 +552,6 @@ function awdev_render_settings_page(): void {
 				</div>
 			</div>
 
-			<div class="awdev-submit-row">
-				<button type="submit" class="button button-primary"><?php esc_html_e( 'Save Settings', 'awdev-plugins-updater' ); ?></button>
-				<?php if ( ! empty( $pending_updates ) ) :
-					$plugins_param = implode( ',', array_map( 'urlencode', $pending_updates ) );
-					$bulk_url      = admin_url(
-						'update.php?action=update-selected&plugins=' . $plugins_param
-						. '&_wpnonce=' . wp_create_nonce( 'bulk-update-plugins' )
-					);
-				?>
-				<a href="<?php echo esc_url( $bulk_url ); ?>" class="button button-primary awdev-update-all-btn">
-					<span class="dashicons dashicons-update"></span>
-					<?php
-					$count = count( $pending_updates );
-					echo esc_html(
-						sprintf(
-							_n( 'Update %d plugin', 'Update all %d plugins', $count, 'awdev-plugins-updater' ),
-							$count
-						)
-					);
-					?>
-				</a>
-				<?php endif; ?>
-			</div>
 		</form>
 
 		<!-- Cache Management Card -->
