@@ -4,7 +4,7 @@ Tags: updater, self-hosted, plugin update, update manager, dark mode
 Requires at least: 6.0
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.0.6
+Stable tag: 0.0.7
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,11 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
+= 0.0.7 =
+* Improved DarkAdmin compatibility on the AWDev Plugins Updater settings page
+* Removed color-related !important declarations from base selectors so DarkAdmin styling can cascade properly
+* Kept DarkAdmin-specific override rules in place for reliable dark mode rendering
+
 = 0.0.6 =
 * Fixed language file msgid strings to exactly match the corresponding __() calls in settings.php
 * Corrected two mismatched strings: 'Configure how often...' and 'Update data is cached for...'
@@ -126,6 +131,11 @@ Funktionen:
 4. Einstellungen → AWDev Plugins Updater aufrufen.
 
 === Changelog ===
+= 0.0.7 =
+* DarkAdmin-Kompatibilität auf der Einstellungsseite des AWDev Plugins Updater verbessert
+* Farbbezogene !important-Deklarationen aus Basis-Selektoren entfernt, damit DarkAdmin-Styles korrekt durchgreifen
+* DarkAdmin-spezifische Override-Regeln für stabiles Dark-Mode-Rendering beibehalten
+
 = 0.0.6 =
 * Sprachdatei-msgid-Strings an die exakten __()-Aufrufe in settings.php angepasst
 * Zwei nicht übereinstimmende Strings korrigiert: 'Configure how often...' und 'Update data is cached for...'
