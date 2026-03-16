@@ -1,7 +1,7 @@
 # AWDev Plugins Updater
 
 ![License: GPLv2](https://img.shields.io/badge/License-GPLv2-blue.svg)
-![WordPress](https://img.shields.io/badge/WordPress-6.0%2B-21759b)
+![WordPress](https://img.shields.io/badge/WordPress-6.3%2B-21759b)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777bb4)
 
 Keeps [AlexanderWagnerDev](https://alexanderwagnerdev.com) plugins up to date — without WordPress.org. Updates are served from a self-hosted server, so every release ships on your own schedule.
@@ -25,7 +25,7 @@ Keeps [AlexanderWagnerDev](https://alexanderwagnerdev.com) plugins up to date �
 
 ## Installation
 
-1. Download the latest `awdev-plugin-updater.zip` from [Releases](https://github.com/AlexanderWagnerDev/wp-plugins-updater/releases).
+1. Download the latest `awdev-plugins-updater.zip` from [Releases](https://github.com/AlexanderWagnerDev/wp-plugins-updater/releases).
 2. In WordPress go to *Plugins → Add New → Upload Plugin* and select the ZIP.
 3. Activate the plugin.
 4. Open *Settings → AWDev Plugins Updater* — DarkAdmin is already registered automatically.
@@ -35,7 +35,6 @@ Keeps [AlexanderWagnerDev](https://alexanderwagnerdev.com) plugins up to date �
 Open *Settings → AWDev Plugins Updater*:
 
 - **Built-in plugins** (AWDev Plugins Updater, DarkAdmin) are always registered automatically
-- Click **Add Plugin** to register additional plugins by providing the basename (e.g. `my-plugin/my-plugin.php`) and API slug
 - Use the **toggle** in the Auto-Update column to enable or disable automatic WP updates per plugin — saves instantly
 - The **global toggle** in the Auto-Update Settings card applies to all plugins at once
 - Use the **🔄 re-check button** to force a fresh API fetch for a single plugin
