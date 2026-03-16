@@ -103,8 +103,8 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
   justify-content: space-between;
   gap: 12px;
   padding: 20px 24px;
-  background: var(--awdev-bg) !important;
-  border: 1px solid var(--awdev-border) !important;
+  background: var(--awdev-bg);
+  border: 1px solid var(--awdev-border);
   border-radius: 10px;
   margin-bottom: 20px;
   box-shadow: 0 1px 3px var(--awdev-shadow);
@@ -118,7 +118,7 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
   font-size: 30px !important;
   width: 30px !important;
   height: 30px !important;
-  color: var(--awdev-link) !important;
+  color: var(--awdev-link);
 }
 .awdev-page-title {
   margin: 0 0 2px !important;
@@ -126,13 +126,13 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
   font-size: 20px !important;
   font-weight: 700 !important;
   line-height: 1.2 !important;
-  color: var(--awdev-text) !important;
+  color: var(--awdev-text);
   border: none !important;
 }
 .awdev-page-subtitle {
   margin: 0;
   font-size: 12px;
-  color: var(--awdev-text-muted) !important;
+  color: var(--awdev-text-muted);
 }
 .awdev-status-badge {
   display: inline-flex;
@@ -146,8 +146,8 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
   text-transform: uppercase;
   white-space: nowrap;
 }
-.awdev-status-active   { background: var(--awdev-active-bg) !important; color: var(--awdev-active-fg) !important; }
-.awdev-status-inactive { background: #fee2e2 !important; color: #7f1d1d !important; }
+.awdev-status-active   { background: var(--awdev-active-bg); color: var(--awdev-active-fg); }
+.awdev-status-inactive { background: #fee2e2; color: #7f1d1d; }
 .awdev-status-dot {
   width: 7px;
   height: 7px;
@@ -159,8 +159,8 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
    CARDS
    ============================================================================= */
 .awdev-card {
-  background: var(--awdev-bg) !important;
-  border: 1px solid var(--awdev-border) !important;
+  background: var(--awdev-bg);
+  border: 1px solid var(--awdev-border);
   border-radius: 10px;
   margin-bottom: 20px;
   box-shadow: 0 1px 3px var(--awdev-shadow);
@@ -171,11 +171,11 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
   align-items: center;
   gap: 10px;
   padding: 13px 20px;
-  background: var(--awdev-bg-alt) !important;
-  border-bottom: 1px solid var(--awdev-border) !important;
+  background: var(--awdev-bg-alt);
+  border-bottom: 1px solid var(--awdev-border);
 }
 .awdev-card-header .dashicons {
-  color: var(--awdev-link) !important;
+  color: var(--awdev-link);
   font-size: 17px !important;
   width: 17px !important;
   height: 17px !important;
@@ -186,7 +186,7 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
   padding: 0 !important;
   font-size: 14px !important;
   font-weight: 600 !important;
-  color: var(--awdev-text) !important;
+  color: var(--awdev-text);
   border: none !important;
 }
 .awdev-card-body {
@@ -195,7 +195,7 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
 .awdev-card-description {
   margin: 0 0 16px !important;
   font-size: 13px;
-  color: var(--awdev-text-muted) !important;
+  color: var(--awdev-text-muted);
   line-height: 1.5;
 }
 
@@ -208,14 +208,14 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
   gap: 10px;
   margin-bottom: 16px;
   padding: 10px 14px;
-  background: var(--awdev-bg-alt) !important;
-  border: 1px solid var(--awdev-border) !important;
+  background: var(--awdev-bg-alt);
+  border: 1px solid var(--awdev-border);
   border-radius: 6px;
 }
 .awdev-global-toggle-label {
   font-size: 13px;
   font-weight: 600;
-  color: var(--awdev-text) !important;
+  color: var(--awdev-text);
 }
 
 /* =============================================================================
@@ -230,44 +230,44 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
 .awdev-plugin-table th {
   text-align: left;
   padding: 8px 10px;
-  background: var(--awdev-bg-alt) !important;
-  border: 1px solid var(--awdev-border) !important;
+  background: var(--awdev-bg-alt);
+  border: 1px solid var(--awdev-border);
   font-weight: 600;
-  color: var(--awdev-text-muted) !important;
+  color: var(--awdev-text-muted);
   font-size: 12px;
   text-transform: uppercase;
   letter-spacing: .4px;
 }
 .awdev-plugin-table td {
   padding: 10px;
-  border: 1px solid var(--awdev-border) !important;
+  border: 1px solid var(--awdev-border);
   vertical-align: middle;
-  color: var(--awdev-text) !important;
-  background: var(--awdev-bg) !important;
+  color: var(--awdev-text);
+  background: var(--awdev-bg);
 }
 .awdev-plugin-table tr:nth-child(even) td {
-  background: var(--awdev-bg-row) !important;
+  background: var(--awdev-bg-row);
 }
 .awdev-plugin-table strong {
-  color: var(--awdev-text) !important;
+  color: var(--awdev-text);
 }
 .awdev-plugin-table a {
-  color: var(--awdev-link) !important;
+  color: var(--awdev-link);
   font-size: 11px;
   word-break: break-all;
 }
 .awdev-version-new {
   display: inline-block;
   font-weight: 700;
-  color: var(--awdev-update-fg) !important;
-  background: var(--awdev-update-bg) !important;
+  color: var(--awdev-update-fg);
+  background: var(--awdev-update-bg);
   border-radius: 4px;
   padding: 1px 6px;
   font-size: 12px;
 }
 .awdev-last-checked {
   font-size: 11px;
-  color: var(--awdev-text-muted) !important;
+  color: var(--awdev-text-muted);
   margin-top: 2px;
   display: block;
 }
@@ -388,8 +388,8 @@ body.adm-dark-active .awdev-settings-wrap .awdev-toggle input:checked + .awdev-t
   font-weight: 600;
   letter-spacing: .3px;
 }
-.awdev-badge-builtin { background: var(--awdev-badge-bi-bg) !important; color: var(--awdev-badge-bi-fg) !important; }
-.awdev-badge-custom  { background: var(--awdev-badge-cu-bg) !important; color: var(--awdev-badge-cu-fg) !important; }
+.awdev-badge-builtin { background: var(--awdev-badge-bi-bg); color: var(--awdev-badge-bi-fg); }
+.awdev-badge-custom  { background: var(--awdev-badge-cu-bg); color: var(--awdev-badge-cu-fg); }
 
 /* =============================================================================
    REMOVE BUTTON
@@ -412,7 +412,7 @@ body.adm-dark-active .awdev-settings-wrap .awdev-toggle input:checked + .awdev-t
    ============================================================================= */
 .awdev-add-row {
   padding-top: 12px;
-  border-top: 1px solid var(--awdev-border) !important;
+  border-top: 1px solid var(--awdev-border);
 }
 .awdev-add-row .button {
   display: inline-flex !important;
@@ -438,10 +438,10 @@ body.adm-dark-active .awdev-settings-wrap .awdev-toggle input:checked + .awdev-t
   text-align: center;
   padding: 10px 0 4px;
   font-size: 12px;
-  color: var(--awdev-text-muted) !important;
+  color: var(--awdev-text-muted);
 }
 .awdev-footer a {
-  color: var(--awdev-link) !important;
+  color: var(--awdev-link);
   text-decoration: none;
 }
 .awdev-footer a:hover { text-decoration: underline; }
