@@ -18,7 +18,7 @@ Keeps [AlexanderWagnerDev](https://alexanderwagnerdev.com) plugins up to date �
 - ✅ Add/remove additional plugins via the Settings UI — no code changes needed
 - ✅ Configurable update cache interval (1h–168h, default 6h)
 - ✅ Manual full cache flush button
-- ✅ “View version details” popup in the WP update screen
+- ✅ "View version details" popup in the WP update screen
 - ✅ Automatic plugin folder name fix after ZIP extraction (including bulk updates and random-suffix folders)
 - ✅ Full Dark Mode support via DarkAdmin — settings page adapts automatically
 - ✅ Translations: `de_DE`, `de_AT`, `en_US`
@@ -41,6 +41,10 @@ Open *Settings → AWDev Plugins Updater*:
 - The **Update button** appears automatically when a newer version is available on the server
 
 ## Changelog
+
+### 0.0.8
+- Fixed auto-update filter returning `null` for AWDev plugins instead of `true`, causing WP background updates to be silently skipped
+- Fixed plugin folder rename silently failing when target directory already exists after ZIP extraction (`WP_Filesystem::move()` now preceded by `delete()` of existing target)
 
 ### 0.0.7
 - Improved DarkAdmin compatibility on the AWDev Plugins Updater settings page
@@ -100,6 +104,10 @@ Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — o
 
 ### Changelog
 
+#### 0.0.8
+- Auto-Update-Filter gab `null` statt `true` für AWDev-Plugins zurück — WP-Hintergrund-Updates wurden dadurch lautlos übersprungen (behoben)
+- Ordnerumbenennung nach ZIP-Extraktion schlug lautlos fehl wenn Zielordner bereits existierte — `WP_Filesystem::move()` wird nun von `delete()` des Zielordners vorangestellt (behoben)
+
 #### 0.0.7
 - DarkAdmin-Kompatibilität auf der Einstellungsseite des AWDev Plugins Updater verbessert
 - Farbbezogene `!important`-Deklarationen aus Basis-Selektoren entfernt, damit DarkAdmin-Styles korrekt durchgreifen
@@ -125,6 +133,7 @@ Hält [AlexanderWagnerDev](https://alexanderwagnerdev.com) Plugins aktuell — o
 - Verschachtelte `<form>`-Elemente behoben
 - Per-Plugin-Toggles speichern sofort via AJAX
 - Globaler Toggle spiegelt Zustand sofort
+- Debug-Ausgaben entfernt
 
 #### 0.0.2
 - Auto-Update-Toggle pro Plugin

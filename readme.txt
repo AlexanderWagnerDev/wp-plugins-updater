@@ -4,7 +4,7 @@ Tags: updater, self-hosted, plugin update, update manager
 Requires at least: 6.3
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.0.7
+Stable tag: 0.0.8
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -60,6 +60,10 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
+= 0.0.8 =
+* Fixed auto-update filter returning null for AWDev plugins instead of true, causing WP background updates to be silently skipped
+* Fixed plugin folder rename silently failing when target directory already exists after ZIP extraction
+
 = 0.0.7 =
 * Improved DarkAdmin compatibility on the AWDev Plugins Updater settings page
 * Removed color-related !important declarations from base selectors so DarkAdmin styling can cascade properly
@@ -131,6 +135,10 @@ Funktionen:
 4. Einstellungen → AWDev Plugins Updater aufrufen.
 
 === Changelog ===
+= 0.0.8 =
+* Auto-Update-Filter gab null statt true für AWDev-Plugins zurück — WP-Hintergrund-Updates wurden dadurch lautlos übersprungen (behoben)
+* Ordnerumbenennung nach ZIP-Extraktion schlug lautlos fehl wenn Zielordner bereits existierte (behoben)
+
 = 0.0.7 =
 * DarkAdmin-Kompatibilität auf der Einstellungsseite des AWDev Plugins Updater verbessert
 * Farbbezogene !important-Deklarationen aus Basis-Selektoren entfernt, damit DarkAdmin-Styles korrekt durchgreifen
