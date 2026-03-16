@@ -106,17 +106,40 @@ add_action( 'wp_ajax_awdev_toggle_global_auto_update', function () {
 
 /**
  * Auto-update hook: respect per-plugin toggle; global toggle overrides all when off.
+ *
+ * For AWDev-managed plugins not yet in the awdev_auto_updates option,
+ * default to true so WP does not skip them due to a null/false return value.
  */
 add_filter( 'auto_update_plugin', function ( $update, $item ) {
+	$plugin_basename = $item->plugin ?? '';
+	if ( ! $plugin_basename ) {
+		return $update;
+	}
+
+	$managed  = (array) get_option( 'awdev_managed_plugins', [] );
+	$built_in = [
+		'awdev-plugins-updater/awdev-plugins-updater.php',
+		'darkadmin-dark-mode-for-adminpanel/darkadmin.php',
+	];
+
+	$is_awdev = in_array( $plugin_basename, $built_in, true ) || isset( $managed[ $plugin_basename ] );
+	if ( ! $is_awdev ) {
+		return $update;
+	}
+
+	// Global toggle off → never auto-update any AWDev plugin.
 	$global = (bool) get_option( 'awdev_auto_updates_global', true );
 	if ( ! $global ) {
 		return false;
 	}
+
+	// Per-plugin toggle: if explicitly set, honour it; otherwise default to true.
 	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
-	if ( isset( $item->plugin ) && isset( $auto_updates[ $item->plugin ] ) ) {
-		return (bool) $auto_updates[ $item->plugin ];
+	if ( isset( $auto_updates[ $plugin_basename ] ) ) {
+		return (bool) $auto_updates[ $plugin_basename ];
 	}
-	return $update;
+
+	return true;
 }, 10, 2 );
 
 /**
