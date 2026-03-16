@@ -1,20 +1,25 @@
 /*
  * AWDev Plugins Updater - Settings Page Styles
  * Author: AlexanderWagnerDev
+ *
+ * Colors are driven by DarkAdmin CSS variables (--adm-*) with light-mode fallbacks.
+ * If DarkAdmin is active, its variables are defined globally and dark colors apply.
+ * If DarkAdmin is inactive, the fallback values provide the default light theme.
  */
 
-/* Light-mode defaults */
-:root {
-  --awdev-bg:          #fff;
-  --awdev-bg-alt:      #f6f7f7;
-  --awdev-bg-row:      #f9f9f9;
-  --awdev-border:      #dcdcde;
-  --awdev-text:        #1d2327;
-  --awdev-text-muted:  #646970;
-  --awdev-link:        #2271b1;
-  --awdev-code-bg:     #f0f0f1;
-  --awdev-code-color:  #2271b1;
-  --awdev-shadow:      rgba(0,0,0,.07);
+/* =============================================================================
+   DESIGN TOKENS
+   Map --awdev-* to DarkAdmin --adm-* with light-mode fallbacks.
+   ============================================================================= */
+.awdev-settings-wrap {
+  --awdev-bg:          var(--adm-bg,          #fff);
+  --awdev-bg-alt:      var(--adm-surface-1,   #f6f7f7);
+  --awdev-bg-row:      var(--adm-table-alt,   #f9f9f9);
+  --awdev-border:      var(--adm-border,      #dcdcde);
+  --awdev-text:        var(--adm-text,        #1d2327);
+  --awdev-text-muted:  var(--adm-text-muted,  #646970);
+  --awdev-link:        var(--adm-link,        #2271b1);
+  --awdev-shadow:      var(--adm-shadow-sm,   rgba(0,0,0,.07));
   --awdev-badge-bi-bg: #dbeafe;
   --awdev-badge-bi-fg: #1e40af;
   --awdev-badge-cu-bg: #fef3c7;
@@ -23,73 +28,7 @@
   --awdev-active-fg:   #12532e;
   --awdev-update-bg:   #fff3cd;
   --awdev-update-fg:   #856404;
-}
 
-/* DarkAdmin compatibility */
-body.adm-dark-active .awdev-settings-wrap {
-  --awdev-bg:          #2c3338;
-  --awdev-bg-alt:      #1d2327;
-  --awdev-bg-row:      #32393f;
-  --awdev-border:      #3c434a;
-  --awdev-text:        #dcdcde;
-  --awdev-text-muted:  #a7aaad;
-  --awdev-link:        #72aee6;
-  --awdev-code-bg:     #3c434a;
-  --awdev-code-color:  #72aee6;
-  --awdev-shadow:      rgba(0,0,0,.25);
-  --awdev-badge-bi-bg: #1e3a5f;
-  --awdev-badge-bi-fg: #93c5fd;
-  --awdev-badge-cu-bg: #4a2e0a;
-  --awdev-badge-cu-fg: #fcd34d;
-  --awdev-active-bg:   rgba(18,83,46,.32);
-  --awdev-active-fg:   #6ee7a0;
-  --awdev-update-bg:   rgba(133,100,4,.25);
-  --awdev-update-fg:   #fde68a;
-}
-
-body.adm-dark-active .awdev-settings-wrap,
-body.adm-dark-active .awdev-settings-wrap .awdev-page-header,
-body.adm-dark-active .awdev-settings-wrap .awdev-card {
-  background-color: var(--awdev-bg) !important;
-  color: var(--awdev-text) !important;
-  border-color: var(--awdev-border) !important;
-}
-body.adm-dark-active .awdev-settings-wrap .awdev-card-header,
-body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table th {
-  background-color: var(--awdev-bg-alt) !important;
-  color: var(--awdev-text-muted) !important;
-  border-color: var(--awdev-border) !important;
-}
-body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table td {
-  background-color: var(--awdev-bg) !important;
-  color: var(--awdev-text) !important;
-  border-color: var(--awdev-border) !important;
-}
-body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table tr:nth-child(even) td {
-  background-color: var(--awdev-bg-row) !important;
-}
-body.adm-dark-active .awdev-settings-wrap h1.awdev-page-title,
-body.adm-dark-active .awdev-settings-wrap .awdev-card-header h2 {
-  color: var(--awdev-text) !important;
-}
-body.adm-dark-active .awdev-settings-wrap .awdev-page-subtitle,
-body.adm-dark-active .awdev-settings-wrap .awdev-card-description,
-body.adm-dark-active .awdev-settings-wrap .awdev-last-checked,
-body.adm-dark-active .awdev-settings-wrap .awdev-footer,
-body.adm-dark-active .awdev-settings-wrap .awdev-global-toggle-label {
-  color: var(--awdev-text-muted) !important;
-}
-body.adm-dark-active .awdev-settings-wrap .awdev-footer a,
-body.adm-dark-active .awdev-settings-wrap .awdev-plugin-table a,
-body.adm-dark-active .awdev-settings-wrap .awdev-header-icon,
-body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
-  color: var(--awdev-link) !important;
-}
-
-/* =============================================================================
-   LAYOUT
-   ============================================================================= */
-.awdev-settings-wrap {
   max-width: 960px;
   margin-top: 16px;
 }
@@ -316,16 +255,10 @@ body.adm-dark-active .awdev-settings-wrap .awdev-card-header .dashicons {
   transition: transform .2s;
 }
 .awdev-toggle input:checked + .awdev-toggle-slider {
-  background-color: #2271b1;
+  background-color: var(--awdev-link);
 }
 .awdev-toggle input:checked + .awdev-toggle-slider::before {
   transform: translateX(16px);
-}
-body.adm-dark-active .awdev-settings-wrap .awdev-toggle-slider {
-  background-color: #50575e !important;
-}
-body.adm-dark-active .awdev-settings-wrap .awdev-toggle input:checked + .awdev-toggle-slider {
-  background-color: #72aee6 !important;
 }
 
 /* =============================================================================
