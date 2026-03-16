@@ -1,7 +1,7 @@
 === AWDev Plugins Updater ===
 Contributors: alexanderwagnerdev
-Tags: updater, self-hosted, plugin update, update manager, dark mode
-Requires at least: 6.0
+Tags: updater, self-hosted, plugin update, update manager
+Requires at least: 6.3
 Tested up to: 6.9
 Requires PHP: 7.4
 Stable tag: 0.0.7
