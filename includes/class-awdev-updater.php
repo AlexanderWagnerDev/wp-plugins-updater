@@ -149,6 +149,7 @@ class AWDev_Updater {
 
 	/**
 	 * Perform the actual WP_Filesystem rename to the correct plugin slug folder.
+	 * Deletes an existing target folder first to prevent silent move() failure.
 	 */
 	private function rename_source( string $source, string $remote_source ): string {
 		$corrected = trailingslashit( $remote_source ) . $this->plugin_slug . '/';
@@ -163,7 +164,16 @@ class AWDev_Updater {
 			WP_Filesystem();
 		}
 
-		if ( $wp_filesystem && $wp_filesystem->move( $source, $corrected ) ) {
+		if ( ! $wp_filesystem ) {
+			return $source;
+		}
+
+		// Remove existing target folder so move() does not silently fail.
+		if ( $wp_filesystem->is_dir( $corrected ) ) {
+			$wp_filesystem->delete( $corrected, true );
+		}
+
+		if ( $wp_filesystem->move( $source, $corrected ) ) {
 			return $corrected;
 		}
 
