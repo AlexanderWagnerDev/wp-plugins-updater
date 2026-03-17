@@ -29,7 +29,7 @@ jobs:
           sudo mv wp-cli.phar /usr/local/bin/wp
 
       - name: Generate .l10n.php files
-        run: wp i18n make-php languages/ --no-use-default-loader
+        run: wp i18n make-php languages/
 
       - name: Commit generated .l10n.php files
         run: |
