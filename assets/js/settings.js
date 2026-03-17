@@ -4,8 +4,9 @@
 
 	document.addEventListener( 'DOMContentLoaded', function () {
 
-		var ajaxUrl = ( window.awdevSettings && awdevSettings.ajaxUrl ) ? awdevSettings.ajaxUrl : '';
-		var nonce   = ( window.awdevSettings && awdevSettings.nonce )   ? awdevSettings.nonce   : '';
+		var ajaxUrl            = ( window.awdevSettings && awdevSettings.ajaxUrl )            ? awdevSettings.ajaxUrl            : '';
+		var nonce              = ( window.awdevSettings && awdevSettings.nonce )              ? awdevSettings.nonce              : '';
+		var nonceRemoteVersion = ( window.awdevSettings && awdevSettings.nonceRemoteVersion ) ? awdevSettings.nonceRemoteVersion : '';
 
 		// Send an AJAX request to instantly save a toggle state.
 		function saveToggle( action, data ) {
@@ -19,6 +20,88 @@
 				headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
 				body    : params.toString(),
 			} );
+		}
+
+		// Fetch all remote versions via AJAX and update the table cells.
+		function loadRemoteVersions() {
+			if ( ! ajaxUrl || ! nonceRemoteVersion ) { return; }
+
+			var params = new URLSearchParams();
+			params.append( 'action', 'awdev_get_remote_versions' );
+			params.append( '_ajax_nonce', nonceRemoteVersion );
+
+			fetch( ajaxUrl, {
+				method  : 'POST',
+				headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body    : params.toString(),
+			} )
+			.then( function ( res ) { return res.json(); } )
+			.then( function ( json ) {
+				if ( ! json.success || ! json.data ) { return; }
+
+				var versions = json.data;
+
+				document.querySelectorAll( '.awdev-remote-version' ).forEach( function ( cell ) {
+					var slug    = cell.dataset.slug;
+					var remote  = versions[ slug ] || '?';
+
+					// Find the actions cell in the same row to optionally inject the Update button.
+					var row         = cell.closest( 'tr' );
+					var actionsCell = row ? row.querySelector( '.awdev-actions-cell' ) : null;
+					var local       = actionsCell ? actionsCell.dataset.local : '';
+					var basename    = actionsCell ? actionsCell.dataset.basename : '';
+
+					var needsUpdate = ( remote !== '?' && local && local !== '?' && compareVersions( remote, local ) > 0 );
+
+					if ( needsUpdate ) {
+						cell.innerHTML = '<span class="awdev-version-new">' + escHtml( remote ) + '</span>';
+					} else {
+						cell.textContent = remote;
+					}
+
+					// Inject Update button when a newer version is available.
+					if ( needsUpdate && actionsCell && basename ) {
+						var placeholder = actionsCell.querySelector( '.awdev-update-btn-placeholder' );
+						if ( placeholder && ! placeholder.dataset.injected ) {
+							placeholder.dataset.injected = '1';
+							var nonce_val = awdevSettings.updateNonces && awdevSettings.updateNonces[ basename ] ? awdevSettings.updateNonces[ basename ] : '';
+							if ( nonce_val ) {
+								var href = awdevSettings.updateBase + '&plugin=' + encodeURIComponent( basename ) + '&_wpnonce=' + nonce_val;
+								placeholder.innerHTML =
+									'<a href="' + escHtml( href ) + '" class="button button-small button-primary awdev-update-btn">' +
+									'<span class="dashicons dashicons-arrow-up-alt"></span> ' +
+									awdevSettings.i18n.update +
+									'</a>';
+							}
+						}
+					}
+				} );
+			} )
+			.catch( function () {
+				document.querySelectorAll( '.awdev-version-loading' ).forEach( function ( el ) {
+					el.textContent = '?';
+				} );
+			} );
+		}
+
+		// Compare two semver strings. Returns >0 if a>b, <0 if a<b, 0 if equal.
+		function compareVersions( a, b ) {
+			var pa = a.split( '.' ).map( Number );
+			var pb = b.split( '.' ).map( Number );
+			for ( var i = 0; i < Math.max( pa.length, pb.length ); i++ ) {
+				var diff = ( pa[ i ] || 0 ) - ( pb[ i ] || 0 );
+				if ( diff !== 0 ) { return diff; }
+			}
+			return 0;
+		}
+
+		// Minimal HTML-escape for dynamic content inserted via innerHTML.
+		function escHtml( str ) {
+			return String( str )
+				.replace( /&/g, '&amp;' )
+				.replace( /</g, '&lt;' )
+				.replace( />/g, '&gt;' )
+				.replace( /"/g, '&quot;' );
 		}
 
 		// Global auto-update toggle: update all per-plugin toggles visually and save everything.
@@ -78,6 +161,9 @@
 				btn.closest( 'tr' ).remove();
 			}
 		} );
+
+		// Kick off remote version fetch after DOM is ready.
+		loadRemoteVersions();
 
 	} );
 } )();

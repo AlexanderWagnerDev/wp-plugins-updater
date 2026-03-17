@@ -204,6 +204,11 @@
   padding: 1px 6px;
   font-size: 12px;
 }
+.awdev-version-loading {
+  color: var(--awdev-text-muted);
+  font-style: italic;
+  font-size: 12px;
+}
 .awdev-last-checked {
   font-size: 11px;
   color: var(--awdev-text-muted);
