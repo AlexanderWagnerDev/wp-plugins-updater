@@ -1,0 +1,77 @@
+AWDev Plugins Updater — Changelog
+==================================
+
+0.0.9 — 2026-03-17
+-------------------
+- Added: json_last_error() validation after every json_decode() call
+  Invalid API responses are now treated as failures and logged via error_log()
+- Added: error_log() output when WP_Filesystem::move() fails during folder rename
+- Added: Days display in "last checked" time
+  Intervals longer than 24h now show e.g. "3 days ago" instead of "72 hours ago"
+- Added: Author field in "View version details" popup reads from API response when available
+  Falls back to hard-coded default
+- Added: Standalone uninstall.php
+  All awdev_* options and transients are removed on plugin deletion
+  Loaded by WordPress directly without bootstrapping the full plugin
+- Added: Built-in plugin registry centralised into awdev_built_in_plugins()
+  Adding a new plugin requires only one entry
+- Changed: Replaced awdev_force_option() DELETE+add_option() with update_option()
+- Changed: Removed register_uninstall_hook() and inline awdev_uninstall() in favour of uninstall.php
+
+0.0.8
+-----
+- Fixed: Auto-update filter returned null instead of true for AWDev plugins
+  WordPress background updates were silently skipped as a result
+- Fixed: Plugin folder rename silently failed when target directory already existed
+
+0.0.7
+-----
+- Changed: Improved DarkAdmin compatibility on the settings page
+- Changed: Removed colour-related !important declarations from base selectors
+- Changed: Kept DarkAdmin-specific override rules for reliable dark mode rendering
+
+0.0.6
+-----
+- Fixed: Language file msgid strings now match the corresponding __() calls in settings.php
+- Fixed: Corrected two mismatched strings
+- Fixed: Updated Project-Id-Version in all .po and .pot files to 0.0.6
+
+0.0.5
+-----
+- Fixed: Plugin folder rename failed on bulk updates and WP auto-updates
+- Added: Fallback matching by extracted source folder name
+- Changed: Extracted rename logic into private rename_source() method
+
+0.0.4
+-----
+- Changed: Replaced wp_redirect() with wp_safe_redirect()
+- Changed: Added wp_unslash() and absint() for POST input sanitisation
+- Changed: Added translators comments for _n() and printf() i18n calls
+- Changed: Replaced direct rename() with WP_Filesystem::move()
+- Changed: Added phpcs:ignore for intentional direct DB queries
+
+0.0.3
+-----
+- Fixed: Illegal nested form elements causing wrong form action on save
+- Added: Per-plugin auto-update toggles save instantly via AJAX
+- Added: Global auto-update toggle mirrors state to all per-plugin toggles
+- Changed: Debug output removed from settings saved notice
+- Changed: Save Settings button moved into Auto-Update Settings card
+
+0.0.2
+-----
+- Added: Per-plugin auto-update toggle
+- Added: Manual re-check button per plugin
+- Added: One-click Update button when newer remote version is detected
+- Fixed: Local installed version detection (folder-name fallback)
+- Fixed: Transient key mismatch causing version display to show dashes
+- Fixed: Dark Mode styling compatibility with DarkAdmin
+- Fixed: Remote version now fetched on settings page load if no transient exists
+
+0.0.1
+-----
+- Initial release
+- Native WordPress update hook integration
+- Settings page with managed plugin table and cache flush
+- Built-in DarkAdmin support
+- Translations: de_DE, de_AT, en_US

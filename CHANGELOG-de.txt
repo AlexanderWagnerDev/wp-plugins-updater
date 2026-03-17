@@ -1,0 +1,77 @@
+AWDev Plugins Updater — Changelog (Deutsch)
+============================================
+
+0.0.9 — 2026-03-17
+-------------------
+- Hinzugefügt: json_last_error()-Validierung nach jedem json_decode()-Aufruf
+  Ungültige API-Responses werden als Fehler behandelt und via error_log() geloggt
+- Hinzugefügt: error_log()-Ausgabe wenn WP_Filesystem::move() bei Ordner-Umbenennung fehlschlägt
+- Hinzugefügt: Tages-Anzeige für "zuletzt geprüft"
+  Intervalle über 24 h zeigen jetzt z.B. "vor 3 Tagen" statt "vor 72 Stunden"
+- Hinzugefügt: Autor-Feld im "Version Details"-Popup liest aus der API-Response
+  Fallback auf Hard-coded-Standard
+- Hinzugefügt: Eigenständige uninstall.php
+  Alle awdev_*-Optionen und Transients werden beim Plugin-Löschen entfernt
+  Von WordPress direkt geladen ohne das komplette Plugin zu initialisieren
+- Hinzugefügt: Built-in Plugin-Registry in awdev_built_in_plugins() zentralisiert
+  Neues Plugin hinzufügen erfordert nur noch einen einzigen Eintrag
+- Geändert: awdev_force_option() DELETE+add_option()-Muster durch update_option() ersetzt
+- Geändert: register_uninstall_hook() und inline awdev_uninstall() entfernt; ersetzt durch uninstall.php
+
+0.0.8
+-----
+- Behoben: Auto-Update-Filter gab null statt true für AWDev-Plugins zurück
+  WP-Hintergrund-Updates wurden dadurch lautlos übersprungen
+- Behoben: Ordnerumbenennung nach ZIP-Extraktion schlug lautlos fehl wenn Zielordner existierte
+
+0.0.7
+-----
+- Geändert: DarkAdmin-Kompatibilität auf der Einstellungsseite verbessert
+- Geändert: Farbbezogene !important-Deklarationen aus Basis-Selektoren entfernt
+- Geändert: DarkAdmin-spezifische Override-Regeln beibehalten
+
+0.0.6
+-----
+- Behoben: Sprachdatei-msgid-Strings an __()-Aufrufe in settings.php angepasst
+- Behoben: Zwei nicht übereinstimmende Strings korrigiert
+- Behoben: Project-Id-Version in allen .po- und .pot-Dateien auf 0.0.6 aktualisiert
+
+0.0.5
+-----
+- Behoben: Fehler bei Ordnerumbenennung bei Bulk-Updates und WP Auto-Updates
+- Hinzugefügt: Fallback-Matching über extrahierten Quellordnernamen
+- Geändert: Rename-Logik in private rename_source()-Methode ausgelagert
+
+0.0.4
+-----
+- Geändert: wp_redirect() durch wp_safe_redirect() ersetzt
+- Geändert: wp_unslash() und absint() für POST-Input hinzugefügt
+- Geändert: translators-Kommentare für _n()- und printf()-Aufrufe hinzugefügt
+- Geändert: rename() durch WP_Filesystem::move() ersetzt
+- Geändert: phpcs:ignore für direkte DB-Queries hinzugefügt
+
+0.0.3
+-----
+- Behoben: Illegal verschachtelte Formular-Elemente
+- Hinzugefügt: Per-Plugin-Toggles speichern sofort via AJAX
+- Hinzugefügt: Globaler Toggle spiegelt Zustand sofort
+- Geändert: Debug-Ausgaben entfernt
+- Geändert: Speichern-Button in Auto-Update-Settings-Karte verschoben
+
+0.0.2
+-----
+- Hinzugefügt: Auto-Update-Toggle pro Plugin
+- Hinzugefügt: Manueller Re-Check-Button pro Plugin
+- Hinzugefügt: Ein-Klick-Aktualisieren-Button
+- Behoben: Versionserkennung (Ordnername-Fallback)
+- Behoben: Transient-Key-Fehler
+- Behoben: Dark-Mode-Kompatibilität
+- Behoben: Remote-Version wird beim Laden aktiv abgerufen
+
+0.0.1
+-----
+- Erste Veröffentlichung
+- Native WordPress-Update-Hook-Integration
+- Einstellungsseite mit verwalteter Plugin-Tabelle und Cache-Flush
+- Integrierte DarkAdmin-Unterstützung
+- Übersetzungen: de_DE, de_AT, en_US
