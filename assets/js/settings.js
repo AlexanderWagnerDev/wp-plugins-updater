@@ -11,7 +11,8 @@
 		var nonceCheckPlugin   = s.nonceCheckPlugin   || '';
 
 		// Send an AJAX request to instantly save a toggle state.
-		function saveToggle( action, data ) {
+		// On failure the checkbox is visually reverted so the user knows the save did not persist.
+		function saveToggle( action, data, checkboxEl ) {
 			var params = new URLSearchParams();
 			params.append( 'action', action );
 			params.append( '_ajax_nonce', nonce );
@@ -21,6 +22,19 @@
 				method  : 'POST',
 				headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
 				body    : params.toString(),
+			} )
+			.then( function ( res ) {
+				if ( ! res.ok ) { throw new Error( 'HTTP ' + res.status ); }
+				return res.json();
+			} )
+			.then( function ( json ) {
+				if ( ! json.success ) { throw new Error( 'wp_send_json_error' ); }
+			} )
+			.catch( function () {
+				// Revert the toggle visually if the save failed.
+				if ( checkboxEl ) {
+					checkboxEl.checked = ! checkboxEl.checked;
+				}
 			} );
 		}
 
@@ -85,7 +99,7 @@
 			} );
 		}
 
-		// Handle re-check button: POST to admin-ajax.php and reload versions on success.
+		// Handle re-check button: clear transient cache then reload versions.
 		document.addEventListener( 'click', function ( e ) {
 			var btn = e.target.closest( '.awdev-check-btn' );
 			if ( ! btn || ! nonceCheckPlugin ) { return; }
@@ -104,18 +118,31 @@
 			btn.disabled = true;
 			if ( icon ) { icon.classList.add( 'awdev-spin' ); }
 
+			// Reset the version cell to the loading indicator before the new fetch.
+			var remoteCell = document.querySelector( '.awdev-remote-version[data-slug="' + slug + '"]' );
+			if ( remoteCell ) {
+				remoteCell.innerHTML = '<span class="awdev-version-loading">\u2026</span>';
+			}
+
 			fetch( ajaxUrl, {
 				method  : 'POST',
 				headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
 				body    : params.toString(),
 			} )
-			.then( function ( res ) { return res.json(); } )
-			.then( function () {
-				var remoteCell = document.querySelector( '.awdev-remote-version[data-slug="' + slug + '"]' );
-				if ( remoteCell ) {
-					remoteCell.innerHTML = '<span class="awdev-version-loading">\u2026</span>';
-				}
+			.then( function ( res ) {
+				if ( ! res.ok ) { throw new Error( 'HTTP ' + res.status ); }
+				return res.json();
+			} )
+			.then( function ( json ) {
+				if ( ! json.success ) { throw new Error( 'wp_send_json_error' ); }
 				loadRemoteVersions();
+			} )
+			.catch( function () {
+				// Show '?' in the version cell so the user knows the check failed.
+				if ( remoteCell ) {
+					var loadingEl = remoteCell.querySelector( '.awdev-version-loading' );
+					if ( loadingEl ) { loadingEl.textContent = '?'; }
+				}
 			} )
 			.finally( function () {
 				btn.disabled = false;
@@ -124,9 +151,10 @@
 		} );
 
 		// Compare two semver strings. Returns >0 if a>b, <0 if a<b, 0 if equal.
+		// Uses parseInt() so pre-release suffixes like "-beta" are safely ignored.
 		function compareVersions( a, b ) {
-			var pa = a.split( '.' ).map( Number );
-			var pb = b.split( '.' ).map( Number );
+			var pa = a.split( '.' ).map( function ( n ) { return parseInt( n, 10 ) || 0; } );
+			var pb = b.split( '.' ).map( function ( n ) { return parseInt( n, 10 ) || 0; } );
 			for ( var i = 0; i < Math.max( pa.length, pb.length ); i++ ) {
 				var diff = ( pa[ i ] || 0 ) - ( pb[ i ] || 0 );
 				if ( diff !== 0 ) { return diff; }
@@ -135,12 +163,14 @@
 		}
 
 		// Minimal HTML-escape for dynamic content inserted via innerHTML.
+		// Escapes &, <, >, ", and ' to cover both attribute and text contexts.
 		function escHtml( str ) {
 			return String( str )
-				.replace( /&/g, '&amp;' )
-				.replace( /</g, '&lt;' )
-				.replace( />/g, '&gt;' )
-				.replace( /"/g, '&quot;' );
+				.replace( /&/g,  '&amp;' )
+				.replace( /</g,  '&lt;' )
+				.replace( />/g,  '&gt;' )
+				.replace( /"/g,  '&quot;' )
+				.replace( /'/g,  '&#039;' );
 		}
 
 		// Global auto-update toggle: update all per-plugin toggles visually and save everything.
@@ -151,7 +181,7 @@
 				document.querySelectorAll( '.awdev-per-plugin-toggle' ).forEach( function ( cb ) {
 					cb.checked = enabled;
 				} );
-				saveToggle( 'awdev_toggle_global_auto_update', { enabled: enabled ? '1' : '0' } );
+				saveToggle( 'awdev_toggle_global_auto_update', { enabled: enabled ? '1' : '0' }, globalToggle );
 			} );
 		}
 
@@ -161,7 +191,7 @@
 				saveToggle( 'awdev_toggle_auto_update', {
 					basename : cb.dataset.basename,
 					enabled  : cb.checked ? '1' : '0',
-				} );
+				}, cb );
 			} );
 		} );
 
