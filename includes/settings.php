@@ -19,10 +19,57 @@ function awdev_built_in_plugins(): array {
 			'api_slug' => 'awdev-plugins-updater',
 		],
 		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => [
-			'name'     => 'DarkAdmin – Dark Mode for Adminpanel',
+			'name'     => 'DarkAdmin \u2013 Dark Mode for Adminpanel',
 			'api_slug' => 'darkadmin-dark-mode-for-adminpanel',
 		],
 	];
+}
+
+/**
+ * Lightweight helper to fetch a single plugin's remote version string.
+ *
+ * Unlike instantiating AWDev_Updater (which registers WP update filters),
+ * this function only performs the transient-cached HTTP request and returns
+ * the version field. Safe to call in AJAX or admin contexts where the full
+ * update-filter machinery is not needed.
+ *
+ * @param string $basename   Plugin basename (folder/file.php).
+ * @param string $api_url    Full API endpoint URL.
+ * @return string            Version string, or '?' on failure.
+ */
+function awdev_fetch_remote_version( string $basename, string $api_url ): string {
+	$slug    = sanitize_key( dirname( $basename ) );
+	$key     = 'awdev_upd_' . $slug;
+	$cached  = get_transient( $key );
+
+	// Re-use existing transient (set by AWDev_Updater or a previous call).
+	if ( $cached !== false ) {
+		return ( $cached && isset( $cached->version ) ) ? $cached->version : '?';
+	}
+
+	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
+	if ( $cache_hours < 1 ) { $cache_hours = 1; }
+
+	$response = wp_remote_get( $api_url, [
+		'timeout'    => 10,
+		'user-agent' => 'AWDev-Plugin-Updater/' . AWDEV_UPDATER_VERSION . '; ' . get_bloginfo( 'url' ),
+	] );
+
+	if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
+		set_transient( $key, false, $cache_hours * HOUR_IN_SECONDS );
+		return '?';
+	}
+
+	$data = json_decode( wp_remote_retrieve_body( $response ) );
+
+	if ( json_last_error() !== JSON_ERROR_NONE || ! isset( $data->version ) ) {
+		set_transient( $key, false, $cache_hours * HOUR_IN_SECONDS );
+		return '?';
+	}
+
+	set_transient( $key, $data, $cache_hours * HOUR_IN_SECONDS );
+
+	return $data->version;
 }
 
 /**
@@ -110,7 +157,7 @@ add_action( 'wp_ajax_awdev_toggle_global_auto_update', function () {
 /**
  * AJAX: fetch remote versions for all managed plugins in one request.
  * Returns a map of dirname_slug => version string (or '?' on failure).
- * Uses AWDev_Updater::get_remote_data() so there is no duplicated HTTP logic.
+ * Uses awdev_fetch_remote_version() — no WP update filters are registered.
  */
 add_action( 'wp_ajax_awdev_get_remote_versions', function () {
 	if ( ! current_user_can( 'manage_options' ) ) {
@@ -127,13 +174,33 @@ add_action( 'wp_ajax_awdev_get_remote_versions', function () {
 		$api_slug     = $managed[ $basename ] ?? ( $built_in[ $basename ]['api_slug'] ?? $dirname_slug );
 		$api_url      = AWDEV_UPDATE_SERVER . '/' . sanitize_key( $api_slug ) . '.php';
 
-		$updater = new AWDev_Updater( $basename, $api_url );
-		$data    = $updater->get_remote_data();
-
-		$versions[ $dirname_slug ] = ( $data && isset( $data->version ) ) ? $data->version : '?';
+		$versions[ $dirname_slug ] = awdev_fetch_remote_version( $basename, $api_url );
 	}
 
 	wp_send_json_success( $versions );
+} );
+
+/**
+ * AJAX: clear the transient cache for a single plugin and return JSON.
+ * Replaces the old admin_post_awdev_check_plugin handler so that the
+ * settings.js fetch() call receives a proper JSON response instead of
+ * following a wp_safe_redirect() into the void.
+ */
+add_action( 'wp_ajax_awdev_check_plugin', function () {
+	if ( ! current_user_can( 'manage_options' ) ) {
+		wp_send_json_error( 'not_allowed', 403 );
+	}
+	check_ajax_referer( 'awdev_check_plugin' );
+
+	$dirname_slug = sanitize_key( wp_unslash( $_POST['dirname_slug'] ?? '' ) );
+	if ( ! $dirname_slug ) {
+		wp_send_json_error( 'missing_slug', 400 );
+	}
+
+	delete_transient( 'awdev_upd_' . $dirname_slug );
+	delete_site_transient( 'update_plugins' );
+
+	wp_send_json_success( [ 'cleared' => $dirname_slug ] );
 } );
 
 /**
@@ -156,7 +223,7 @@ add_filter( 'auto_update_plugin', function ( $update, $item ) {
 		return $update;
 	}
 
-	// Global toggle off → never auto-update any AWDev plugin.
+	// Global toggle off \u2192 never auto-update any AWDev plugin.
 	$global = (bool) get_option( 'awdev_auto_updates_global', true );
 	if ( ! $global ) {
 		return false;
@@ -173,12 +240,7 @@ add_filter( 'auto_update_plugin', function ( $update, $item ) {
 
 /**
  * Enqueue settings page assets.
- * Passes all data needed by settings.js via wp_localize_script():
- * - ajaxUrl, nonce, nonceRemoteVersion: for AJAX calls
- * - nonceCheckPlugin: single re-check nonce shared across all plugin rows
- * - updateBase: base URL for the WP upgrade action
- * - updateNonces: per-plugin nonces for the one-click Update button
- * - i18n.update: translated "Update" label for the dynamically injected button
+ * Passes all data needed by settings.js via wp_localize_script().
  */
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	if ( $hook !== 'settings_page_' . AWDEV_SETTINGS_SLUG ) {
@@ -250,25 +312,6 @@ add_action( 'admin_post_awdev_flush_cache', function () {
 } );
 
 /**
- * Handle manual single-plugin re-check.
- */
-add_action( 'admin_post_awdev_check_plugin', function () {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'Not allowed.', 'awdev-plugins-updater' ) );
-	}
-	check_admin_referer( 'awdev_check_plugin' );
-
-	$dirname_slug = sanitize_key( wp_unslash( $_POST['dirname_slug'] ?? '' ) );
-	if ( $dirname_slug ) {
-		delete_transient( 'awdev_upd_' . $dirname_slug );
-		delete_site_transient( 'update_plugins' );
-	}
-
-	wp_safe_redirect( add_query_arg( [ 'page' => AWDEV_SETTINGS_SLUG, 'plugin-checked' => '1' ], admin_url( 'options-general.php' ) ) );
-	exit;
-} );
-
-/**
  * Resolve local installed version for a plugin basename.
  * Returns '?' when the plugin is not found, using plain ASCII to avoid
  * encoding issues in string comparisons.
@@ -334,10 +377,6 @@ function awdev_get_last_checked( string $dirname_slug ): string {
 /**
  * Render a single plugin row in the managed plugins table.
  *
- * The re-check form uses a nonce value passed via awdevSettings.nonceCheckPlugin
- * (set in wp_localize_script) rather than a per-row wp_nonce_field() call,
- * eliminating redundant hidden fields when many plugins are listed.
- *
  * @param string $basename    Plugin basename (folder/file.php).
  * @param string $name        Display name.
  * @param array  $st          Status array from awdev_render_settings_page().
@@ -350,7 +389,7 @@ function awdev_render_plugin_row( string $basename, string $name, array $st, str
 		<td><?php echo esc_html( $st['local_version'] ); ?></td>
 		<td>
 			<span class="awdev-remote-version" data-slug="<?php echo esc_attr( $st['dirname_slug'] ); ?>">
-				<span class="awdev-version-loading"><?php esc_html_e( '…', 'awdev-plugins-updater' ); ?></span>
+				<span class="awdev-version-loading"><?php esc_html_e( '\u2026', 'awdev-plugins-updater' ); ?></span>
 			</span>
 			<span class="awdev-last-checked"><?php echo esc_html( $st['last_checked'] ); ?></span>
 		</td>
@@ -372,7 +411,6 @@ function awdev_render_plugin_row( string $basename, string $name, array $st, str
 			<button type="button"
 				class="button button-small awdev-check-btn"
 				title="<?php esc_attr_e( 'Re-check update', 'awdev-plugins-updater' ); ?>"
-				data-action="awdev_check_plugin"
 				data-slug="<?php echo esc_attr( $st['dirname_slug'] ); ?>">
 				<span class="dashicons dashicons-update"></span>
 			</button>
@@ -407,11 +445,24 @@ function awdev_render_settings_page(): void {
 		$auto_updates = $defaults;
 	}
 
+	// Build statuses: built-in first, then managed-only (skip duplicates).
 	$statuses = [];
 
-	foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
-		$dirname_slug = sanitize_key( dirname( $basename ) );
+	foreach ( $built_in as $basename => $_ ) {
+		$dirname_slug            = sanitize_key( dirname( $basename ) );
+		$statuses[ $basename ]   = [
+			'dirname_slug'  => $dirname_slug,
+			'local_version' => awdev_get_local_version( $basename ),
+			'last_checked'  => awdev_get_last_checked( $dirname_slug ),
+			'auto_update'   => $auto_updates[ $basename ] ?? true,
+		];
+	}
 
+	foreach ( $managed as $basename => $_ ) {
+		if ( isset( $built_in[ $basename ] ) ) {
+			continue; // Already in $statuses above — no duplicate entry.
+		}
+		$dirname_slug          = sanitize_key( dirname( $basename ) );
 		$statuses[ $basename ] = [
 			'dirname_slug'  => $dirname_slug,
 			'local_version' => awdev_get_local_version( $basename ),
@@ -422,7 +473,6 @@ function awdev_render_settings_page(): void {
 
 	// Read-only GET flags — no nonce needed (no state change).
 	$cache_flushed  = isset( $_GET['cache-flushed'] );    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$plugin_checked = isset( $_GET['plugin-checked'] );   // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$settings_saved = isset( $_GET['settings-updated'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	?>
 	<div class="wrap awdev-settings-wrap">
@@ -445,15 +495,15 @@ function awdev_render_settings_page(): void {
 		</div>
 
 		<?php if ( $cache_flushed ) : ?>
-		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Update cache flushed.', 'awdev-plugins-updater' ); ?></p></div>
-		<?php endif; ?>
-
-		<?php if ( $plugin_checked ) : ?>
-		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Plugin cache cleared. WordPress will re-check on next load.', 'awdev-plugins-updater' ); ?></p></div>
+		<div class="notice notice-success is-dismissible"><p>
+			<span aria-hidden="true">&#10003;</span> <?php esc_html_e( 'Update cache flushed.', 'awdev-plugins-updater' ); ?>
+		</p></div>
 		<?php endif; ?>
 
 		<?php if ( $settings_saved ) : ?>
-		<div class="notice notice-success is-dismissible"><p><?php esc_html_e( '✓ Settings saved.', 'awdev-plugins-updater' ); ?></p></div>
+		<div class="notice notice-success is-dismissible"><p>
+			<span aria-hidden="true">&#10003;</span> <?php esc_html_e( 'Settings saved.', 'awdev-plugins-updater' ); ?>
+		</p></div>
 		<?php endif; ?>
 
 		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
@@ -499,7 +549,7 @@ function awdev_render_settings_page(): void {
 							step="1"
 							class="small-text"
 					/>
-						<span class="description"><?php esc_html_e( 'Min: 1h — Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
+						<span class="description"><?php esc_html_e( 'Min: 1h \u2014 Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
 					</div>
 
 					<div class="awdev-submit-row">
@@ -536,7 +586,7 @@ function awdev_render_settings_page(): void {
 						<?php endforeach; ?>
 
 						<?php foreach ( $managed as $basename => $slug ) :
-							if ( isset( $built_in[ $basename ] ) ) continue;
+							if ( isset( $built_in[ $basename ] ) ) { continue; }
 							$plugin_name = sanitize_text_field( dirname( $basename ) );
 						?>
 							<?php awdev_render_plugin_row( $basename, $plugin_name, $statuses[ $basename ], 'awdev-badge-custom' ); ?>

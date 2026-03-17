@@ -26,6 +26,8 @@ class AWDev_Updater {
 	/**
 	 * Fetch update metadata from the self-hosted API endpoint.
 	 * Cache duration is configurable via awdev_cache_hours option (default: 6).
+	 * On failure, respects the same cache_hours setting (min: 1h) so error
+	 * responses are not hammered more frequently than successful ones.
 	 */
 	public function get_remote_data(): ?object {
 		$key    = 'awdev_upd_' . sanitize_key( $this->plugin_slug );
@@ -35,13 +37,18 @@ class AWDev_Updater {
 			return $cached ?: null;
 		}
 
+		$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
+		if ( $cache_hours < 1 ) {
+			$cache_hours = 1;
+		}
+
 		$response = wp_remote_get( $this->api_url, [
 			'timeout'    => 10,
 			'user-agent' => 'AWDev-Plugin-Updater/' . AWDEV_UPDATER_VERSION . '; ' . get_bloginfo( 'url' ),
 		] );
 
 		if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
-			set_transient( $key, false, HOUR_IN_SECONDS );
+			set_transient( $key, false, $cache_hours * HOUR_IN_SECONDS );
 			return null;
 		}
 
@@ -50,14 +57,10 @@ class AWDev_Updater {
 		// Treat invalid JSON as a failed response.
 		if ( json_last_error() !== JSON_ERROR_NONE ) {
 			error_log( 'AWDev Updater: invalid JSON from API for ' . $this->plugin_slug . ' — ' . json_last_error_msg() );
-			set_transient( $key, false, HOUR_IN_SECONDS );
+			set_transient( $key, false, $cache_hours * HOUR_IN_SECONDS );
 			return null;
 		}
 
-		$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
-		if ( $cache_hours < 1 ) {
-			$cache_hours = 1;
-		}
 		set_transient( $key, $data, $cache_hours * HOUR_IN_SECONDS );
 
 		return $data;

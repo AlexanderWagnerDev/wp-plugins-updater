@@ -85,7 +85,7 @@
 			} );
 		}
 
-		// Handle re-check button click: POST to admin-post.php via fetch using the shared nonce.
+		// Handle re-check button: POST to admin-ajax.php and reload versions on success.
 		document.addEventListener( 'click', function ( e ) {
 			var btn = e.target.closest( '.awdev-check-btn' );
 			if ( ! btn || ! nonceCheckPlugin ) { return; }
@@ -97,28 +97,29 @@
 
 			var params = new URLSearchParams();
 			params.append( 'action',       'awdev_check_plugin' );
-			params.append( '_wpnonce',     nonceCheckPlugin );
+			params.append( '_ajax_nonce',  nonceCheckPlugin );
 			params.append( 'dirname_slug', slug );
 
+			var icon = btn.querySelector( '.dashicons' );
 			btn.disabled = true;
-			btn.querySelector( '.dashicons' ).classList.add( 'awdev-spin' );
+			if ( icon ) { icon.classList.add( 'awdev-spin' ); }
 
-			fetch( ajaxUrl.replace( 'admin-ajax.php', 'admin-post.php' ), {
+			fetch( ajaxUrl, {
 				method  : 'POST',
 				headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
 				body    : params.toString(),
-			} ).then( function () {
-				// Reload remote versions after re-check.
+			} )
+			.then( function ( res ) { return res.json(); } )
+			.then( function () {
 				var remoteCell = document.querySelector( '.awdev-remote-version[data-slug="' + slug + '"]' );
 				if ( remoteCell ) {
-					remoteCell.innerHTML = '<span class="awdev-version-loading">…</span>';
+					remoteCell.innerHTML = '<span class="awdev-version-loading">\u2026</span>';
 				}
 				loadRemoteVersions();
+			} )
+			.finally( function () {
 				btn.disabled = false;
-				btn.querySelector( '.dashicons' ).classList.remove( 'awdev-spin' );
-			} ).catch( function () {
-				btn.disabled = false;
-				btn.querySelector( '.dashicons' ).classList.remove( 'awdev-spin' );
+				if ( icon ) { icon.classList.remove( 'awdev-spin' ); }
 			} );
 		} );
 
@@ -174,15 +175,15 @@
 				row.className = 'awdev-dynamic-row';
 				row.innerHTML =
 					'<td><input type="text" name="awdev_managed_plugins_basename[' + ts + ']" placeholder="folder/plugin-file.php" class="awdev-input-basename" /></td>' +
-					'<td>–</td>' +
-					'<td>–</td>' +
+					'<td>\u2013</td>' +
+					'<td>\u2013</td>' +
 					'<td>' +
 					  '<label class="awdev-toggle">' +
 					  '<input type="checkbox" class="awdev-per-plugin-toggle" data-basename="" value="1" checked />' +
 					  '<span class="awdev-toggle-slider"></span>' +
 					  '</label>' +
 					'</td>' +
-					'<td>–</td>' +
+					'<td>\u2013</td>' +
 					'<td>' +
 					  '<input type="text" name="awdev_managed_plugins[__new_' + ts + ']" placeholder="api-slug" class="awdev-input-slug" />' +
 					  '<button type="button" class="awdev-remove-row button-link" title="Remove"><span class="dashicons dashicons-trash"></span></button>' +
