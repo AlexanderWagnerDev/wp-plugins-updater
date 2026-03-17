@@ -56,6 +56,8 @@ register_activation_hook( __FILE__, 'awdev_activate' );
  * Register all managed AlexanderWagnerDev plugins.
  * Built-in list comes from the single source of truth: awdev_built_in_plugins().
  * Every created instance is stored in $awdev_updaters for later access.
+ * Priority 20 ensures all other plugins are fully loaded before registering
+ * update filters, avoiding any hook order conflicts.
  */
 add_action( 'plugins_loaded', function () {
 	global $awdev_updaters;
@@ -78,7 +80,7 @@ add_action( 'plugins_loaded', function () {
 			);
 		}
 	}
-} );
+}, 20 );
 
 /**
  * Add settings link in the Plugins list.
