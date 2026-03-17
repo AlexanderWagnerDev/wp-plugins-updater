@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-0.0.9-blue?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.1.0-blue?style=flat-square)
 ![WordPress](https://img.shields.io/badge/WordPress-6.3%2B-21759b?style=flat-square&logo=wordpress&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777bb4?style=flat-square&logo=php&logoColor=white)
 ![Lizenz](https://img.shields.io/badge/Lizenz-GPLv2-green?style=flat-square)
@@ -57,15 +57,16 @@ Unter **Einstellungen → AWDev Plugins Updater**:
 
 ## Changelog
 
-### 0.0.9 — 2026-03-17
+### 0.1.0 — 2026-03-17
 
-- **Hinzugefügt** `json_last_error()`-Validierung nach jedem `json_decode()`-Aufruf — ungültige API-Responses werden als Fehler behandelt und via `error_log()` geloggt
-- **Hinzugefügt** `error_log()`-Ausgabe wenn `WP_Filesystem::move()` bei der Ordner-Umbenennung fehlschlägt
-- **Hinzugefügt** Tages-Anzeige für "zuletzt geprüft" — Intervalle über 24 h zeigen jetzt z. B. *"vor 3 Tagen"* statt *"vor 72 Stunden"*
-- **Hinzugefügt** Autor-Feld im "Version Details"-Popup liest aus der API-Response; Fallback auf Standard
-- **Hinzugefügt** Eigenständige [`uninstall.php`](uninstall.php) — alle `awdev_*`-Optionen und Transients werden beim Plugin-Löschen aus der DB entfernt; wird von WordPress direkt geladen ohne das Plugin zu initialisieren
-- **Hinzugefügt** Built-in Plugin-Registry in `awdev_built_in_plugins()` zentralisiert — neues Plugin hinzufügen erfordert nur noch einen Eintrag
-- **Geändert** `awdev_force_option()` `DELETE` + `add_option()`-Muster durch `update_option()` ersetzt
+- **Behoben** `awdev_fetch_api_data()`: API-Responses mit `null`- oder leerem Body werden jetzt explizit als Fehler behandelt und als `false` gecacht
+- **Behoben** `saveToggle()` in `settings.js`: fehlende Fehlerbehandlung sorgte dafür dass Speicher-Fehler lautlos ignoriert wurden — Toggle wird jetzt bei Fehler visuell zurückgesetzt
+- **Behoben** Re-Check-Button: Versions-Zelle wird vor dem Fetch auf `…` zurückgesetzt und zeigt `?` bei Fehler statt dauerhaft stecken zu bleiben
+- **Behoben** `compareVersions()`: `Number()` durch `parseInt()` ersetzt, damit Pre-Release-Suffixe wie `-beta` sicher ignoriert werden
+- **Hinzugefügt** `awdev_sync_auto_update_defaults()`: neue Built-in-Plugin-Defaults werden auf bestehenden Installationen ohne Deaktivieren/Aktivieren übernommen
+- **Hinzugefügt** `escHtml()` in `settings.js` escapt jetzt auch Apostrophe für vollständige Attribut/Text-Sicherheit
+- **Geändert** Ungenutzte jQuery-Abhängigkeit aus `wp_enqueue_script()` entfernt
+- **Ebenfalls enthalten (von 0.0.9):** `json_last_error()`-Validierung, `error_log()` bei Rename-Fehler, Tages-Anzeige für zuletzt geprüft, Autor-Feld aus API, eigenständige `uninstall.php`, `awdev_built_in_plugins()`-Registry, `generate-l10n.yml`-Workflow, `update_option()`-Refactoring
 
 ### 0.0.8
 
@@ -111,7 +112,7 @@ Unter **Einstellungen → AWDev Plugins Updater**:
 - **Hinzugefügt** Auto-Update-Toggle pro Plugin
 - **Hinzugefügt** Manueller Re-Check-Button pro Plugin
 - **Hinzugefügt** Ein-Klick-Aktualisieren-Button
-- **Behoben** Versionserkennung (Ordnername-Fallback)
+- **Behoben** Lokale Versionserkennung (Ordnername-Fallback)
 - **Behoben** Transient-Key-Fehler bei der DarkAdmin-Versionsanzeige
 - **Behoben** Dark-Mode-Kompatibilität mit DarkAdmin
 - **Behoben** Remote-Version wird beim Laden der Einstellungsseite aktiv abgerufen

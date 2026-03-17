@@ -4,7 +4,7 @@ Tags: updater, self-hosted, plugin update, update manager
 Requires at least: 6.3
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.0.9
+Stable tag: 0.1.0
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,14 +61,15 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
-= 0.0.9 =
-* Added json_last_error() validation after json_decode() — invalid API responses are now treated as failures and logged via error_log()
-* Added error_log() output when WP_Filesystem::move() fails during folder rename, making update failures diagnosable
-* Added days display to "last checked" time — intervals longer than 24h now show e.g. "3 days ago" instead of "72 hours ago"
-* Author field in "View version details" popup now reads from API response when provided; falls back to default
-* Added uninstall routine — all awdev_* options and transients are removed from the database when the plugin is deleted
-* Replaced awdev_force_option() DELETE+add_option() pattern with update_option() to eliminate race condition risk
-* Centralised built-in plugin registry into awdev_built_in_plugins() — adding a new plugin now requires only one entry
+= 0.1.0 =
+* Fixed awdev_fetch_api_data(): null/empty API body now explicitly treated as failure and cached as false
+* Fixed saveToggle() in settings.js: missing error handling caused silent failures — toggle now reverts visually on error
+* Fixed re-check button: version cell resets to ... before fetch and shows ? on error instead of staying stuck
+* Fixed compareVersions(): Number() replaced with parseInt() to safely ignore pre-release suffixes like -beta
+* Added awdev_sync_auto_update_defaults(): new built-in plugin defaults picked up without deactivate/activate cycle
+* Added escHtml() in settings.js now escapes apostrophes for full attribute/text safety
+* Changed: removed unused jQuery dependency from wp_enqueue_script()
+* Also included from 0.0.9: json_last_error() validation, error_log() on rename failure, days display in last-checked, author field from API, uninstall.php, awdev_built_in_plugins(), generate-l10n.yml workflow, update_option() refactor
 
 = 0.0.8 =
 * Fixed auto-update filter returning null for AWDev plugins instead of true, causing WP background updates to be silently skipped
@@ -95,7 +96,6 @@ Yes. The settings page fully supports DarkAdmin and adapts to dark mode automati
 * Added translators comments for all _n() and printf() i18n calls.
 * Replaced direct rename() with WP_Filesystem::move() for folder fix after ZIP extraction.
 * Added phpcs:ignore for intentional direct DB queries.
-* Shortened readme.txt short description to comply with 150-char limit.
 
 = 0.0.3 =
 * Fixed illegal nested form elements causing "Save Settings" to submit the wrong action.
@@ -146,14 +146,15 @@ Funktionen:
 4. Einstellungen → AWDev Plugins Updater aufrufen.
 
 === Changelog ===
-= 0.0.9 =
-* json_last_error()-Validierung nach json_decode() hinzugefügt — ungültige API-Responses werden als Fehler behandelt und geloggt
-* error_log()-Ausgabe bei fehlgeschlagenem WP_Filesystem::move() während Ordner-Umbenennung hinzugefügt
-* Tages-Anzeige für "zuletzt geprüft" ergänzt — Intervalle über 24h zeigen jetzt z.B. "vor 3 Tagen"
-* Autor-Feld im "Version Details"-Popup liest jetzt aus der API-Response, Fallback auf Standard
-* Deinstallations-Routine hinzugefügt — alle awdev_*-Optionen und Transients werden beim Plugin-Löschen entfernt
-* awdev_force_option() DELETE+add_option()-Muster durch update_option() ersetzt
-* Built-in Plugin-Registry in awdev_built_in_plugins() zentralisiert
+= 0.1.0 =
+* awdev_fetch_api_data(): null/leerer API-Body wird jetzt explizit als Fehler behandelt und als false gecacht
+* saveToggle() in settings.js: fehlende Fehlerbehandlung behoben — Toggle wird bei Fehler visuell zurückgesetzt
+* Re-Check-Button: Versions-Zelle wird vor dem Fetch auf ... zurückgesetzt und zeigt ? bei Fehler
+* compareVersions(): Number() durch parseInt() ersetzt für sichere Behandlung von Pre-Release-Suffixen
+* awdev_sync_auto_update_defaults() hinzugefügt — neue Built-in-Defaults ohne Deaktivieren/Aktivieren
+* escHtml() in settings.js escapt jetzt auch Apostrophe
+* Ungenutzte jQuery-Abhängigkeit aus wp_enqueue_script() entfernt
+* Ebenfalls enthalten (von 0.0.9): json_last_error()-Validierung, error_log() bei Rename-Fehler, Tages-Anzeige, Autor-Feld aus API, uninstall.php, awdev_built_in_plugins(), generate-l10n.yml, update_option()-Refactoring
 
 = 0.0.8 =
 * Auto-Update-Filter gab null statt true für AWDev-Plugins zurück — WP-Hintergrund-Updates wurden dadurch lautlos übersprungen (behoben)
@@ -166,34 +167,34 @@ Funktionen:
 
 = 0.0.6 =
 * Sprachdatei-msgid-Strings an die exakten __()-Aufrufe in settings.php angepasst
-* Zwei nicht übereinstimmende Strings korrigiert: 'Configure how often...' und 'Update data is cached for...'
+* Zwei nicht übereinstimmende Strings korrigiert
 * Project-Id-Version in allen .po- und .pot-Dateien auf 0.0.6 aktualisiert
 
 = 0.0.5 =
-* Fehler bei Ordnerumbenennung bei Bulk-Updates (update-core.php) und WP Auto-Updates behoben
+* Fehler bei Ordnerumbenennung bei Bulk-Updates und WP Auto-Updates behoben
 * Fallback-Matching über extrahierten Quellordnernamen hinzugefügt
 * Rename-Logik in private rename_source()-Methode ausgelagert
 
 = 0.0.4 =
-* wp_redirect() durch wp_safe_redirect() ersetzt.
-* wp_unslash() und absint() für POST-Input hinzugefügt.
-* translators-Kommentare hinzugefügt.
-* rename() durch WP_Filesystem::move() ersetzt.
-* phpcs:ignore für direkte DB-Queries hinzugefügt.
+* wp_redirect() durch wp_safe_redirect() ersetzt
+* wp_unslash() und absint() für POST-Input hinzugefügt
+* translators-Kommentare hinzugefügt
+* rename() durch WP_Filesystem::move() ersetzt
+* phpcs:ignore für direkte DB-Queries hinzugefügt
 
 = 0.0.3 =
-* Verschachtelte Formular-Elemente behoben.
-* Per-Plugin-Toggles speichern sofort via AJAX.
-* Globaler Toggle spiegelt Zustand sofort.
-* Debug-Ausgaben entfernt.
+* Verschachtelte Formular-Elemente behoben
+* Per-Plugin-Toggles speichern sofort via AJAX
+* Globaler Toggle spiegelt Zustand sofort
+* Debug-Ausgaben entfernt
 
 = 0.0.2 =
-* Auto-Update-Toggle pro Plugin hinzugefügt.
-* Manuellen Re-Check-Button hinzugefügt.
-* Ein-Klick-Aktualisieren-Button hinzugefügt.
-* Versionserkennung korrigiert.
-* Transient-Key-Fehler behoben.
-* Dark-Mode-Kompatibilität behoben.
+* Auto-Update-Toggle pro Plugin hinzugefügt
+* Manuellen Re-Check-Button hinzugefügt
+* Ein-Klick-Aktualisieren-Button hinzugefügt
+* Versionserkennung korrigiert
+* Transient-Key-Fehler behoben
+* Dark-Mode-Kompatibilität behoben
 
 = 0.0.1 =
-* Erste Veröffentlichung.
+* Erste Veröffentlichung

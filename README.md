@@ -2,7 +2,7 @@
 
 <div align="center">
 
-![Version](https://img.shields.io/badge/version-0.0.9-blue?style=flat-square)
+![Version](https://img.shields.io/badge/version-0.1.0-blue?style=flat-square)
 ![WordPress](https://img.shields.io/badge/WordPress-6.3%2B-21759b?style=flat-square&logo=wordpress&logoColor=white)
 ![PHP](https://img.shields.io/badge/PHP-7.4%2B-777bb4?style=flat-square&logo=php&logoColor=white)
 ![License](https://img.shields.io/badge/License-GPLv2-green?style=flat-square)
@@ -57,15 +57,16 @@ Open **Settings → AWDev Plugins Updater**:
 
 ## Changelog
 
-### 0.0.9 — 2026-03-17
+### 0.1.0 — 2026-03-17
 
-- **Added** `json_last_error()` validation after every `json_decode()` call — invalid API responses are treated as failures and logged via `error_log()`
-- **Added** `error_log()` output when `WP_Filesystem::move()` fails during folder rename, making update failures diagnosable
-- **Added** Days display in "last checked" time — intervals > 24 h now show e.g. *"3 days ago"* instead of *"72 hours ago"*
-- **Added** Author field in "View version details" popup reads from API response when available; falls back to default
-- **Added** Standalone [`uninstall.php`](uninstall.php) — all `awdev_*` options and transients removed from DB on plugin deletion; loaded by WordPress directly without bootstrapping the full plugin
-- **Added** Built-in plugin registry centralised into `awdev_built_in_plugins()` — adding a new plugin requires only one entry
-- **Changed** Replaced `awdev_force_option()` `DELETE` + `add_option()` pattern with `update_option()` to eliminate race condition risk
+- **Fixed** `awdev_fetch_api_data()`: API responses with a `null` or empty body are now explicitly treated as failures and cached as `false`
+- **Fixed** `saveToggle()` in `settings.js`: missing error handling caused save failures to be silently ignored — toggle is now visually reverted on failure
+- **Fixed** Re-check button: version cell resets to `…` before the fetch and shows `?` on error instead of staying stuck
+- **Fixed** `compareVersions()`: replaced `Number()` with `parseInt()` so pre-release suffixes like `-beta` are safely ignored
+- **Added** `awdev_sync_auto_update_defaults()`: new built-in plugin defaults are picked up on existing installs without requiring deactivate/activate
+- **Added** `escHtml()` in `settings.js` now also escapes apostrophes for full attribute/text safety
+- **Changed** Removed unused jQuery dependency from `wp_enqueue_script()`
+- **Also included from 0.0.9:** `json_last_error()` validation, `error_log()` on rename failure, days display in last-checked, author field from API, standalone `uninstall.php`, `awdev_built_in_plugins()` registry, `generate-l10n.yml` workflow, `update_option()` refactor
 
 ### 0.0.8
 
@@ -114,7 +115,7 @@ Open **Settings → AWDev Plugins Updater**:
 - **Fixed** Local installed version detection (folder-name fallback)
 - **Fixed** Transient key mismatch causing version display to show dashes
 - **Fixed** Dark Mode styling compatibility with DarkAdmin
-- **Fixed** Remote version now actively fetched on settings page load if no transient exists
+- **Fixed** Remote version is now actively fetched on settings page load if no transient exists
 
 ### 0.0.1
 

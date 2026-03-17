@@ -4,7 +4,7 @@ Schlagwörter: updater, self-hosted, plugin update, update manager
 Erfordert mindestens: 6.3
 Getestet bis: 6.9
 Erfordert PHP: 7.4
-Stabile Version: 0.0.9
+Stabile Version: 0.1.0
 Lizenz: GPLv2 or later
 Lizenz-URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -43,7 +43,7 @@ Funktionen:
 Nein. DarkAdmin wird automatisch registriert, wenn es installiert ist. Die Standard-Server-URL ist vorkonfiguriert.
 
 = Kann ich weitere Plugins hinzufügen? =
-Ja. Verwende die Einstellungsseite, um weitere AlexanderWagnerDev-Plugins über ihren Basename (z. B. my-plugin/my-plugin.php) und API-Slug hinzuzufügen.
+Ja. Verwende die Einstellungsseite, um weitere AlexanderWagnerDev-Plugins über ihren Basename (z. B. my-plugin/my-plugin.php) und API-Slug hinzuzufügen.
 
 = Wie funktioniert der Auto-Update-Toggle? =
 Jedes Plugin hat einen Auto-Update-Toggle auf der Einstellungsseite. Ein Klick speichert den Zustand sofort via AJAX — kein Speichern-Button nötig. Wenn aktiviert, installiert WordPress Updates automatisch im regelmäßigen Hintergrund-Update-Zyklus.
@@ -52,7 +52,7 @@ Jedes Plugin hat einen Auto-Update-Toggle auf der Einstellungsseite. Ein Klick s
 Klicke auf den Re-Check-Button (Kreis-Pfeil-Symbol) neben einem Plugin auf der Einstellungsseite. Dadurch werden die gecachten Versionsdaten gelöscht und die neueste Version sofort vom Server abgerufen.
 
 = Wie oft prüft WordPress auf Updates? =
-WordPress prüft standardmäßig ungefähr alle 12 Stunden. Der Updater cached API-Antworten für das konfigurierte Intervall (Standard 6h). Verwende den "Update-Cache leeren"-Button für eine sofortige vollständige Neuprüfung.
+WordPress prüft standardmäßig ungefähr alle 12 Stunden. Der Updater cached API-Antworten für das konfigurierte Intervall (Standard 6h). Verwende den "Update-Cache leeren"-Button für eine sofortige vollständige Neuprüfung.
 
 = Ersetzt das WordPress.org-Updates? =
 Nur für AlexanderWagnerDev-Plugins, die in diesem Updater registriert sind. Alle anderen Plugins werden weiterhin normal über WordPress.org aktualisiert.
@@ -61,14 +61,15 @@ Nur für AlexanderWagnerDev-Plugins, die in diesem Updater registriert sind. All
 Ja. Die Einstellungsseite unterstützt DarkAdmin vollständig und passt sich automatisch an den Dark Mode an.
 
 == Changelog ==
-= 0.0.9 =
-* json_last_error()-Validierung nach json_decode() hinzugefügt — ungültige API-Responses werden als Fehler behandelt und via error_log() geloggt
-* error_log()-Ausgabe bei fehlgeschlagenem WP_Filesystem::move() während Ordner-Umbenennung hinzugefügt
-* Tages-Anzeige für "zuletzt geprüft" ergänzt — Intervalle über 24 h zeigen jetzt z. B. "vor 3 Tagen"
-* Autor-Feld im "Version Details"-Popup liest jetzt aus der API-Response; Fallback auf Standard
-* Deinstallations-Routine in separate uninstall.php ausgelagert — alle awdev_*-Optionen und Transients werden beim Plugin-Löschen entfernt
-* awdev_force_option() DELETE+add_option()-Muster durch update_option() ersetzt
-* Built-in Plugin-Registry in awdev_built_in_plugins() zentralisiert
+= 0.1.0 =
+* awdev_fetch_api_data(): null/leerer API-Body wird jetzt explizit als Fehler behandelt und als false gecacht
+* saveToggle() in settings.js: fehlende Fehlerbehandlung behoben — Toggle wird bei Fehler visuell zurückgesetzt
+* Re-Check-Button: Versions-Zelle wird vor dem Fetch auf ... zurückgesetzt und zeigt ? bei Fehler
+* compareVersions(): Number() durch parseInt() ersetzt für sichere Behandlung von Pre-Release-Suffixen
+* awdev_sync_auto_update_defaults() hinzugefügt — neue Built-in-Defaults ohne Deaktivieren/Aktivieren
+* escHtml() in settings.js escapt jetzt auch Apostrophe
+* Ungenutzte jQuery-Abhängigkeit aus wp_enqueue_script() entfernt
+* Ebenfalls enthalten (von 0.0.9): json_last_error()-Validierung, error_log() bei Rename-Fehler, Tages-Anzeige, Autor-Feld aus API, uninstall.php, awdev_built_in_plugins(), generate-l10n.yml, update_option()-Refactoring
 
 = 0.0.8 =
 * Auto-Update-Filter gab null statt true für AWDev-Plugins zurück — WP-Hintergrund-Updates wurden dadurch lautlos übersprungen (behoben)
@@ -76,11 +77,11 @@ Ja. Die Einstellungsseite unterstützt DarkAdmin vollständig und passt sich aut
 
 = 0.0.7 =
 * DarkAdmin-Kompatibilität auf der Einstellungsseite verbessert
-* Farbbezogene !important-Deklarationen aus Basis-Selektoren entfernt, damit DarkAdmin-Styles korrekt durchgreifen
-* DarkAdmin-spezifische Override-Regeln für stabiles Dark-Mode-Rendering beibehalten
+* Farbbezogene !important-Deklarationen aus Basis-Selektoren entfernt
+* DarkAdmin-spezifische Override-Regeln beibehalten
 
 = 0.0.6 =
-* Sprachdatei-msgid-Strings an die exakten __()-Aufrufe in settings.php angepasst
+* Sprachdatei-msgid-Strings an __()-Aufrufe in settings.php angepasst
 * Zwei nicht übereinstimmende Strings korrigiert
 * Project-Id-Version in allen .po- und .pot-Dateien auf 0.0.6 aktualisiert
 
