@@ -42,7 +42,6 @@ jobs:
             -not -name '*.svg' \
             -not -name '*.po' \
             -not -name '*.pot' \
-            -not -name 'readme.txt' \
             -not -name 'readme-de.txt' \
             -not -name 'CHANGELOG*.txt' \
             -type f \
