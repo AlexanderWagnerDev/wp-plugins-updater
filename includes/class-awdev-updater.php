@@ -94,11 +94,12 @@ class AWDev_Updater {
 	 *
 	 * Handles two scenarios:
 	 * 1. Single-plugin update (Plugins list / AWDev Updater button):
-	 *    hook_extra['plugin'] is set → match by basename directly.
+	 *    hook_extra['plugin'] is set -> match by basename directly.
 	 * 2. Bulk/auto update (update-core.php, WP cron):
-	 *    hook_extra['plugin'] is NOT set → match by source folder basename:
-	 *    the folder must contain the plugin slug. Random WP suffixes like
-	 *    "-NKvWbz" are tolerated because stripos is used, not an exact match.
+	 *    hook_extra['plugin'] is NOT set -> match by source folder basename
+	 *    using an exact prefix + WP random suffix pattern (-[A-Za-z0-9]{5,12}).
+	 *    This prevents touching third-party plugin folders that happen to share
+	 *    partial slug overlap.
 	 *
 	 * Uses WP_Filesystem to avoid direct rename() call.
 	 */
@@ -119,11 +120,11 @@ class AWDev_Updater {
 		}
 
 		// Scenario 2: bulk/auto update — hook_extra['plugin'] is empty.
-		// Match by checking if the extracted folder basename contains the plugin slug.
-		// Covers cases like "awdev-plugins-updater-NKvWbz" or
-		// "darkadmin-dark-mode-for-adminpanel-xFArZf" produced by WP core.
+		// Only match if the extracted folder is exactly our slug followed by
+		// the WP-appended random suffix (-[A-Za-z0-9]{5,12}). This ensures
+		// third-party plugins are never accidentally renamed.
 		$source_dirname = basename( untrailingslashit( $source ) );
-		if ( stripos( $source_dirname, $this->plugin_slug ) === false ) {
+		if ( ! preg_match( '/^' . preg_quote( $this->plugin_slug, '/' ) . '-[A-Za-z0-9]{5,12}$/', $source_dirname ) ) {
 			return $source;
 		}
 
