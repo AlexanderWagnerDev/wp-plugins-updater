@@ -32,7 +32,7 @@ function awdev_built_in_plugins(): array {
  * built on top of this function so that HTTP/caching behaviour only needs to
  * be maintained in one place.
  *
- * @param string $transient_key  Transient key (without prefix), e.g. 'awdev_upd_my-plugin'.
+ * @param string $transient_key  Transient key, e.g. 'awdev_upd_my-plugin'.
  * @param string $api_url        Full API endpoint URL.
  * @return object|null           Decoded JSON object, or null on failure.
  */
@@ -60,8 +60,9 @@ function awdev_fetch_api_data( string $transient_key, string $api_url ): ?object
 
 	$data = json_decode( wp_remote_retrieve_body( $response ) );
 
-	if ( json_last_error() !== JSON_ERROR_NONE ) {
-		error_log( 'AWDev Updater: invalid JSON from API (' . $api_url . ') — ' . json_last_error_msg() );
+	// Treat invalid JSON or a null body as a failed response.
+	if ( json_last_error() !== JSON_ERROR_NONE || $data === null ) {
+		error_log( 'AWDev Updater: invalid or empty JSON from API (' . $api_url . ') — ' . json_last_error_msg() );
 		set_transient( $transient_key, false, $cache_hours * HOUR_IN_SECONDS );
 		return null;
 	}
@@ -93,13 +94,7 @@ function awdev_fetch_remote_version( string $basename, string $api_url ): string
  * Runs once via register_activation_hook() in the main plugin file.
  */
 function awdev_activate(): void {
-	if ( get_option( 'awdev_auto_updates' ) === false ) {
-		$defaults = [];
-		foreach ( array_keys( awdev_built_in_plugins() ) as $basename ) {
-			$defaults[ $basename ] = true;
-		}
-		update_option( 'awdev_auto_updates', $defaults );
-	}
+	awdev_sync_auto_update_defaults();
 
 	if ( get_option( 'awdev_cache_hours' ) === false ) {
 		update_option( 'awdev_cache_hours', 6 );
@@ -109,6 +104,33 @@ function awdev_activate(): void {
 		update_option( 'awdev_auto_updates_global', true );
 	}
 }
+
+/**
+ * Ensure every built-in plugin has an entry in awdev_auto_updates.
+ *
+ * Called both on activation and on every admin init so that newly added
+ * built-in plugins are picked up for existing installs without requiring
+ * a manual deactivate/activate cycle.
+ * Existing entries are never overwritten.
+ */
+function awdev_sync_auto_update_defaults(): void {
+	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
+	$changed      = false;
+
+	foreach ( array_keys( awdev_built_in_plugins() ) as $basename ) {
+		if ( ! array_key_exists( $basename, $auto_updates ) ) {
+			$auto_updates[ $basename ] = true;
+			$changed                   = true;
+		}
+	}
+
+	if ( $changed ) {
+		update_option( 'awdev_auto_updates', $auto_updates );
+	}
+}
+
+// Sync missing built-in entries on every admin page load (cheap: only writes when something is missing).
+add_action( 'admin_init', 'awdev_sync_auto_update_defaults' );
 
 /**
  * Register settings and menu.
