@@ -7,6 +7,25 @@ if ( ! defined( 'ABSPATH' ) ) {
 define( 'AWDEV_SETTINGS_SLUG', 'awdev-plugins-updater' );
 
 /**
+ * Single source of truth for all built-in AWDev plugins.
+ * Add new plugins here only — every other place reads from this function.
+ *
+ * @return array<string, array{name: string, api_slug: string}>
+ */
+function awdev_built_in_plugins(): array {
+	return [
+		'awdev-plugins-updater/awdev-plugins-updater.php' => [
+			'name'     => 'AWDev Plugins Updater',
+			'api_slug' => 'awdev-plugins-updater',
+		],
+		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => [
+			'name'     => 'DarkAdmin – Dark Mode for Adminpanel',
+			'api_slug' => 'darkadmin-dark-mode-for-adminpanel',
+		],
+	];
+}
+
+/**
  * Register settings and menu.
  */
 add_action( 'admin_menu', function () {
@@ -20,22 +39,6 @@ add_action( 'admin_menu', function () {
 } );
 
 /**
- * Persist an option reliably regardless of whether the value changed.
- */
-function awdev_force_option( string $option, $value, string $autoload = 'yes' ): void {
-	global $wpdb;
-	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->prepare(
-			"DELETE FROM {$wpdb->options} WHERE option_name = %s",
-			$option
-		)
-	);
-	wp_cache_delete( $option, 'options' );
-	wp_cache_delete( 'alloptions', 'options' );
-	add_option( $option, $value, '', $autoload );
-}
-
-/**
  * Handle main settings form save.
  */
 add_action( 'admin_post_awdev_save_settings', function () {
@@ -45,12 +48,12 @@ add_action( 'admin_post_awdev_save_settings', function () {
 	check_admin_referer( 'awdev_save_settings' );
 
 	$global = isset( $_POST['awdev_auto_updates_global'] );
-	awdev_force_option( 'awdev_auto_updates_global', $global );
+	update_option( 'awdev_auto_updates_global', $global );
 
 	$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? absint( wp_unslash( $_POST['awdev_cache_hours'] ) ) : 6;
 	if ( $cache_hours < 1 )   { $cache_hours = 1; }
 	if ( $cache_hours > 168 ) { $cache_hours = 168; }
-	awdev_force_option( 'awdev_cache_hours', $cache_hours );
+	update_option( 'awdev_cache_hours', $cache_hours );
 
 	wp_safe_redirect( add_query_arg(
 		[ 'page' => AWDEV_SETTINGS_SLUG, 'settings-updated' => '1' ],
@@ -77,7 +80,7 @@ add_action( 'wp_ajax_awdev_toggle_auto_update', function () {
 
 	$auto_updates              = (array) get_option( 'awdev_auto_updates', [] );
 	$auto_updates[ $basename ] = $enabled;
-	awdev_force_option( 'awdev_auto_updates', $auto_updates );
+	update_option( 'awdev_auto_updates', $auto_updates );
 
 	wp_send_json_success( [ 'basename' => $basename, 'enabled' => $enabled ] );
 } );
@@ -93,13 +96,13 @@ add_action( 'wp_ajax_awdev_toggle_global_auto_update', function () {
 
 	$enabled = filter_var( wp_unslash( $_POST['enabled'] ?? false ), FILTER_VALIDATE_BOOLEAN );
 
-	awdev_force_option( 'awdev_auto_updates_global', $enabled );
+	update_option( 'awdev_auto_updates_global', $enabled );
 
 	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
 	foreach ( $auto_updates as $basename => $_ ) {
 		$auto_updates[ $basename ] = $enabled;
 	}
-	awdev_force_option( 'awdev_auto_updates', $auto_updates );
+	update_option( 'awdev_auto_updates', $auto_updates );
 
 	wp_send_json_success( [ 'enabled' => $enabled ] );
 } );
@@ -117,12 +120,9 @@ add_filter( 'auto_update_plugin', function ( $update, $item ) {
 	}
 
 	$managed  = (array) get_option( 'awdev_managed_plugins', [] );
-	$built_in = [
-		'awdev-plugins-updater/awdev-plugins-updater.php',
-		'darkadmin-dark-mode-for-adminpanel/darkadmin.php',
-	];
+	$built_in = awdev_built_in_plugins();
 
-	$is_awdev = in_array( $plugin_basename, $built_in, true ) || isset( $managed[ $plugin_basename ] );
+	$is_awdev = isset( $built_in[ $plugin_basename ] ) || isset( $managed[ $plugin_basename ] );
 	if ( ! $is_awdev ) {
 		return $update;
 	}
@@ -317,29 +317,19 @@ function awdev_render_settings_page(): void {
 		return;
 	}
 
+	$built_in     = awdev_built_in_plugins();
 	$managed      = (array) get_option( 'awdev_managed_plugins', [] );
 	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
 	$global_auto  = get_option( 'awdev_auto_updates_global', true );
 	$cache_hours  = (int) get_option( 'awdev_cache_hours', 6 );
 	if ( $cache_hours < 1 ) { $cache_hours = 1; }
 
-	$built_in = [
-		'awdev-plugins-updater/awdev-plugins-updater.php' => [
-			'name'     => 'AWDev Plugins Updater',
-			'api_slug' => 'awdev-plugins-updater',
-		],
-		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => [
-			'name'     => 'DarkAdmin – Dark Mode for Adminpanel',
-			'api_slug' => 'darkadmin-dark-mode-for-adminpanel',
-		],
-	];
-
 	if ( get_option( 'awdev_auto_updates' ) === false ) {
 		$defaults = [];
 		foreach ( array_keys( $built_in ) as $basename ) {
 			$defaults[ $basename ] = true;
 		}
-		add_option( 'awdev_auto_updates', $defaults, '', 'yes' );
+		update_option( 'awdev_auto_updates', $defaults );
 		$auto_updates = $defaults;
 	}
 
@@ -370,8 +360,8 @@ function awdev_render_settings_page(): void {
 	}
 
 	// Read-only GET flags — no nonce needed (no state change).
-	$cache_flushed  = isset( $_GET['cache-flushed'] );   // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$plugin_checked = isset( $_GET['plugin-checked'] );  // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$cache_flushed  = isset( $_GET['cache-flushed'] );    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	$plugin_checked = isset( $_GET['plugin-checked'] );   // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$settings_saved = isset( $_GET['settings-updated'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	?>
 	<div class="wrap awdev-settings-wrap">

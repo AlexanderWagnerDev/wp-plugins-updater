@@ -5,7 +5,7 @@
  * Description: Keeps AlexanderWagnerDev plugins up to date — without WordPress.org. Updates are served from a self-hosted server, so every release ships on your own schedule.
  * Version: 0.0.8
  * Requires at least: 6.3
- * Tested up to: 6.9
+ * Tested up to: 6.7
  * Requires PHP: 7.4
  * Author: AlexanderWagnerDev
  * Author URI: https://alexanderwagnerdev.com
@@ -40,17 +40,14 @@ require_once AWDEV_UPDATER_PATH . 'includes/settings.php';
 
 /**
  * Register all managed AlexanderWagnerDev plugins.
+ * Built-in list comes from the single source of truth: awdev_built_in_plugins().
  */
 add_action( 'plugins_loaded', function () {
-	$managed = (array) get_option( 'awdev_managed_plugins', [] );
+	$managed  = (array) get_option( 'awdev_managed_plugins', [] );
+	$built_in = awdev_built_in_plugins();
 
-	$built_in = [
-		'awdev-plugins-updater/awdev-plugins-updater.php'  => 'awdev-plugins-updater',
-		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => 'darkadmin-dark-mode-for-adminpanel',
-	];
-
-	foreach ( $built_in as $basename => $api_slug ) {
-		new AWDev_Updater( $basename, AWDEV_UPDATE_SERVER . '/' . $api_slug . '.php' );
+	foreach ( $built_in as $basename => $info ) {
+		new AWDev_Updater( $basename, AWDEV_UPDATE_SERVER . '/' . $info['api_slug'] . '.php' );
 	}
 
 	foreach ( $managed as $basename => $api_slug ) {
