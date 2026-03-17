@@ -14,10 +14,14 @@ Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1
 - Autor-Feld im "Version Details"-Popup liest jetzt aus der API-Response; Fallback auf Hard-coded-Standard
 - Eigenständige `uninstall.php` — alle `awdev_*`-Optionen und Transients werden beim Plugin-Löschen aus der Datenbank entfernt; wird von WordPress direkt geladen ohne das komplette Plugin zu initialisieren
 - Built-in Plugin-Registry in `awdev_built_in_plugins()` zentralisiert — neues Plugin hinzufügen erfordert nur noch einen einzigen Eintrag
+- GitHub Actions Workflow `generate-l10n.yml` — kompiliert `.po`-Dateien automatisch zu `.l10n.php` via WP-CLI bei jeder `.po`-Änderung; `.l10n.php`-Dateien werden ins Repository zurückgeführt und in die Release-ZIP eingepackt (Performance-Vorteil für WordPress 6.5+)
 
 ### Geändert
 - `awdev_force_option()` `DELETE` + `add_option()`-Muster durch `update_option()` ersetzt um Race-Condition-Risiko zu eliminieren
 - `register_uninstall_hook()` und inline `awdev_uninstall()` aus der Haupt-Plugin-Datei entfernt; ersetzt durch `uninstall.php`
+- `.po`, `.pot`, `readme.txt`, `readme-de.txt` und `CHANGELOG*.txt` aus der Release-ZIP ausgeschlossen — diese sind Entwickler-/Dokumentationsdateien die zur Laufzeit nicht benötigt werden
+- `Project-Id-Version` in allen `.po`- und `.pot`-Dateien auf `0.0.9` angehoben
+- Fehlende `%d day ago` / `%d days ago` msgid-Einträge in allen `.po`- und `.pot`-Dateien nachgetragen
 
 ---
 

@@ -15,8 +15,14 @@ AWDev Plugins Updater — Changelog
   Loaded by WordPress directly without bootstrapping the full plugin
 - Added: Built-in plugin registry centralised into awdev_built_in_plugins()
   Adding a new plugin requires only one entry
+- Added: GitHub Actions workflow generate-l10n.yml
+  Automatically compiles .po files to .l10n.php via WP-CLI on every .po change
+  .l10n.php files committed back to repo and included in release ZIP (WP 6.5+ performance)
 - Changed: Replaced awdev_force_option() DELETE+add_option() with update_option()
 - Changed: Removed register_uninstall_hook() and inline awdev_uninstall() in favour of uninstall.php
+- Changed: Excluded .po, .pot, readme.txt, readme-de.txt and CHANGELOG*.txt from release ZIP
+- Changed: Bumped Project-Id-Version to 0.0.9 in all .po and .pot files
+- Changed: Added missing "%d day ago" / "%d days ago" msgid entries to all .po and .pot files
 
 0.0.8
 -----
