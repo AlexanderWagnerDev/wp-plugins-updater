@@ -143,10 +143,13 @@ class AWDev_Updater {
 		}
 
 		global $wp_filesystem;
-		if ( ! $wp_filesystem ) {
+
+		// Always call WP_Filesystem() to ensure it is properly initialized,
+		// regardless of the current state of the global.
+		if ( ! function_exists( 'WP_Filesystem' ) ) {
 			require_once ABSPATH . 'wp-admin/includes/file.php';
-			WP_Filesystem();
 		}
+		WP_Filesystem();
 
 		if ( ! $wp_filesystem ) {
 			error_log( 'AWDev Updater: WP_Filesystem unavailable, cannot rename folder for ' . $this->plugin_slug );
@@ -155,10 +158,14 @@ class AWDev_Updater {
 
 		// Remove existing target folder so move() does not silently fail.
 		if ( $wp_filesystem->is_dir( $corrected ) ) {
-			$wp_filesystem->delete( $corrected, true );
+			if ( ! $wp_filesystem->delete( $corrected, true ) ) {
+				error_log( 'AWDev Updater: could not delete existing target folder "' . $corrected . '" for plugin ' . $this->plugin_slug );
+				return $source;
+			}
 		}
 
-		if ( $wp_filesystem->move( $source, $corrected ) ) {
+		// Pass true as third argument to overwrite if target still exists.
+		if ( $wp_filesystem->move( $source, $corrected, true ) ) {
 			return $corrected;
 		}
 
