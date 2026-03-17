@@ -4,7 +4,7 @@ Tags: updater, self-hosted, plugin update, update manager
 Requires at least: 6.3
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.1.0
+Stable tag: 0.1.1
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,12 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
+= 0.1.1 =
+* Fixed fix_folder_name(): crash when ZIP extracts without a subfolder (flat structure) — rename() was called with target path inside the source directory producing Invalid argument; source/remote-source paths are now normalised and compared, rename redirected to sibling directory
+* Fixed plugins_loaded hook priority raised to 20 for reliable init order
+* Changed rename_source() now receives fully resolved target path directly
+* Changed awdev_get_local_version() caches get_plugins() via wp_cache_get/set (group awdev_updater) — at most one filesystem scan per request
+
 = 0.1.0 =
 * Fixed awdev_fetch_api_data(): null/empty API body now explicitly treated as failure and cached as false
 * Fixed saveToggle() in settings.js: missing error handling caused silent failures — toggle now reverts visually on error
@@ -87,7 +93,7 @@ Yes. The settings page fully supports DarkAdmin and adapts to dark mode automati
 
 = 0.0.5 =
 * Fixed plugin folder rename failing on bulk updates (update-core.php) and WP auto-updates where hook_extra['plugin'] is not populated
-* Added fallback matching by extracted source folder name: matches against plugin slug and GitHub repo name derived from download URL
+* Added fallback matching by extracted source folder name
 * Extracted rename logic into private rename_source() method to avoid duplication
 
 = 0.0.4 =
@@ -121,80 +127,81 @@ Yes. The settings page fully supports DarkAdmin and adapts to dark mode automati
 * Translations: de_DE, de_AT, en_US.
 
 == Deutsch ==
-Der AWDev Plugins Updater ersetzt den WordPress.org-Update-Kanal für AlexanderWagnerDev-Plugins durch einen selbst gehosteten Update-Server.
+Der AWDev Plugins Updater ersetzt den WordPress.org-Update-Kanal fuer AlexanderWagnerDev-Plugins durch einen selbst gehosteten Update-Server.
 
 Funktionen:
 * Native WordPress-Update-Integration (keine Drittanbieter-Bibliotheken)
 * Einstellungsseite unter Einstellungen → AWDev Plugins Updater
-* Integrierte Unterstützung für DarkAdmin (automatisch registriert)
+* Integrierte Unterstuetzung fuer DarkAdmin (automatisch registriert)
 * Auto-Update-Toggle pro Plugin — wird sofort beim Klick gespeichert
-* Globaler Auto-Update-Hauptschalter — überträgt Zustand sofort auf alle Per-Plugin-Toggles
+* Globaler Auto-Update-Hauptschalter — uebertraegt Zustand sofort auf alle Per-Plugin-Toggles
 * Manueller Re-Check-Button pro Plugin
-* Ein-Klick-Aktualisieren-Button bei verfügbarer neuerer Version
-* Weitere Plugins über die Einstellungsseite hinzufügen
+* Ein-Klick-Aktualisieren-Button bei verfuegbarer neuerer Version
+* Weitere Plugins ueber die Einstellungsseite hinzufuegen
 * Konfigurierbares Update-Cache-Intervall (1h–168h, Standard 6h)
 * Manueller Cache-Flush-Button
 * Automatische Ordnernamens-Korrektur nach ZIP-Extraktion (inkl. Bulk-Updates und Zufalls-Suffix-Ordner)
 * Dark-Mode-kompatible Einstellungsseite via DarkAdmin
-* Übersetzungen: de_DE, de_AT, en_US
-* Saubere Deinstallation — alle Plugin-Optionen werden beim Löschen aus der Datenbank entfernt
+* Uebersetzungen: de_DE, de_AT, en_US
+* Saubere Deinstallation — alle Plugin-Optionen werden beim Loeschen aus der Datenbank entfernt
 
 === Installation ===
 1. Neuste awdev-plugin-updater.zip von der GitHub-Releases-Seite herunterladen.
-2. Über Plugins → Neu hinzufügen → Plugin hochladen installieren.
+2. Ueber Plugins → Neu hinzufuegen → Plugin hochladen installieren.
 3. Plugin aktivieren.
 4. Einstellungen → AWDev Plugins Updater aufrufen.
 
 === Changelog ===
+= 0.1.1 =
+* fix_folder_name(): Absturz bei flacher ZIP-Struktur behoben — Umbenennung in Geschwisterverzeichnis umgeleitet
+* plugins_loaded-Prioritaet auf 20 erhoeht
+* rename_source() erhaelt jetzt den vollstaendig aufgeloesten Zielpfad direkt
+* awdev_get_local_version() cached get_plugins() via wp_cache_get/set
+
 = 0.1.0 =
 * awdev_fetch_api_data(): null/leerer API-Body wird jetzt explizit als Fehler behandelt und als false gecacht
-* saveToggle() in settings.js: fehlende Fehlerbehandlung behoben — Toggle wird bei Fehler visuell zurückgesetzt
-* Re-Check-Button: Versions-Zelle wird vor dem Fetch auf ... zurückgesetzt und zeigt ? bei Fehler
-* compareVersions(): Number() durch parseInt() ersetzt für sichere Behandlung von Pre-Release-Suffixen
-* awdev_sync_auto_update_defaults() hinzugefügt — neue Built-in-Defaults ohne Deaktivieren/Aktivieren
+* saveToggle() in settings.js: fehlende Fehlerbehandlung behoben — Toggle wird bei Fehler visuell zurueckgesetzt
+* Re-Check-Button: Versions-Zelle wird vor dem Fetch auf ... zurueckgesetzt und zeigt ? bei Fehler
+* compareVersions(): Number() durch parseInt() ersetzt fuer sichere Behandlung von Pre-Release-Suffixen
+* awdev_sync_auto_update_defaults() hinzugefuegt — neue Built-in-Defaults ohne Deaktivieren/Aktivieren
 * escHtml() in settings.js escapt jetzt auch Apostrophe
-* Ungenutzte jQuery-Abhängigkeit aus wp_enqueue_script() entfernt
+* Ungenutzte jQuery-Abhaengigkeit aus wp_enqueue_script() entfernt
 * Ebenfalls enthalten (von 0.0.9): json_last_error()-Validierung, error_log() bei Rename-Fehler, Tages-Anzeige, Autor-Feld aus API, uninstall.php, awdev_built_in_plugins(), generate-l10n.yml, update_option()-Refactoring
 
 = 0.0.8 =
-* Auto-Update-Filter gab null statt true für AWDev-Plugins zurück — WP-Hintergrund-Updates wurden dadurch lautlos übersprungen (behoben)
-* Ordnerumbenennung nach ZIP-Extraktion schlug lautlos fehl wenn Zielordner bereits existierte (behoben)
+* Auto-Update-Filter gab null statt true fuer AWDev-Plugins zurueck (behoben)
+* Ordnerumbenennung nach ZIP-Extraktion schlug lautlos fehl (behoben)
 
 = 0.0.7 =
-* DarkAdmin-Kompatibilität auf der Einstellungsseite des AWDev Plugins Updater verbessert
-* Farbbezogene !important-Deklarationen aus Basis-Selektoren entfernt, damit DarkAdmin-Styles korrekt durchgreifen
-* DarkAdmin-spezifische Override-Regeln für stabiles Dark-Mode-Rendering beibehalten
+* DarkAdmin-Kompatibilitaet verbessert
+* Farbbezogene !important-Deklarationen entfernt
+* DarkAdmin-Override-Regeln beibehalten
 
 = 0.0.6 =
-* Sprachdatei-msgid-Strings an die exakten __()-Aufrufe in settings.php angepasst
-* Zwei nicht übereinstimmende Strings korrigiert
-* Project-Id-Version in allen .po- und .pot-Dateien auf 0.0.6 aktualisiert
+* Sprachdatei-msgid-Strings angepasst
+* Zwei nicht uebereinstimmende Strings korrigiert
+* Project-Id-Version auf 0.0.6 aktualisiert
 
 = 0.0.5 =
-* Fehler bei Ordnerumbenennung bei Bulk-Updates und WP Auto-Updates behoben
-* Fallback-Matching über extrahierten Quellordnernamen hinzugefügt
-* Rename-Logik in private rename_source()-Methode ausgelagert
+* Fehler bei Ordnerumbenennung bei Bulk-Updates behoben
+* Fallback-Matching hinzugefuegt
+* Rename-Logik in rename_source() ausgelagert
 
 = 0.0.4 =
-* wp_redirect() durch wp_safe_redirect() ersetzt
-* wp_unslash() und absint() für POST-Input hinzugefügt
-* translators-Kommentare hinzugefügt
-* rename() durch WP_Filesystem::move() ersetzt
-* phpcs:ignore für direkte DB-Queries hinzugefügt
+* wp_safe_redirect() verwendet
+* wp_unslash() und absint() fuer POST-Input
+* translators-Kommentare hinzugefuegt
+* WP_Filesystem::move() statt rename()
+* phpcs:ignore fuer direkte DB-Queries
 
 = 0.0.3 =
 * Verschachtelte Formular-Elemente behoben
-* Per-Plugin-Toggles speichern sofort via AJAX
-* Globaler Toggle spiegelt Zustand sofort
+* AJAX-Toggles hinzugefuegt
 * Debug-Ausgaben entfernt
 
 = 0.0.2 =
-* Auto-Update-Toggle pro Plugin hinzugefügt
-* Manuellen Re-Check-Button hinzugefügt
-* Ein-Klick-Aktualisieren-Button hinzugefügt
-* Versionserkennung korrigiert
-* Transient-Key-Fehler behoben
-* Dark-Mode-Kompatibilität behoben
+* Auto-Update-Toggle, Re-Check-Button, Aktualisieren-Button hinzugefuegt
+* Versionserkennung, Transient-Key, Dark-Mode behoben
 
 = 0.0.1 =
-* Erste Veröffentlichung
+* Erste Veroeffentlichung
