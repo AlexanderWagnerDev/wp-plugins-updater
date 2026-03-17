@@ -1,22 +1,28 @@
-AWDev Plugins Updater — Changelog
+AWDev Plugins Updater - Changelog
 ==================================
 
-0.1.0 — 2026-03-17
+0.1.1 - 2026-03-17
+-------------------
+- Fixed: fix_folder_name(): crash when ZIP extracts without a subfolder (flat structure)
+  rename() was called with target path inside the source directory -> Invalid argument
+  Source/remote-source paths are now normalised and compared to detect flat ZIPs
+  Rename is redirected to a sibling directory instead
+- Fixed: plugins_loaded hook priority raised to 20 for reliable init order
+- Changed: rename_source() now receives fully resolved target path directly
+- Changed: awdev_get_local_version() caches get_plugins() via wp_cache_get/set (group awdev_updater)
+  get_plugins() now scans filesystem at most once per request
+
+0.1.0 - 2026-03-17
 -------------------
 - Fixed: awdev_fetch_api_data(): null/empty API body now explicitly treated as failure and cached as false
-  Previously json_decode() returned null without triggering the JSON error check
 - Fixed: saveToggle() in settings.js: missing .then()/.catch() meant failures were silently ignored
-  Toggle is now visually reverted when the AJAX request fails
 - Fixed: Re-check button: version cell resets to ... before fetch and shows ? on error
-  Previously the cell stayed stuck on ... indefinitely
-- Fixed: compareVersions(): Number() replaced with parseInt() to safely ignore pre-release suffixes like -beta
+- Fixed: compareVersions(): Number() replaced with parseInt() to safely ignore pre-release suffixes
 - Added: register_activation_hook() now calls awdev_activate() for first-activation defaults
 - Added: awdev_sync_auto_update_defaults(): adds missing awdev_auto_updates entries for built-in plugins
-  Hooked to admin_init so new built-in plugins are picked up without deactivate/activate cycle
-- Added: escHtml() in settings.js now also escapes apostrophes for full attribute/text safety
-- Changed: awdev_activate() delegates to awdev_sync_auto_update_defaults() to avoid duplication
+- Added: escHtml() in settings.js now also escapes apostrophes
+- Changed: awdev_activate() delegates to awdev_sync_auto_update_defaults()
 - Changed: AWDev_Updater::get_remote_data() delegates to shared awdev_fetch_api_data() helper
-  Eliminates duplicated transient/HTTP code
 - Changed: Removed unused jQuery dependency from wp_enqueue_script()
 - Changed: JS Unicode escapes replaced with literal UTF-8 characters in PHP files
 - Also included (from 0.0.9): json_last_error() validation, error_log() on rename failure,
@@ -26,7 +32,6 @@ AWDev Plugins Updater — Changelog
 0.0.8
 -----
 - Fixed: Auto-update filter returned null instead of true for AWDev plugins
-  WordPress background updates were silently skipped as a result
 - Fixed: Plugin folder rename silently failed when target directory already existed
 
 0.0.7
