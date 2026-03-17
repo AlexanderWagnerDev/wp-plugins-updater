@@ -19,7 +19,7 @@ function awdev_built_in_plugins(): array {
 			'api_slug' => 'awdev-plugins-updater',
 		],
 		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => [
-			'name'     => 'DarkAdmin – Dark Mode for Adminpanel',
+			'name'     => 'DarkAdmin - Dark Mode for Adminpanel',
 			'api_slug' => 'darkadmin-dark-mode-for-adminpanel',
 		],
 	];
@@ -62,7 +62,7 @@ function awdev_fetch_api_data( string $transient_key, string $api_url ): ?object
 
 	// Treat invalid JSON or a null body as a failed response.
 	if ( json_last_error() !== JSON_ERROR_NONE || $data === null ) {
-		error_log( 'AWDev Updater: invalid or empty JSON from API (' . $api_url . ') — ' . json_last_error_msg() );
+		error_log( 'AWDev Updater: invalid or empty JSON from API (' . $api_url . ') - ' . json_last_error_msg() );
 		set_transient( $transient_key, false, $cache_hours * HOUR_IN_SECONDS );
 		return null;
 	}
@@ -280,7 +280,7 @@ add_filter( 'auto_update_plugin', function ( $update, $item ) {
 		return $update;
 	}
 
-	// Global toggle off → never auto-update any AWDev plugin.
+	// Global toggle off - never auto-update any AWDev plugin.
 	$global = (bool) get_option( 'awdev_auto_updates_global', true );
 	if ( ! $global ) {
 		return false;
@@ -371,13 +371,24 @@ add_action( 'admin_post_awdev_flush_cache', function () {
 
 /**
  * Resolve local installed version for a plugin basename.
+ *
+ * Calls get_plugins() at most once per request by caching the full plugin list
+ * in the WP object cache (group 'awdev_updater', key 'all_plugins').
+ * get_plugins() scans the filesystem on every call when there is no persistent
+ * object cache, so avoiding repeated calls keeps the settings page fast.
+ *
  * Returns '?' when the plugin is not found.
  */
 function awdev_get_local_version( string $basename ): string {
 	if ( ! function_exists( 'get_plugins' ) ) {
 		require_once ABSPATH . 'wp-admin/includes/plugin.php';
 	}
-	$plugins = get_plugins();
+
+	$plugins = wp_cache_get( 'all_plugins', 'awdev_updater' );
+	if ( ! is_array( $plugins ) ) {
+		$plugins = get_plugins();
+		wp_cache_set( 'all_plugins', $plugins, 'awdev_updater' );
+	}
 
 	if ( isset( $plugins[ $basename ] ) ) {
 		return $plugins[ $basename ]['Version'];
@@ -445,7 +456,7 @@ function awdev_render_plugin_row( string $basename, string $name, array $st, str
 		<td><?php echo esc_html( $st['local_version'] ); ?></td>
 		<td>
 			<span class="awdev-remote-version" data-slug="<?php echo esc_attr( $st['dirname_slug'] ); ?>">
-				<span class="awdev-version-loading">…</span>
+				<span class="awdev-version-loading">...</span>
 			</span>
 			<span class="awdev-last-checked"><?php echo esc_html( $st['last_checked'] ); ?></span>
 		</td>
@@ -518,7 +529,7 @@ function awdev_render_settings_page(): void {
 		];
 	}
 
-	// Read-only GET flags — no nonce needed (no state change).
+	// Read-only GET flags - no nonce needed (no state change).
 	$cache_flushed  = isset( $_GET['cache-flushed'] );    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	$settings_saved = isset( $_GET['settings-updated'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	?>
@@ -596,7 +607,7 @@ function awdev_render_settings_page(): void {
 							step="1"
 							class="small-text"
 					/>
-						<span class="description"><?php esc_html_e( 'Min: 1h — Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
+						<span class="description"><?php esc_html_e( 'Min: 1h - Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
 					</div>
 
 					<div class="awdev-submit-row">
