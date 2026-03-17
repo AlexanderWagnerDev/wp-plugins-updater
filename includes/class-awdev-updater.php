@@ -45,8 +45,8 @@ class AWDev_Updater {
 			return null;
 		}
 
-		$data         = json_decode( wp_remote_retrieve_body( $response ) );
-		$cache_hours  = (int) get_option( 'awdev_cache_hours', 6 );
+		$data        = json_decode( wp_remote_retrieve_body( $response ) );
+		$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
 		if ( $cache_hours < 1 ) {
 			$cache_hours = 1;
 		}
@@ -66,13 +66,14 @@ class AWDev_Updater {
 		$data    = $this->get_remote_data();
 		$current = $transient->checked[ $this->plugin_basename ] ?? '0.0.0';
 
-		if ( $data && version_compare( $data->version, $current, '>' ) ) {
+		// Guard against incomplete API responses that are missing the version field.
+		if ( $data && isset( $data->version ) && version_compare( $data->version, $current, '>' ) ) {
 			$transient->response[ $this->plugin_basename ] = (object) [
 				'slug'        => $this->plugin_slug,
 				'plugin'      => $this->plugin_basename,
 				'new_version' => $data->version,
-				'url'         => $data->details_url ?? '',
-				'package'     => $data->download_url,
+				'url'         => $data->details_url   ?? '',
+				'package'     => $data->download_url  ?? '',
 			];
 		}
 
@@ -88,7 +89,7 @@ class AWDev_Updater {
 		}
 
 		$data = $this->get_remote_data();
-		if ( ! $data ) {
+		if ( ! $data || ! isset( $data->version ) ) {
 			return $result;
 		}
 
@@ -99,7 +100,7 @@ class AWDev_Updater {
 			'author'        => '<a href="https://alexanderwagnerdev.com">AlexanderWagnerDev</a>',
 			'homepage'      => $data->details_url   ?? '',
 			'sections'      => [ 'changelog' => $data->changelog ?? '' ],
-			'download_link' => $data->download_url,
+			'download_link' => $data->download_url  ?? '',
 			'requires'      => $data->requires      ?? '6.0',
 			'tested'        => $data->tested        ?? '6.9',
 			'requires_php'  => $data->requires_php  ?? '7.4',

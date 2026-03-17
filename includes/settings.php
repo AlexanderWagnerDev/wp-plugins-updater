@@ -217,6 +217,8 @@ add_action( 'admin_post_awdev_check_plugin', function () {
 
 /**
  * Resolve local installed version for a plugin basename.
+ * Returns '?' when the plugin is not found, using plain ASCII to avoid
+ * encoding issues in string comparisons.
  */
 function awdev_get_local_version( string $basename ): string {
 	if ( ! function_exists( 'get_plugins' ) ) {
@@ -241,7 +243,7 @@ function awdev_get_local_version( string $basename ): string {
 		}
 	}
 
-	return '–';
+	return '?';
 }
 
 /**
@@ -271,12 +273,19 @@ function awdev_get_last_checked( string $dirname_slug ): string {
 }
 
 /**
- * Fetch remote version from API, using transient cache.
+ * Return the remote version string for a plugin by reading its transient directly.
+ * Falls back to '?' (plain ASCII) when no cached data is available, avoiding
+ * a duplicate HTTP request since AWDev_Updater already populates the same key.
  */
 function awdev_get_remote_version( string $api_url, string $dirname_slug ): string {
 	$key  = 'awdev_upd_' . sanitize_key( $dirname_slug );
 	$data = get_transient( $key );
 
+	if ( $data !== false && $data && isset( $data->version ) ) {
+		return $data->version;
+	}
+
+	// Transient is empty — fire a single HTTP request to populate it.
 	if ( $data === false ) {
 		$response = wp_remote_get( $api_url, [
 			'timeout'    => 10,
@@ -288,13 +297,16 @@ function awdev_get_remote_version( string $api_url, string $dirname_slug ): stri
 			$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
 			if ( $cache_hours < 1 ) { $cache_hours = 1; }
 			set_transient( $key, $data, $cache_hours * HOUR_IN_SECONDS );
+
+			if ( $data && isset( $data->version ) ) {
+				return $data->version;
+			}
 		} else {
 			set_transient( $key, false, HOUR_IN_SECONDS );
-			return '–';
 		}
 	}
 
-	return ( $data && isset( $data->version ) ) ? $data->version : '–';
+	return '?';
 }
 
 /**
@@ -341,7 +353,7 @@ function awdev_render_settings_page(): void {
 
 		$local        = awdev_get_local_version( $basename );
 		$remote       = awdev_get_remote_version( $api_url, $dirname_slug );
-		$needs_update = ( $local !== '–' && $remote !== '–' && version_compare( $remote, $local, '>' ) );
+		$needs_update = ( $local !== '?' && $remote !== '?' && version_compare( $remote, $local, '>' ) );
 
 		$statuses[ $basename ] = [
 			'dirname_slug'   => $dirname_slug,
