@@ -4,9 +4,11 @@
 
 	document.addEventListener( 'DOMContentLoaded', function () {
 
-		var ajaxUrl            = ( window.awdevSettings && awdevSettings.ajaxUrl )            ? awdevSettings.ajaxUrl            : '';
-		var nonce              = ( window.awdevSettings && awdevSettings.nonce )              ? awdevSettings.nonce              : '';
-		var nonceRemoteVersion = ( window.awdevSettings && awdevSettings.nonceRemoteVersion ) ? awdevSettings.nonceRemoteVersion : '';
+		var s                  = window.awdevSettings || {};
+		var ajaxUrl            = s.ajaxUrl            || '';
+		var nonce              = s.nonce              || '';
+		var nonceRemoteVersion = s.nonceRemoteVersion || '';
+		var nonceCheckPlugin   = s.nonceCheckPlugin   || '';
 
 		// Send an AJAX request to instantly save a toggle state.
 		function saveToggle( action, data ) {
@@ -45,10 +47,9 @@
 					var slug    = cell.dataset.slug;
 					var remote  = versions[ slug ] || '?';
 
-					// Find the actions cell in the same row to optionally inject the Update button.
 					var row         = cell.closest( 'tr' );
 					var actionsCell = row ? row.querySelector( '.awdev-actions-cell' ) : null;
-					var local       = actionsCell ? actionsCell.dataset.local : '';
+					var local       = actionsCell ? actionsCell.dataset.local   : '';
 					var basename    = actionsCell ? actionsCell.dataset.basename : '';
 
 					var needsUpdate = ( remote !== '?' && local && local !== '?' && compareVersions( remote, local ) > 0 );
@@ -64,13 +65,13 @@
 						var placeholder = actionsCell.querySelector( '.awdev-update-btn-placeholder' );
 						if ( placeholder && ! placeholder.dataset.injected ) {
 							placeholder.dataset.injected = '1';
-							var nonce_val = awdevSettings.updateNonces && awdevSettings.updateNonces[ basename ] ? awdevSettings.updateNonces[ basename ] : '';
-							if ( nonce_val ) {
-								var href = awdevSettings.updateBase + '&plugin=' + encodeURIComponent( basename ) + '&_wpnonce=' + nonce_val;
+							var updateNonce = s.updateNonces && s.updateNonces[ basename ] ? s.updateNonces[ basename ] : '';
+							if ( updateNonce && s.updateBase ) {
+								var href = s.updateBase + '&plugin=' + encodeURIComponent( basename ) + '&_wpnonce=' + updateNonce;
 								placeholder.innerHTML =
 									'<a href="' + escHtml( href ) + '" class="button button-small button-primary awdev-update-btn">' +
 									'<span class="dashicons dashicons-arrow-up-alt"></span> ' +
-									awdevSettings.i18n.update +
+									escHtml( s.i18n && s.i18n.update ? s.i18n.update : 'Update' ) +
 									'</a>';
 							}
 						}
@@ -83,6 +84,43 @@
 				} );
 			} );
 		}
+
+		// Handle re-check button click: POST to admin-post.php via fetch using the shared nonce.
+		document.addEventListener( 'click', function ( e ) {
+			var btn = e.target.closest( '.awdev-check-btn' );
+			if ( ! btn || ! nonceCheckPlugin ) { return; }
+
+			e.preventDefault();
+
+			var slug = btn.dataset.slug || '';
+			if ( ! slug ) { return; }
+
+			var params = new URLSearchParams();
+			params.append( 'action',       'awdev_check_plugin' );
+			params.append( '_wpnonce',     nonceCheckPlugin );
+			params.append( 'dirname_slug', slug );
+
+			btn.disabled = true;
+			btn.querySelector( '.dashicons' ).classList.add( 'awdev-spin' );
+
+			fetch( ajaxUrl.replace( 'admin-ajax.php', 'admin-post.php' ), {
+				method  : 'POST',
+				headers : { 'Content-Type': 'application/x-www-form-urlencoded' },
+				body    : params.toString(),
+			} ).then( function () {
+				// Reload remote versions after re-check.
+				var remoteCell = document.querySelector( '.awdev-remote-version[data-slug="' + slug + '"]' );
+				if ( remoteCell ) {
+					remoteCell.innerHTML = '<span class="awdev-version-loading">…</span>';
+				}
+				loadRemoteVersions();
+				btn.disabled = false;
+				btn.querySelector( '.dashicons' ).classList.remove( 'awdev-spin' );
+			} ).catch( function () {
+				btn.disabled = false;
+				btn.querySelector( '.dashicons' ).classList.remove( 'awdev-spin' );
+			} );
+		} );
 
 		// Compare two semver strings. Returns >0 if a>b, <0 if a<b, 0 if equal.
 		function compareVersions( a, b ) {

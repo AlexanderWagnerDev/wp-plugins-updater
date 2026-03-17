@@ -173,11 +173,18 @@ add_filter( 'auto_update_plugin', function ( $update, $item ) {
 
 /**
  * Enqueue settings page assets.
+ * Passes all data needed by settings.js via wp_localize_script():
+ * - ajaxUrl, nonce, nonceRemoteVersion: for AJAX calls
+ * - nonceCheckPlugin: single re-check nonce shared across all plugin rows
+ * - updateBase: base URL for the WP upgrade action
+ * - updateNonces: per-plugin nonces for the one-click Update button
+ * - i18n.update: translated "Update" label for the dynamically injected button
  */
 add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	if ( $hook !== 'settings_page_' . AWDEV_SETTINGS_SLUG ) {
 		return;
 	}
+
 	wp_enqueue_style(
 		'awdev-settings',
 		AWDEV_UPDATER_URL . 'assets/css/settings.css',
@@ -191,10 +198,26 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 		AWDEV_UPDATER_VERSION,
 		true
 	);
+
+	// Build per-plugin update nonces for the one-click Update button.
+	$built_in      = awdev_built_in_plugins();
+	$managed       = (array) get_option( 'awdev_managed_plugins', [] );
+	$update_nonces = [];
+
+	foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
+		$update_nonces[ $basename ] = wp_create_nonce( 'upgrade-plugin_' . $basename );
+	}
+
 	wp_localize_script( 'awdev-settings-js', 'awdevSettings', [
 		'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
 		'nonce'              => wp_create_nonce( 'awdev_toggle_auto_update' ),
 		'nonceRemoteVersion' => wp_create_nonce( 'awdev_get_remote_versions' ),
+		'nonceCheckPlugin'   => wp_create_nonce( 'awdev_check_plugin' ),
+		'updateBase'         => admin_url( 'update.php?action=upgrade-plugin' ),
+		'updateNonces'       => $update_nonces,
+		'i18n'               => [
+			'update' => __( 'Update', 'awdev-plugins-updater' ),
+		],
 	] );
 } );
 
@@ -311,10 +334,14 @@ function awdev_get_last_checked( string $dirname_slug ): string {
 /**
  * Render a single plugin row in the managed plugins table.
  *
- * @param string $basename  Plugin basename (folder/file.php).
- * @param string $name      Display name.
- * @param array  $st        Status array from awdev_render_settings_page().
- * @param string $badge_class CSS class for the type badge (awdev-badge-builtin or awdev-badge-custom).
+ * The re-check form uses a nonce value passed via awdevSettings.nonceCheckPlugin
+ * (set in wp_localize_script) rather than a per-row wp_nonce_field() call,
+ * eliminating redundant hidden fields when many plugins are listed.
+ *
+ * @param string $basename    Plugin basename (folder/file.php).
+ * @param string $name        Display name.
+ * @param array  $st          Status array from awdev_render_settings_page().
+ * @param string $badge_class CSS class for the type badge.
  */
 function awdev_render_plugin_row( string $basename, string $name, array $st, string $badge_class ): void {
 	?>
@@ -338,15 +365,17 @@ function awdev_render_plugin_row( string $basename, string $name, array $st, str
 				<span class="awdev-toggle-slider"></span>
 			</label>
 		</td>
-		<td class="awdev-actions-cell" data-basename="<?php echo esc_attr( $basename ); ?>" data-local="<?php echo esc_attr( $st['local_version'] ); ?>">
-			<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>" style="display:inline">
-				<input type="hidden" name="action" value="awdev_check_plugin" />
-				<input type="hidden" name="dirname_slug" value="<?php echo esc_attr( $st['dirname_slug'] ); ?>" />
-				<?php wp_nonce_field( 'awdev_check_plugin' ); ?>
-				<button type="submit" class="button button-small awdev-check-btn" title="<?php esc_attr_e( 'Re-check update', 'awdev-plugins-updater' ); ?>">
-					<span class="dashicons dashicons-update"></span>
-				</button>
-			</form>
+		<td class="awdev-actions-cell"
+			data-basename="<?php echo esc_attr( $basename ); ?>"
+			data-local="<?php echo esc_attr( $st['local_version'] ); ?>"
+			data-slug="<?php echo esc_attr( $st['dirname_slug'] ); ?>">
+			<button type="button"
+				class="button button-small awdev-check-btn"
+				title="<?php esc_attr_e( 'Re-check update', 'awdev-plugins-updater' ); ?>"
+				data-action="awdev_check_plugin"
+				data-slug="<?php echo esc_attr( $st['dirname_slug'] ); ?>">
+				<span class="dashicons dashicons-update"></span>
+			</button>
 			<span class="awdev-update-btn-placeholder"></span>
 		</td>
 		<td><span class="awdev-badge <?php echo esc_attr( $badge_class ); ?>"><?php esc_html_e( 'AWDev', 'awdev-plugins-updater' ); ?></span></td>

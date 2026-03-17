@@ -25,6 +25,15 @@ define( 'AWDEV_UPDATER_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AWDEV_UPDATE_SERVER', 'https://wp-plugins-updates.awdev.space/api' );
 
 /**
+ * Global registry of all active AWDev_Updater instances.
+ * Keyed by plugin basename so individual instances can be accessed
+ * (e.g. to call clear_cache()) without re-instantiation.
+ *
+ * @var AWDev_Updater[]
+ */
+$awdev_updaters = [];
+
+/**
  * Load plugin text domain for translations.
  */
 add_action( 'init', function () {
@@ -41,18 +50,27 @@ require_once AWDEV_UPDATER_PATH . 'includes/settings.php';
 /**
  * Register all managed AlexanderWagnerDev plugins.
  * Built-in list comes from the single source of truth: awdev_built_in_plugins().
+ * Every created instance is stored in $awdev_updaters for later access.
  */
 add_action( 'plugins_loaded', function () {
+	global $awdev_updaters;
+
 	$managed  = (array) get_option( 'awdev_managed_plugins', [] );
 	$built_in = awdev_built_in_plugins();
 
 	foreach ( $built_in as $basename => $info ) {
-		new AWDev_Updater( $basename, AWDEV_UPDATE_SERVER . '/' . $info['api_slug'] . '.php' );
+		$awdev_updaters[ $basename ] = new AWDev_Updater(
+			$basename,
+			AWDEV_UPDATE_SERVER . '/' . $info['api_slug'] . '.php'
+		);
 	}
 
 	foreach ( $managed as $basename => $api_slug ) {
 		if ( ! isset( $built_in[ $basename ] ) ) {
-			new AWDev_Updater( $basename, AWDEV_UPDATE_SERVER . '/' . sanitize_key( $api_slug ) . '.php' );
+			$awdev_updaters[ $basename ] = new AWDev_Updater(
+				$basename,
+				AWDEV_UPDATE_SERVER . '/' . sanitize_key( $api_slug ) . '.php'
+			);
 		}
 	}
 } );
