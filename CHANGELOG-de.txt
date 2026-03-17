@@ -1,28 +1,27 @@
 AWDev Plugins Updater — Changelog (Deutsch)
 ============================================
 
-0.0.9 — 2026-03-17
+0.1.0 — 2026-03-17
 -------------------
-- Hinzugefügt: json_last_error()-Validierung nach jedem json_decode()-Aufruf
-  Ungültige API-Responses werden als Fehler behandelt und via error_log() geloggt
-- Hinzugefügt: error_log()-Ausgabe wenn WP_Filesystem::move() bei Ordner-Umbenennung fehlschlägt
-- Hinzugefügt: Tages-Anzeige für "zuletzt geprüft"
-  Intervalle über 24 h zeigen jetzt z.B. "vor 3 Tagen" statt "vor 72 Stunden"
-- Hinzugefügt: Autor-Feld im "Version Details"-Popup liest aus der API-Response
-  Fallback auf Hard-coded-Standard
-- Hinzugefügt: Eigenständige uninstall.php
-  Alle awdev_*-Optionen und Transients werden beim Plugin-Löschen entfernt
-  Von WordPress direkt geladen ohne das komplette Plugin zu initialisieren
-- Hinzugefügt: Built-in Plugin-Registry in awdev_built_in_plugins() zentralisiert
-  Neues Plugin hinzufügen erfordert nur noch einen einzigen Eintrag
-- Hinzugefügt: GitHub Actions Workflow generate-l10n.yml
-  Kompiliert .po-Dateien automatisch zu .l10n.php via WP-CLI bei jeder .po-Änderung
-  .l10n.php-Dateien werden ins Repository zurückgeführt und in die Release-ZIP eingepackt (WP 6.5+)
-- Geändert: awdev_force_option() DELETE+add_option()-Muster durch update_option() ersetzt
-- Geändert: register_uninstall_hook() und inline awdev_uninstall() entfernt; ersetzt durch uninstall.php
-- Geändert: .po, .pot, readme.txt, readme-de.txt und CHANGELOG*.txt aus der Release-ZIP ausgeschlossen
-- Geändert: Project-Id-Version in allen .po- und .pot-Dateien auf 0.0.9 angehoben
-- Geändert: Fehlende "%d day ago" / "%d days ago" msgid-Einträge in allen .po- und .pot-Dateien nachgetragen
+- Behoben: awdev_fetch_api_data(): null/leerer API-Body wird jetzt explizit als Fehler behandelt und als false gecacht
+  Zuvor gab json_decode() null zurück ohne den JSON-Fehler-Check auszulösen
+- Behoben: saveToggle() in settings.js: fehlende .then()/.catch()-Kette sorgte für lautlose Fehler
+  Toggle wird jetzt visuell zurückgesetzt wenn der AJAX-Request fehlschlägt
+- Behoben: Re-Check-Button: Versions-Zelle wird vor dem Fetch auf ... zurückgesetzt und zeigt ? bei Fehler
+  Zuvor blieb die Zelle dauerhaft auf ... stecken
+- Behoben: compareVersions(): Number() durch parseInt() ersetzt für sichere Behandlung von Pre-Release-Suffixen wie -beta
+- Hinzugefügt: register_activation_hook() ruft jetzt awdev_activate() für Standard-Optionen bei Erstaktivierung auf
+- Hinzugefügt: awdev_sync_auto_update_defaults(): ergänzt fehlende awdev_auto_updates-Einträge für Built-in-Plugins
+  An admin_init gebunden — neue Built-in-Plugins werden ohne Deaktivieren/Aktivieren übernommen
+- Hinzugefügt: escHtml() in settings.js escapt jetzt auch Apostrophe für vollständige Attribut/Text-Sicherheit
+- Geändert: awdev_activate() delegiert an awdev_sync_auto_update_defaults() um Duplikate zu vermeiden
+- Geändert: AWDev_Updater::get_remote_data() delegiert an gemeinsamen awdev_fetch_api_data()-Helper
+  Kein duplizierter Transient/HTTP-Code mehr
+- Geändert: Ungenutzte jQuery-Abhängigkeit aus wp_enqueue_script() entfernt
+- Geändert: JS-Unicode-Escapes durch literale UTF-8-Zeichen in PHP-Dateien ersetzt
+- Ebenfalls enthalten (von 0.0.9): json_last_error()-Validierung, error_log() bei Rename-Fehler,
+  Tages-Anzeige für zuletzt geprüft, Autor-Feld aus API, uninstall.php, awdev_built_in_plugins(),
+  generate-l10n.yml Workflow, update_option()-Refactoring, uninstall.php-Konsolidierung
 
 0.0.8
 -----

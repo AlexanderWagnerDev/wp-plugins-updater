@@ -5,23 +5,35 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
-## [0.0.9] — 2026-03-17
+## [0.1.0] — 2026-03-17
+
+### Fixed
+- `awdev_fetch_api_data()`: API responses with an empty or `null` body are now explicitly treated as failures and cached as `false` — previously `json_decode()` returned `null` without triggering the JSON error check, causing a `null` value to be stored in the transient
+- `saveToggle()` in `settings.js`: missing `.then()`/`.catch()` chain meant save failures were silently ignored; the toggle is now visually reverted when the AJAX request fails
+- Re-check button: version cell now resets to `…` *before* the fetch and shows `?` on error instead of staying stuck on `…` indefinitely
+- `compareVersions()`: replaced `Number()` with `parseInt()` so pre-release suffixes like `-beta` are safely ignored instead of producing `NaN` and falsely indicating an update
 
 ### Added
-- `json_last_error()` validation after every `json_decode()` call — invalid API responses are now treated as failures and logged via `error_log()`
-- `error_log()` output when `WP_Filesystem::move()` fails during folder rename, making update failures diagnosable
-- Days display in "last checked" time — cache intervals longer than 24 h now show e.g. "3 days ago" instead of "72 hours ago"
-- Author field in "View version details" popup now reads from API response when provided; falls back to hard-coded default
-- Standalone `uninstall.php` — all `awdev_*` options and transients are removed from the database when the plugin is deleted; loaded by WordPress directly without bootstrapping the full plugin
-- Built-in plugin registry centralised into `awdev_built_in_plugins()` — adding a new plugin requires only one entry
-- GitHub Actions workflow `generate-l10n.yml` — automatically compiles `.po` files to `.l10n.php` via WP-CLI on every `.po` change; `.l10n.php` files are committed back to the repository and included in the release ZIP for WordPress 6.5+ performance benefit
+- `register_activation_hook()` now calls `awdev_activate()` to set default options on first activation
+- `awdev_sync_auto_update_defaults()`: new function that adds missing `awdev_auto_updates` entries for built-in plugins without overwriting existing ones; hooked to `admin_init` so newly added built-in plugins are picked up on existing installs without requiring a deactivate/activate cycle
+- `escHtml()` in `settings.js` now also escapes apostrophes (`'` → `&#039;`) for full attribute and text context safety
 
 ### Changed
-- Replaced `awdev_force_option()` `DELETE` + `add_option()` pattern with `update_option()` to eliminate race condition risk
-- Removed `register_uninstall_hook()` and inline `awdev_uninstall()` from main plugin file in favour of `uninstall.php`
-- Excluded `.po`, `.pot`, `readme.txt`, `readme-de.txt` and `CHANGELOG*.txt` from release ZIP — these are developer/documentation files not needed at runtime
-- Bumped `Project-Id-Version` to `0.0.9` in all `.po` and `.pot` files
-- Added missing `%d day ago` / `%d days ago` msgid entries to all `.po` and `.pot` files
+- `awdev_activate()` delegates defaults setup to `awdev_sync_auto_update_defaults()` to avoid duplication
+- `AWDev_Updater::get_remote_data()` delegates all HTTP/cache logic to the shared `awdev_fetch_api_data()` helper — no more duplicated transient/HTTP code
+- Removed unused jQuery dependency from `wp_enqueue_script()` — `settings.js` uses only vanilla JS
+- JS Unicode escapes (`\u2013`, `\u2014`) replaced with literal UTF-8 characters throughout PHP files
+
+### Also in this release (carried over from 0.0.9)
+- `json_last_error()` validation after every `json_decode()` call — invalid API responses are treated as failures and logged via `error_log()`
+- `error_log()` output when `WP_Filesystem::move()` fails during folder rename
+- Days display in "last checked" time — intervals longer than 24 h show e.g. "3 days ago"
+- Author field in "View version details" popup reads from API response; falls back to hard-coded default
+- Standalone `uninstall.php` — all `awdev_*` options and transients removed on plugin deletion
+- Built-in plugin registry centralised into `awdev_built_in_plugins()`
+- GitHub Actions workflow `generate-l10n.yml` — auto-compiles `.po` → `.l10n.php` via WP-CLI
+- Replaced `awdev_force_option()` pattern with `update_option()`
+- Removed `register_uninstall_hook()` and inline `awdev_uninstall()` in favour of `uninstall.php`
 
 ---
 

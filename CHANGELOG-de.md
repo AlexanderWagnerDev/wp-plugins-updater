@@ -5,23 +5,35 @@ Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1
 
 ---
 
-## [0.0.9] — 2026-03-17
+## [0.1.0] — 2026-03-17
+
+### Behoben
+- `awdev_fetch_api_data()`: API-Responses mit leerem oder `null`-Body werden jetzt explizit als Fehler behandelt und als `false` gecacht — zuvor gab `json_decode()` `null` zurück ohne den JSON-Fehler-Check auszulösen, was dazu führte dass `null` in den Transient geschrieben wurde
+- `saveToggle()` in `settings.js`: fehlende `.then()`/`.catch()`-Kette sorgte dafür dass Speicher-Fehler lautlos ignoriert wurden; der Toggle wird jetzt visuell zurückgesetzt wenn der AJAX-Request fehlschlägt
+- Re-Check-Button: Versions-Zelle wird jetzt *vor* dem Fetch auf `…` zurückgesetzt und zeigt `?` bei Fehler statt dauerhaft auf `…` stecken zu bleiben
+- `compareVersions()`: `Number()` durch `parseInt()` ersetzt, damit Pre-Release-Suffixe wie `-beta` sicher ignoriert werden statt `NaN` zu produzieren und fälschlicherweise ein Update anzuzeigen
 
 ### Hinzugefügt
-- `json_last_error()`-Validierung nach jedem `json_decode()`-Aufruf — ungültige API-Responses werden als Fehler behandelt und via `error_log()` geloggt
-- `error_log()`-Ausgabe wenn `WP_Filesystem::move()` bei der Ordner-Umbenennung fehlschlägt
-- Tages-Anzeige für "zuletzt geprüft" — Intervalle über 24 h zeigen jetzt z. B. "vor 3 Tagen" statt "vor 72 Stunden"
-- Autor-Feld im "Version Details"-Popup liest jetzt aus der API-Response; Fallback auf Hard-coded-Standard
-- Eigenständige `uninstall.php` — alle `awdev_*`-Optionen und Transients werden beim Plugin-Löschen aus der Datenbank entfernt; wird von WordPress direkt geladen ohne das komplette Plugin zu initialisieren
-- Built-in Plugin-Registry in `awdev_built_in_plugins()` zentralisiert — neues Plugin hinzufügen erfordert nur noch einen einzigen Eintrag
-- GitHub Actions Workflow `generate-l10n.yml` — kompiliert `.po`-Dateien automatisch zu `.l10n.php` via WP-CLI bei jeder `.po`-Änderung; `.l10n.php`-Dateien werden ins Repository zurückgeführt und in die Release-ZIP eingepackt (Performance-Vorteil für WordPress 6.5+)
+- `register_activation_hook()` ruft jetzt `awdev_activate()` auf um Standard-Optionen bei der Erstaktivierung zu setzen
+- `awdev_sync_auto_update_defaults()`: neue Funktion die fehlende `awdev_auto_updates`-Einträge für Built-in-Plugins ergänzt ohne bestehende zu überschreiben; an `admin_init` gebunden, damit neu hinzugefügte Built-in-Plugins auf bestehenden Installationen ohne Deaktivieren/Aktivieren übernommen werden
+- `escHtml()` in `settings.js` escapt jetzt auch Apostrophe (`'` → `&#039;`) für vollständige Sicherheit in Attribut- und Text-Kontexten
 
 ### Geändert
-- `awdev_force_option()` `DELETE` + `add_option()`-Muster durch `update_option()` ersetzt um Race-Condition-Risiko zu eliminieren
-- `register_uninstall_hook()` und inline `awdev_uninstall()` aus der Haupt-Plugin-Datei entfernt; ersetzt durch `uninstall.php`
-- `.po`, `.pot`, `readme.txt`, `readme-de.txt` und `CHANGELOG*.txt` aus der Release-ZIP ausgeschlossen — diese sind Entwickler-/Dokumentationsdateien die zur Laufzeit nicht benötigt werden
-- `Project-Id-Version` in allen `.po`- und `.pot`-Dateien auf `0.0.9` angehoben
-- Fehlende `%d day ago` / `%d days ago` msgid-Einträge in allen `.po`- und `.pot`-Dateien nachgetragen
+- `awdev_activate()` delegiert die Defaults-Einrichtung an `awdev_sync_auto_update_defaults()` um Duplikate zu vermeiden
+- `AWDev_Updater::get_remote_data()` delegiert alle HTTP/Cache-Logik an den gemeinsamen `awdev_fetch_api_data()`-Helper — kein duplizierter Transient/HTTP-Code mehr
+- Ungenutzte jQuery-Abhängigkeit aus `wp_enqueue_script()` entfernt — `settings.js` verwendet ausschließlich Vanilla JS
+- JS-Unicode-Escapes (`\u2013`, `\u2014`) durch literale UTF-8-Zeichen in PHP-Dateien ersetzt
+
+### Ebenfalls in dieser Version (von 0.0.9 übernommen)
+- `json_last_error()`-Validierung nach jedem `json_decode()`-Aufruf
+- `error_log()`-Ausgabe wenn `WP_Filesystem::move()` bei Ordner-Umbenennung fehlschlägt
+- Tages-Anzeige für "zuletzt geprüft" — Intervalle über 24 h zeigen z. B. "vor 3 Tagen"
+- Autor-Feld im "Version Details"-Popup liest aus der API-Response; Fallback auf Standard
+- Eigenständige `uninstall.php` — alle `awdev_*`-Optionen und Transients beim Löschen entfernt
+- Built-in Plugin-Registry in `awdev_built_in_plugins()` zentralisiert
+- GitHub Actions Workflow `generate-l10n.yml` — kompiliert `.po` → `.l10n.php` automatisch via WP-CLI
+- `awdev_force_option()`-Muster durch `update_option()` ersetzt
+- `register_uninstall_hook()` und inline `awdev_uninstall()` entfernt; ersetzt durch `uninstall.php`
 
 ---
 
@@ -55,7 +67,7 @@ Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1
 
 ### Behoben
 - Fehler bei Ordnerumbenennung bei Bulk-Updates (`update-core.php`) und WP Auto-Updates wenn `hook_extra['plugin']` nicht befüllt ist
-- Fallback-Matching über extrahierten Quellordnernamen hinzugefügt (matcht gegen Plugin-Slug und GitHub-Repo-Name aus der Download-URL)
+- Fallback-Matching über extrahierten Quellordnernamen hinzugefügt
 
 ### Geändert
 - Rename-Logik in private `rename_source()`-Methode ausgelagert um Duplikate zu vermeiden

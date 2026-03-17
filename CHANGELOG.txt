@@ -1,28 +1,27 @@
 AWDev Plugins Updater — Changelog
 ==================================
 
-0.0.9 — 2026-03-17
+0.1.0 — 2026-03-17
 -------------------
-- Added: json_last_error() validation after every json_decode() call
-  Invalid API responses are now treated as failures and logged via error_log()
-- Added: error_log() output when WP_Filesystem::move() fails during folder rename
-- Added: Days display in "last checked" time
-  Intervals longer than 24h now show e.g. "3 days ago" instead of "72 hours ago"
-- Added: Author field in "View version details" popup reads from API response when available
-  Falls back to hard-coded default
-- Added: Standalone uninstall.php
-  All awdev_* options and transients are removed on plugin deletion
-  Loaded by WordPress directly without bootstrapping the full plugin
-- Added: Built-in plugin registry centralised into awdev_built_in_plugins()
-  Adding a new plugin requires only one entry
-- Added: GitHub Actions workflow generate-l10n.yml
-  Automatically compiles .po files to .l10n.php via WP-CLI on every .po change
-  .l10n.php files committed back to repo and included in release ZIP (WP 6.5+ performance)
-- Changed: Replaced awdev_force_option() DELETE+add_option() with update_option()
-- Changed: Removed register_uninstall_hook() and inline awdev_uninstall() in favour of uninstall.php
-- Changed: Excluded .po, .pot, readme.txt, readme-de.txt and CHANGELOG*.txt from release ZIP
-- Changed: Bumped Project-Id-Version to 0.0.9 in all .po and .pot files
-- Changed: Added missing "%d day ago" / "%d days ago" msgid entries to all .po and .pot files
+- Fixed: awdev_fetch_api_data(): null/empty API body now explicitly treated as failure and cached as false
+  Previously json_decode() returned null without triggering the JSON error check
+- Fixed: saveToggle() in settings.js: missing .then()/.catch() meant failures were silently ignored
+  Toggle is now visually reverted when the AJAX request fails
+- Fixed: Re-check button: version cell resets to ... before fetch and shows ? on error
+  Previously the cell stayed stuck on ... indefinitely
+- Fixed: compareVersions(): Number() replaced with parseInt() to safely ignore pre-release suffixes like -beta
+- Added: register_activation_hook() now calls awdev_activate() for first-activation defaults
+- Added: awdev_sync_auto_update_defaults(): adds missing awdev_auto_updates entries for built-in plugins
+  Hooked to admin_init so new built-in plugins are picked up without deactivate/activate cycle
+- Added: escHtml() in settings.js now also escapes apostrophes for full attribute/text safety
+- Changed: awdev_activate() delegates to awdev_sync_auto_update_defaults() to avoid duplication
+- Changed: AWDev_Updater::get_remote_data() delegates to shared awdev_fetch_api_data() helper
+  Eliminates duplicated transient/HTTP code
+- Changed: Removed unused jQuery dependency from wp_enqueue_script()
+- Changed: JS Unicode escapes replaced with literal UTF-8 characters in PHP files
+- Also included (from 0.0.9): json_last_error() validation, error_log() on rename failure,
+  days display in last-checked, author field from API, uninstall.php, awdev_built_in_plugins(),
+  generate-l10n.yml workflow, update_option() refactor, uninstall.php consolidation
 
 0.0.8
 -----
