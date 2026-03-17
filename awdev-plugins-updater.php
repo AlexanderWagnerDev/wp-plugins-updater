@@ -48,6 +48,11 @@ require_once AWDEV_UPDATER_PATH . 'includes/class-awdev-updater.php';
 require_once AWDEV_UPDATER_PATH . 'includes/settings.php';
 
 /**
+ * Set default options on first activation.
+ */
+register_activation_hook( __FILE__, 'awdev_activate' );
+
+/**
  * Register all managed AlexanderWagnerDev plugins.
  * Built-in list comes from the single source of truth: awdev_built_in_plugins().
  * Every created instance is stored in $awdev_updaters for later access.

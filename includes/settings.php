@@ -19,36 +19,34 @@ function awdev_built_in_plugins(): array {
 			'api_slug' => 'awdev-plugins-updater',
 		],
 		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => [
-			'name'     => 'DarkAdmin \u2013 Dark Mode for Adminpanel',
+			'name'     => 'DarkAdmin – Dark Mode for Adminpanel',
 			'api_slug' => 'darkadmin-dark-mode-for-adminpanel',
 		],
 	];
 }
 
 /**
- * Lightweight helper to fetch a single plugin's remote version string.
+ * Shared low-level helper: fetch and cache raw API data for a single plugin.
  *
- * Unlike instantiating AWDev_Updater (which registers WP update filters),
- * this function only performs the transient-cached HTTP request and returns
- * the version field. Safe to call in AJAX or admin contexts where the full
- * update-filter machinery is not needed.
+ * Both AWDev_Updater::get_remote_data() and awdev_fetch_remote_version() are
+ * built on top of this function so that HTTP/caching behaviour only needs to
+ * be maintained in one place.
  *
- * @param string $basename   Plugin basename (folder/file.php).
- * @param string $api_url    Full API endpoint URL.
- * @return string            Version string, or '?' on failure.
+ * @param string $transient_key  Transient key (without prefix), e.g. 'awdev_upd_my-plugin'.
+ * @param string $api_url        Full API endpoint URL.
+ * @return object|null           Decoded JSON object, or null on failure.
  */
-function awdev_fetch_remote_version( string $basename, string $api_url ): string {
-	$slug    = sanitize_key( dirname( $basename ) );
-	$key     = 'awdev_upd_' . $slug;
-	$cached  = get_transient( $key );
+function awdev_fetch_api_data( string $transient_key, string $api_url ): ?object {
+	$cached = get_transient( $transient_key );
 
-	// Re-use existing transient (set by AWDev_Updater or a previous call).
 	if ( $cached !== false ) {
-		return ( $cached && isset( $cached->version ) ) ? $cached->version : '?';
+		return $cached ?: null;
 	}
 
 	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
-	if ( $cache_hours < 1 ) { $cache_hours = 1; }
+	if ( $cache_hours < 1 ) {
+		$cache_hours = 1;
+	}
 
 	$response = wp_remote_get( $api_url, [
 		'timeout'    => 10,
@@ -56,20 +54,60 @@ function awdev_fetch_remote_version( string $basename, string $api_url ): string
 	] );
 
 	if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
-		set_transient( $key, false, $cache_hours * HOUR_IN_SECONDS );
-		return '?';
+		set_transient( $transient_key, false, $cache_hours * HOUR_IN_SECONDS );
+		return null;
 	}
 
 	$data = json_decode( wp_remote_retrieve_body( $response ) );
 
-	if ( json_last_error() !== JSON_ERROR_NONE || ! isset( $data->version ) ) {
-		set_transient( $key, false, $cache_hours * HOUR_IN_SECONDS );
-		return '?';
+	if ( json_last_error() !== JSON_ERROR_NONE ) {
+		error_log( 'AWDev Updater: invalid JSON from API (' . $api_url . ') — ' . json_last_error_msg() );
+		set_transient( $transient_key, false, $cache_hours * HOUR_IN_SECONDS );
+		return null;
 	}
 
-	set_transient( $key, $data, $cache_hours * HOUR_IN_SECONDS );
+	set_transient( $transient_key, $data, $cache_hours * HOUR_IN_SECONDS );
 
-	return $data->version;
+	return $data;
+}
+
+/**
+ * Lightweight helper to fetch a single plugin's remote version string.
+ *
+ * Uses awdev_fetch_api_data() — no WP update filters are registered.
+ * Safe to call in AJAX or admin contexts.
+ *
+ * @param string $basename   Plugin basename (folder/file.php).
+ * @param string $api_url    Full API endpoint URL.
+ * @return string            Version string, or '?' on failure.
+ */
+function awdev_fetch_remote_version( string $basename, string $api_url ): string {
+	$key  = 'awdev_upd_' . sanitize_key( dirname( $basename ) );
+	$data = awdev_fetch_api_data( $key, $api_url );
+
+	return ( $data && isset( $data->version ) ) ? $data->version : '?';
+}
+
+/**
+ * Set default option values on first activation.
+ * Runs once via register_activation_hook() in the main plugin file.
+ */
+function awdev_activate(): void {
+	if ( get_option( 'awdev_auto_updates' ) === false ) {
+		$defaults = [];
+		foreach ( array_keys( awdev_built_in_plugins() ) as $basename ) {
+			$defaults[ $basename ] = true;
+		}
+		update_option( 'awdev_auto_updates', $defaults );
+	}
+
+	if ( get_option( 'awdev_cache_hours' ) === false ) {
+		update_option( 'awdev_cache_hours', 6 );
+	}
+
+	if ( get_option( 'awdev_auto_updates_global' ) === false ) {
+		update_option( 'awdev_auto_updates_global', true );
+	}
 }
 
 /**
@@ -182,9 +220,6 @@ add_action( 'wp_ajax_awdev_get_remote_versions', function () {
 
 /**
  * AJAX: clear the transient cache for a single plugin and return JSON.
- * Replaces the old admin_post_awdev_check_plugin handler so that the
- * settings.js fetch() call receives a proper JSON response instead of
- * following a wp_safe_redirect() into the void.
  */
 add_action( 'wp_ajax_awdev_check_plugin', function () {
 	if ( ! current_user_can( 'manage_options' ) ) {
@@ -223,7 +258,7 @@ add_filter( 'auto_update_plugin', function ( $update, $item ) {
 		return $update;
 	}
 
-	// Global toggle off \u2192 never auto-update any AWDev plugin.
+	// Global toggle off → never auto-update any AWDev plugin.
 	$global = (bool) get_option( 'awdev_auto_updates_global', true );
 	if ( ! $global ) {
 		return false;
@@ -253,10 +288,11 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 		[],
 		AWDEV_UPDATER_VERSION
 	);
+	// No jQuery dependency — settings.js uses only vanilla JS.
 	wp_enqueue_script(
 		'awdev-settings-js',
 		AWDEV_UPDATER_URL . 'assets/js/settings.js',
-		[ 'jquery' ],
+		[],
 		AWDEV_UPDATER_VERSION,
 		true
 	);
@@ -313,8 +349,7 @@ add_action( 'admin_post_awdev_flush_cache', function () {
 
 /**
  * Resolve local installed version for a plugin basename.
- * Returns '?' when the plugin is not found, using plain ASCII to avoid
- * encoding issues in string comparisons.
+ * Returns '?' when the plugin is not found.
  */
 function awdev_get_local_version( string $basename ): string {
 	if ( ! function_exists( 'get_plugins' ) ) {
@@ -344,7 +379,6 @@ function awdev_get_local_version( string $basename ): string {
 
 /**
  * Return human-readable "last checked" time from the transient timeout.
- * Displays seconds, minutes, hours, or days depending on elapsed time.
  */
 function awdev_get_last_checked( string $dirname_slug ): string {
 	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
@@ -389,7 +423,7 @@ function awdev_render_plugin_row( string $basename, string $name, array $st, str
 		<td><?php echo esc_html( $st['local_version'] ); ?></td>
 		<td>
 			<span class="awdev-remote-version" data-slug="<?php echo esc_attr( $st['dirname_slug'] ); ?>">
-				<span class="awdev-version-loading"><?php esc_html_e( '\u2026', 'awdev-plugins-updater' ); ?></span>
+				<span class="awdev-version-loading">…</span>
 			</span>
 			<span class="awdev-last-checked"><?php echo esc_html( $st['last_checked'] ); ?></span>
 		</td>
@@ -436,21 +470,12 @@ function awdev_render_settings_page(): void {
 	$cache_hours  = (int) get_option( 'awdev_cache_hours', 6 );
 	if ( $cache_hours < 1 ) { $cache_hours = 1; }
 
-	if ( get_option( 'awdev_auto_updates' ) === false ) {
-		$defaults = [];
-		foreach ( array_keys( $built_in ) as $basename ) {
-			$defaults[ $basename ] = true;
-		}
-		update_option( 'awdev_auto_updates', $defaults );
-		$auto_updates = $defaults;
-	}
-
 	// Build statuses: built-in first, then managed-only (skip duplicates).
 	$statuses = [];
 
 	foreach ( $built_in as $basename => $_ ) {
-		$dirname_slug            = sanitize_key( dirname( $basename ) );
-		$statuses[ $basename ]   = [
+		$dirname_slug          = sanitize_key( dirname( $basename ) );
+		$statuses[ $basename ] = [
 			'dirname_slug'  => $dirname_slug,
 			'local_version' => awdev_get_local_version( $basename ),
 			'last_checked'  => awdev_get_last_checked( $dirname_slug ),
@@ -460,7 +485,7 @@ function awdev_render_settings_page(): void {
 
 	foreach ( $managed as $basename => $_ ) {
 		if ( isset( $built_in[ $basename ] ) ) {
-			continue; // Already in $statuses above — no duplicate entry.
+			continue;
 		}
 		$dirname_slug          = sanitize_key( dirname( $basename ) );
 		$statuses[ $basename ] = [
@@ -549,7 +574,7 @@ function awdev_render_settings_page(): void {
 							step="1"
 							class="small-text"
 					/>
-						<span class="description"><?php esc_html_e( 'Min: 1h \u2014 Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
+						<span class="description"><?php esc_html_e( 'Min: 1h — Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
 					</div>
 
 					<div class="awdev-submit-row">
