@@ -4,7 +4,7 @@ Tags: updater, self-hosted, plugin update, update manager
 Requires at least: 6.3
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.0.8
+Stable tag: 0.0.9
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -30,6 +30,7 @@ Features:
 * Automatic plugin folder name fix after ZIP extraction (including bulk updates and random-suffix folders)
 * Full Dark Mode support — settings page adapts automatically via DarkAdmin CSS variables
 * Translations: de_DE, de_AT, en_US
+* Clean uninstall — all plugin options are removed from the database on deletion
 
 == Installation ==
 1. Download the latest awdev-plugin-updater.zip from the GitHub Releases page.
@@ -60,6 +61,15 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
+= 0.0.9 =
+* Added json_last_error() validation after json_decode() — invalid API responses are now treated as failures and logged via error_log()
+* Added error_log() output when WP_Filesystem::move() fails during folder rename, making update failures diagnosable
+* Added days display to "last checked" time — intervals longer than 24h now show e.g. "3 days ago" instead of "72 hours ago"
+* Author field in "View version details" popup now reads from API response when provided; falls back to default
+* Added uninstall routine — all awdev_* options and transients are removed from the database when the plugin is deleted
+* Replaced awdev_force_option() DELETE+add_option() pattern with update_option() to eliminate race condition risk
+* Centralised built-in plugin registry into awdev_built_in_plugins() — adding a new plugin now requires only one entry
+
 = 0.0.8 =
 * Fixed auto-update filter returning null for AWDev plugins instead of true, causing WP background updates to be silently skipped
 * Fixed plugin folder rename silently failing when target directory already exists after ZIP extraction
@@ -127,6 +137,7 @@ Funktionen:
 * Automatische Ordnernamens-Korrektur nach ZIP-Extraktion (inkl. Bulk-Updates und Zufalls-Suffix-Ordner)
 * Dark-Mode-kompatible Einstellungsseite via DarkAdmin
 * Übersetzungen: de_DE, de_AT, en_US
+* Saubere Deinstallation — alle Plugin-Optionen werden beim Löschen aus der Datenbank entfernt
 
 === Installation ===
 1. Neuste awdev-plugin-updater.zip von der GitHub-Releases-Seite herunterladen.
@@ -135,6 +146,15 @@ Funktionen:
 4. Einstellungen → AWDev Plugins Updater aufrufen.
 
 === Changelog ===
+= 0.0.9 =
+* json_last_error()-Validierung nach json_decode() hinzugefügt — ungültige API-Responses werden als Fehler behandelt und geloggt
+* error_log()-Ausgabe bei fehlgeschlagenem WP_Filesystem::move() während Ordner-Umbenennung hinzugefügt
+* Tages-Anzeige für "zuletzt geprüft" ergänzt — Intervalle über 24h zeigen jetzt z.B. "vor 3 Tagen"
+* Autor-Feld im "Version Details"-Popup liest jetzt aus der API-Response, Fallback auf Standard
+* Deinstallations-Routine hinzugefügt — alle awdev_*-Optionen und Transients werden beim Plugin-Löschen entfernt
+* awdev_force_option() DELETE+add_option()-Muster durch update_option() ersetzt
+* Built-in Plugin-Registry in awdev_built_in_plugins() zentralisiert
+
 = 0.0.8 =
 * Auto-Update-Filter gab null statt true für AWDev-Plugins zurück — WP-Hintergrund-Updates wurden dadurch lautlos übersprungen (behoben)
 * Ordnerumbenennung nach ZIP-Extraktion schlug lautlos fehl wenn Zielordner bereits existierte (behoben)

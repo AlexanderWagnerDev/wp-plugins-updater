@@ -45,7 +45,15 @@ class AWDev_Updater {
 			return null;
 		}
 
-		$data        = json_decode( wp_remote_retrieve_body( $response ) );
+		$data = json_decode( wp_remote_retrieve_body( $response ) );
+
+		// Treat invalid JSON as a failed response.
+		if ( json_last_error() !== JSON_ERROR_NONE ) {
+			error_log( 'AWDev Updater: invalid JSON from API for ' . $this->plugin_slug . ' — ' . json_last_error_msg() );
+			set_transient( $key, false, HOUR_IN_SECONDS );
+			return null;
+		}
+
 		$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
 		if ( $cache_hours < 1 ) {
 			$cache_hours = 1;
@@ -93,11 +101,16 @@ class AWDev_Updater {
 			return $result;
 		}
 
+		// Use author from API response when available; fall back to default.
+		$author = isset( $data->author )
+			? esc_html( $data->author )
+			: '<a href="https://alexanderwagnerdev.com">AlexanderWagnerDev</a>';
+
 		return (object) [
 			'name'          => $data->name          ?? $this->plugin_slug,
 			'slug'          => $this->plugin_slug,
 			'version'       => $data->version,
-			'author'        => '<a href="https://alexanderwagnerdev.com">AlexanderWagnerDev</a>',
+			'author'        => $author,
 			'homepage'      => $data->details_url   ?? '',
 			'sections'      => [ 'changelog' => $data->changelog ?? '' ],
 			'download_link' => $data->download_url  ?? '',
@@ -151,6 +164,7 @@ class AWDev_Updater {
 	/**
 	 * Perform the actual WP_Filesystem rename to the correct plugin slug folder.
 	 * Deletes an existing target folder first to prevent silent move() failure.
+	 * Logs an error if move() fails so the cause can be diagnosed.
 	 */
 	private function rename_source( string $source, string $remote_source ): string {
 		$corrected = trailingslashit( $remote_source ) . $this->plugin_slug . '/';
@@ -166,6 +180,7 @@ class AWDev_Updater {
 		}
 
 		if ( ! $wp_filesystem ) {
+			error_log( 'AWDev Updater: WP_Filesystem unavailable, cannot rename folder for ' . $this->plugin_slug );
 			return $source;
 		}
 
@@ -178,6 +193,7 @@ class AWDev_Updater {
 			return $corrected;
 		}
 
+		error_log( 'AWDev Updater: failed to rename "' . $source . '" to "' . $corrected . '" for plugin ' . $this->plugin_slug );
 		return $source;
 	}
 

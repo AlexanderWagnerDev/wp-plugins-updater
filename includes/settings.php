@@ -248,6 +248,7 @@ function awdev_get_local_version( string $basename ): string {
 
 /**
  * Return human-readable "last checked" time from the transient timeout.
+ * Displays seconds, minutes, hours, or days depending on elapsed time.
  */
 function awdev_get_last_checked( string $dirname_slug ): string {
 	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
@@ -267,9 +268,14 @@ function awdev_get_last_checked( string $dirname_slug ): string {
 		/* translators: %d = number of minutes */
 		return sprintf( _n( '%d minute ago', '%d minutes ago', $mins, 'awdev-plugins-updater' ), $mins );
 	}
-	$hours = (int) ( $diff / HOUR_IN_SECONDS );
-	/* translators: %d = number of hours */
-	return sprintf( _n( '%d hour ago', '%d hours ago', $hours, 'awdev-plugins-updater' ), $hours );
+	if ( $diff < DAY_IN_SECONDS ) {
+		$hours = (int) ( $diff / HOUR_IN_SECONDS );
+		/* translators: %d = number of hours */
+		return sprintf( _n( '%d hour ago', '%d hours ago', $hours, 'awdev-plugins-updater' ), $hours );
+	}
+	$days = (int) ( $diff / DAY_IN_SECONDS );
+	/* translators: %d = number of days */
+	return sprintf( _n( '%d day ago', '%d days ago', $days, 'awdev-plugins-updater' ), $days );
 }
 
 /**
@@ -293,7 +299,14 @@ function awdev_get_remote_version( string $api_url, string $dirname_slug ): stri
 		] );
 
 		if ( ! is_wp_error( $response ) && wp_remote_retrieve_response_code( $response ) === 200 ) {
-			$data        = json_decode( wp_remote_retrieve_body( $response ) );
+			$data = json_decode( wp_remote_retrieve_body( $response ) );
+
+			if ( json_last_error() !== JSON_ERROR_NONE ) {
+				error_log( 'AWDev Updater: invalid JSON from API for ' . $dirname_slug . ' — ' . json_last_error_msg() );
+				set_transient( $key, false, HOUR_IN_SECONDS );
+				return '?';
+			}
+
 			$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
 			if ( $cache_hours < 1 ) { $cache_hours = 1; }
 			set_transient( $key, $data, $cache_hours * HOUR_IN_SECONDS );
