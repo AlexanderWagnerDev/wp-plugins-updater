@@ -5,7 +5,7 @@
  * Description: Keeps AlexanderWagnerDev plugins up to date — without WordPress.org. Updates are served from a self-hosted server, so every release ships on your own schedule.
  * Version: 0.0.8
  * Requires at least: 6.3
- * Tested up to: 6.7
+ * Tested up to: 6.9
  * Requires PHP: 7.4
  * Author: AlexanderWagnerDev
  * Author URI: https://alexanderwagnerdev.com
