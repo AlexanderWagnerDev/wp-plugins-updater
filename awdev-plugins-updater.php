@@ -38,37 +38,6 @@ add_action( 'init', function () {
 require_once AWDEV_UPDATER_PATH . 'includes/class-awdev-updater.php';
 require_once AWDEV_UPDATER_PATH . 'includes/settings.php';
 
-register_uninstall_hook( __FILE__, 'awdev_uninstall' );
-
-/**
- * Remove all plugin options from the database on uninstall.
- */
-function awdev_uninstall(): void {
-	$options = [
-		'awdev_auto_updates_global',
-		'awdev_auto_updates',
-		'awdev_cache_hours',
-		'awdev_managed_plugins',
-	];
-	foreach ( $options as $option ) {
-		delete_option( $option );
-	}
-
-	global $wpdb;
-	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->prepare(
-			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
-			'_transient_awdev_upd_%'
-		)
-	);
-	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->prepare(
-			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
-			'_transient_timeout_awdev_upd_%'
-		)
-	);
-}
-
 /**
  * Register all managed AlexanderWagnerDev plugins.
  * Built-in list comes from the single source of truth: awdev_built_in_plugins().
