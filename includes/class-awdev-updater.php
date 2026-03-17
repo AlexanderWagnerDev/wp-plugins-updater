@@ -104,9 +104,32 @@ class AWDev_Updater {
 	 * Uses WP_Filesystem to avoid direct rename() call.
 	 */
 	public function fix_folder_name( string $source, string $remote_source, object $upgrader, array $hook_extra ): string {
-		// Already correct — nothing to do.
-		$corrected = trailingslashit( $remote_source ) . $this->plugin_slug . '/';
-		if ( $source === $corrected ) {
+		// Resolve the correct target path. Two ZIP structures are possible:
+		//
+		// A) ZIP contains a subfolder (standard GitHub/most hosts):
+		//    $remote_source = /upgrade/tmp-xyz/
+		//    $source        = /upgrade/tmp-xyz/plugin-slug-Gmctwk/
+		//    Target         = /upgrade/tmp-xyz/plugin-slug/  (sibling of source inside remote_source)
+		//
+		// B) ZIP extracts flat, no subfolder (rare but valid):
+		//    $remote_source = /upgrade/plugin-slug-Gmctwk/
+		//    $source        = /upgrade/plugin-slug-Gmctwk/  (same as remote_source)
+		//    Target         = /upgrade/plugin-slug/          (sibling of remote_source)
+		//
+		// Distinguishing the two: if normalised $source === normalised $remote_source
+		// we are in scenario B and must use dirname($remote_source) as the parent.
+		$source_norm = trailingslashit( $source );
+		$remote_norm = trailingslashit( $remote_source );
+
+		if ( $source_norm === $remote_norm ) {
+			// Scenario B: flat ZIP — target is a sibling of remote_source.
+			$corrected = trailingslashit( dirname( untrailingslashit( $remote_source ) ) ) . $this->plugin_slug . '/';
+		} else {
+			// Scenario A: ZIP had a subfolder — target is inside remote_source.
+			$corrected = $remote_norm . $this->plugin_slug . '/';
+		}
+
+		if ( $source_norm === $corrected ) {
 			return $source;
 		}
 
@@ -116,7 +139,7 @@ class AWDev_Updater {
 			if ( $extra_plugin !== $this->plugin_basename ) {
 				return $source;
 			}
-			return $this->rename_source( $source, $remote_source );
+			return $this->rename_source( $source, $corrected );
 		}
 
 		// Scenario 2: bulk/auto update — hook_extra['plugin'] is empty.
@@ -128,18 +151,18 @@ class AWDev_Updater {
 			return $source;
 		}
 
-		return $this->rename_source( $source, $remote_source );
+		return $this->rename_source( $source, $corrected );
 	}
 
 	/**
 	 * Perform the actual WP_Filesystem rename to the correct plugin slug folder.
+	 * Receives the fully resolved $corrected path (not $remote_source) so it
+	 * never has to recalculate the target — avoids the rename-into-self bug.
 	 * Deletes an existing target folder first to prevent silent move() failure.
 	 * Logs an error if move() fails so the cause can be diagnosed.
 	 */
-	private function rename_source( string $source, string $remote_source ): string {
-		$corrected = trailingslashit( $remote_source ) . $this->plugin_slug . '/';
-
-		if ( $source === $corrected ) {
+	private function rename_source( string $source, string $corrected ): string {
+		if ( trailingslashit( $source ) === $corrected ) {
 			return $source;
 		}
 
