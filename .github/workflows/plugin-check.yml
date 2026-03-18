@@ -19,6 +19,13 @@ jobs:
         slug: "awdev-plugins-updater"
         wp-version: latest
         strict: true
+        exclude: |
+          tests/
+          vendor/
+          composer.json
+          composer.lock
+          phpunit.xml
+          .distignore
   plugin-check-trunk:
     runs-on: ubuntu-latest
     steps:
@@ -31,3 +38,10 @@ jobs:
         wp-version: trunk
         include-experimental: true
         strict: true
+        exclude: |
+          tests/
+          vendor/
+          composer.json
+          composer.lock
+          phpunit.xml
+          .distignore
