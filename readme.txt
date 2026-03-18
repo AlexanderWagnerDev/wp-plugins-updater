@@ -59,6 +59,7 @@ Yes. The settings page fully supports DarkAdmin and adapts to dark mode automati
 == Changelog ==
 = 0.1.2 =
 * Removed error logging calls
+* Removed dead add-plugin JS code (no UI counterpart existed)
 
 = 0.1.1 =
 * Fixed fix_folder_name(): crash when ZIP extracts without a subfolder (flat structure) — rename() was called with target path inside the source directory producing Invalid argument; source/remote-source paths are now normalised and compared, rename redirected to sibling directory
@@ -151,7 +152,8 @@ Funktionen:
 
 === Changelog ===
 = 0.1.2 =
-* Error-Logging-Aufrufe entfernt
+* Removed error logging calls
+* Removed dead add-plugin JS code (no UI counterpart existed)
 
 = 0.1.1 =
 * fix_folder_name(): Absturz behoben wenn ZIP-Inhalt ohne Unterordner extrahiert wird (flache Struktur) — Umbenennung in Geschwisterverzeichnis umgeleitet

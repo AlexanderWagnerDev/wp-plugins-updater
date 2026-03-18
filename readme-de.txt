@@ -58,7 +58,8 @@ Ja. Die Einstellungsseite unterstuetzt DarkAdmin vollstaendig und passt sich aut
 
 == Changelog ==
 = 0.1.2 =
-* Error-Logging-Aufrufe entfernt
+* Removed error logging calls
+* Removed dead add-plugin JS code (no UI counterpart existed)
 
 = 0.1.1 =
 * fix_folder_name(): Absturz behoben wenn ZIP-Inhalt ohne Unterordner extrahiert wird (flache Struktur) — rename() wurde mit Zielpfad innerhalb des Quellverzeichnisses aufgerufen; Umbenennung wird jetzt in ein Geschwisterverzeichnis umgeleitet
@@ -96,7 +97,7 @@ Ja. Die Einstellungsseite unterstuetzt DarkAdmin vollstaendig und passt sich aut
 * Rename-Logik in private rename_source()-Methode ausgelagert
 
 = 0.0.4 =
-* wp_redirect() durch wp_safe_redirect() ersetzt
+* wp_safe_redirect() durch wp_safe_redirect() ersetzt
 * wp_unslash() und absint() fuer POST-Input hinzugefuegt
 * translators-Kommentare hinzugefuegt
 * rename() durch WP_Filesystem::move() ersetzt

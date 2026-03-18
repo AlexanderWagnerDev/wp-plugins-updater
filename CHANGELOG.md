@@ -9,6 +9,7 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ### Removed
 - Removed error logging calls
+- Removed dead add-plugin JS code (no UI counterpart existed)
 
 ---
 
