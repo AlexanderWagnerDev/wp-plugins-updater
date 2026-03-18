@@ -1,5 +1,8 @@
 name: Check PHP Compatibility
 
+permissions:
+  contents: read
+
 on:
   push:
   pull_request:
