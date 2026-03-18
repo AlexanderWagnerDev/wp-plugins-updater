@@ -1,0 +1,70 @@
+name: PHPUnit Tests
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  phpunit:
+    name: PHP ${{ matrix.php }} / WP ${{ matrix.wp }}
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3']
+        wp: ['latest']
+        include:
+          - php: '8.3'
+            wp: 'trunk'
+
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: wordpress_test
+        ports:
+          - 3306:3306
+        options: >-
+          --health-cmd="mysqladmin ping --silent"
+          --health-interval=10s
+          --health-timeout=5s
+          --health-retries=5
+
+    env:
+      DB_NAME: wordpress_test
+      DB_USER: root
+      DB_PASS: root
+      DB_HOST: 127.0.0.1
+      WP_VERSION: ${{ matrix.wp }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Setup PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          extensions: mysqli, pdo_mysql
+          tools: composer
+          coverage: none
+
+      - name: Install Composer dependencies
+        run: composer install --prefer-dist --no-progress --no-interaction
+
+      - name: Install WP-CLI
+        run: |
+          curl -sO https://raw.githubusercontent.com/wp-cli/builds/gh-pages/phar/wp-cli.phar
+          chmod +x wp-cli.phar
+          sudo mv wp-cli.phar /usr/local/bin/wp
+
+      - name: Install WordPress test suite
+        run: |
+          bash bin/install-wp-tests.sh "$DB_NAME" "$DB_USER" "$DB_PASS" "$DB_HOST" "$WP_VERSION"
+
+      - name: Run PHPUnit
+        run: vendor/bin/phpunit --configuration phpunit.xml
