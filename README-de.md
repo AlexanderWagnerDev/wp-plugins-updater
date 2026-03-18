@@ -2,7 +2,7 @@
 
 **Self-hosted Update-Manager fuer AlexanderWagnerDev Plugins - ohne WordPress.org.**
 
-> Version 0.1.1 | Erfordert WordPress 6.3+ | Erfordert PHP 7.4+ | Lizenz: GPLv2
+> Version 0.1.2 | Erfordert WordPress 6.3+ | Erfordert PHP 7.4+ | Lizenz: GPLv2
 
 ---
 
@@ -69,6 +69,7 @@ AWDev Plugins Updater integriert sich nahtlos in das native WordPress-Update-Sys
 
 Siehe [CHANGELOG-de.md](CHANGELOG-de.md) für die vollständige Historie.
 
+**0.1.2** — Error-Logging-Aufrufe entfernt  
 **0.1.1** — Fix Rename-in-sich-selbst-Absturz bei flacher ZIP-Extraktion, plugins_loaded Priorität 20, get_plugins()-Caching  
 **0.1.0** — Mehrere Bugfixes und Verbesserungen (siehe CHANGELOG-de.md)  
 **0.0.8** — Fix Auto-Update-Filter null-Rückgabe; Fix lautlose Rename-Fehler  

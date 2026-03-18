@@ -5,6 +5,13 @@ Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1
 
 ---
 
+## [0.1.2] — 2026-03-18
+
+### Entfernt
+- Error-Logging-Aufrufe entfernt
+
+---
+
 ## [0.1.1] — 2026-03-17
 
 ### Behoben

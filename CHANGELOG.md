@@ -5,6 +5,13 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.1.2] — 2026-03-18
+
+### Removed
+- Removed error logging calls
+
+---
+
 ## [0.1.1] — 2026-03-17
 
 ### Fixed

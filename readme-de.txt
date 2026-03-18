@@ -4,7 +4,7 @@ Schlagwoerter: updater, self-hosted, plugin update, update manager
 Erfordert mindestens: 6.3
 Getestet bis: 6.9
 Erfordert PHP: 7.4
-Stabile Version: 0.1.1
+Stabile Version: 0.1.2
 Lizenz: GPLv2 or later
 Lizenz-URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,9 @@ Nur fuer AlexanderWagnerDev-Plugins, die in diesem Updater registriert sind. All
 Ja. Die Einstellungsseite unterstuetzt DarkAdmin vollstaendig und passt sich automatisch an den Dark Mode an.
 
 == Changelog ==
+= 0.1.2 =
+* Error-Logging-Aufrufe entfernt
+
 = 0.1.1 =
 * fix_folder_name(): Absturz behoben wenn ZIP-Inhalt ohne Unterordner extrahiert wird (flache Struktur) — rename() wurde mit Zielpfad innerhalb des Quellverzeichnisses aufgerufen; Umbenennung wird jetzt in ein Geschwisterverzeichnis umgeleitet
 * plugins_loaded-Hook-Prioritaet auf 20 erhoeht fuer zuverlaessige Initialisierungsreihenfolge

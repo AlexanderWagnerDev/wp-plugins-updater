@@ -4,7 +4,7 @@ Tags: updater, self-hosted, plugin update, update manager
 Requires at least: 6.3
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.1.1
+Stable tag: 0.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -61,6 +61,9 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
+= 0.1.2 =
+* Removed error logging calls
+
 = 0.1.1 =
 * Fixed fix_folder_name(): crash when ZIP extracts without a subfolder (flat structure) — rename() was called with target path inside the source directory producing Invalid argument; source/remote-source paths are now normalised and compared, rename redirected to sibling directory
 * Fixed plugins_loaded hook priority raised to 20 for reliable init order
@@ -152,8 +155,11 @@ Funktionen:
 4. Einstellungen → AWDev Plugins Updater aufrufen.
 
 === Changelog ===
+= 0.1.2 =
+* Error-Logging-Aufrufe entfernt
+
 = 0.1.1 =
-* fix_folder_name(): Absturz bei flacher ZIP-Struktur behoben — Umbenennung in Geschwisterverzeichnis umgeleitet
+* fix_folder_name(): Absturz behoben wenn ZIP-Inhalt ohne Unterordner extrahiert wird (flache Struktur) — Umbenennung in Geschwisterverzeichnis umgeleitet
 * plugins_loaded-Prioritaet auf 20 erhoeht
 * rename_source() erhaelt jetzt den vollstaendig aufgeloesten Zielpfad direkt
 * awdev_get_local_version() cached get_plugins() via wp_cache_get/set
@@ -205,3 +211,7 @@ Funktionen:
 
 = 0.0.1 =
 * Erste Veroeffentlichung
+* Native WordPress-Update-Hook-Integration
+* Einstellungsseite mit verwalteter Plugin-Tabelle und Cache-Flush
+* Integrierte DarkAdmin-Unterstuetzung
+* Uebersetzungen: de_DE, de_AT, en_US
