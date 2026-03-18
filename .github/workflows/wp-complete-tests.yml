@@ -82,10 +82,6 @@ jobs:
        --admin_email="test@example.com" \
        --quiet \
        --allow-root
-
-       cd ..
-       wp scaffold plugin-tests awdev-plugins-updater --dir=wp-tests
-       cd wp-tests/
        
        PLUGIN_DIR="wp-content/plugins/awdev-plugins-updater"
        rm -rf "$PLUGIN_DIR"
