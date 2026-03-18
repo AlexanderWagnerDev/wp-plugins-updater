@@ -1,0 +1,89 @@
+name: Check Code Style
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+jobs:
+  checkcs:
+    name: 'Check code style'
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          coverage: none
+          tools: cs2pr
+
+      - name: Create temporary composer.json
+        run: |
+          composer init \
+            --name="awdev/plugins-updater-cs" \
+            --description="Temp CS config" \
+            --type="project" \
+            --no-interaction
+          composer require --dev \
+            squizlabs/php_codesniffer \
+            wp-coding-standards/wpcs \
+            --no-interaction --no-progress
+          vendor/bin/phpcs --config-set installed_paths vendor/wp-coding-standards/wpcs
+
+      - name: Check PHP code style
+        id: phpcs
+        run: |
+          vendor/bin/phpcs \
+            --standard=WordPress \
+            --report-full \
+            --report-checkstyle=./phpcs-report.xml \
+            --extensions=php \
+            includes/ awdev-plugins-updater.php uninstall.php
+
+      - name: Show PHPCS results in PR
+        if: ${{ always() && steps.phpcs.outcome == 'failure' }}
+        run: cs2pr ./phpcs-report.xml
+
+  phpcompat:
+    name: 'PHP Compatibility (${{ matrix.php }})'
+    runs-on: ubuntu-latest
+
+    strategy:
+      fail-fast: false
+      matrix:
+        php: ['7.4', '8.0', '8.1', '8.2', '8.3']
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Install PHP ${{ matrix.php }}
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: ${{ matrix.php }}
+          coverage: none
+
+      - name: Create temporary composer.json
+        run: |
+          composer init \
+            --name="awdev/plugins-updater-compat" \
+            --description="Temp compat config" \
+            --type="project" \
+            --no-interaction
+          composer require --dev \
+            squizlabs/php_codesniffer \
+            phpcompatibility/php-compatibility \
+            --no-interaction --no-progress
+          vendor/bin/phpcs --config-set installed_paths vendor/phpcompatibility/php-compatibility
+
+      - name: Run PHPCompatibility check
+        run: |
+          vendor/bin/phpcs \
+            --standard=PHPCompatibility \
+            --runtime-set testVersion ${{ matrix.php }} \
+            --extensions=php \
+            includes/ awdev-plugins-updater.php uninstall.php
