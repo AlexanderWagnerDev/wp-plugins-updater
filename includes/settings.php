@@ -62,7 +62,6 @@ function awdev_fetch_api_data( string $transient_key, string $api_url ): ?object
 
 	// Treat invalid JSON or a null body as a failed response.
 	if ( json_last_error() !== JSON_ERROR_NONE || $data === null ) {
-		error_log( 'AWDev Updater: invalid or empty JSON from API (' . $api_url . ') - ' . json_last_error_msg() );
 		set_transient( $transient_key, false, $cache_hours * HOUR_IN_SECONDS );
 		return null;
 	}
