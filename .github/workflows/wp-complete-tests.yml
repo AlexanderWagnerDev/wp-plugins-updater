@@ -83,7 +83,9 @@ jobs:
        --quiet \
        --allow-root
 
-       wp scaffold plugin-tests ../ --quiet
+       cd ..
+       wp scaffold plugin-tests awdev-plugins-updater --dir=wp-tests
+       cd wp-tests/
        
        PLUGIN_DIR="wp-content/plugins/awdev-plugins-updater"
        rm -rf "$PLUGIN_DIR"
