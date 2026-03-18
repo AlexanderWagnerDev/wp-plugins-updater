@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     services:
       mysql:
-        image: mariadb:latest
+        image: mariadb:10.11
         env:
           MYSQL_ROOT_PASSWORD: root
           MYSQL_DATABASE: wordpress_test
@@ -115,7 +115,6 @@ jobs:
         build-dir: '.'
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         wp-version: 'latest'
-        php-version: '8.3'
         strict: true
         slug: "awdev-plugins-updater"
 
