@@ -99,7 +99,7 @@ jobs:
         wp plugin list
         
         echo "=== Activate AWDev Plugins Updater ==="
-        wp plugin activate awdev-plugins-updater --quiet --allow-root
+        wp plugin activate awdev-plugins-updater --allow-root
         
         echo "=== Plugin activated - run tests ==="
         wp plugin list
