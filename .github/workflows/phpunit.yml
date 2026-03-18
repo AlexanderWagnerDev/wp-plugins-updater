@@ -53,8 +53,16 @@ jobs:
           tools: composer
           coverage: none
 
-      - name: Install Composer dependencies
-        run: composer install --prefer-dist --no-progress --no-interaction
+      - name: Create temporary composer.json
+        run: |
+          composer init \
+            --name="awdev/plugins-updater-phpunit" \
+            --description="Temp PHPUnit config" \
+            --type="project" \
+            --no-interaction
+          composer require --dev \
+            phpunit/phpunit \
+            --no-interaction --no-progress
 
       - name: Install WP-CLI
         run: |
