@@ -8,7 +8,7 @@ on:
     branches: [ main ]
 
 jobs:
-  plugin-check:
+  plugin-check-latest:
     runs-on: ubuntu-latest
     steps:
     - uses: actions/checkout@v6
@@ -17,3 +17,17 @@ jobs:
         build-dir: '.'
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         slug: "awdev-plugins-updater"
+        wp-version: latest
+        strict: true
+  plugin-check-trunk:
+    runs-on: ubuntu-latest
+    steps:
+    - uses: actions/checkout@v6
+    - uses: WordPress/plugin-check-action@v1
+      with:
+        build-dir: '.'
+        repo-token: ${{ secrets.GITHUB_TOKEN }}
+        slug: "awdev-plugins-updater"
+        wp-version: trunk
+        include-experimental: true
+        strict: true
