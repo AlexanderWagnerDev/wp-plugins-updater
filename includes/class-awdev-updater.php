@@ -176,14 +176,12 @@ class AWDev_Updater {
 		WP_Filesystem();
 
 		if ( ! $wp_filesystem ) {
-			error_log( 'AWDev Updater: WP_Filesystem unavailable, cannot rename folder for ' . $this->plugin_slug );
 			return $source;
 		}
 
 		// Remove existing target folder so move() does not silently fail.
 		if ( $wp_filesystem->is_dir( $corrected ) ) {
 			if ( ! $wp_filesystem->delete( $corrected, true ) ) {
-				error_log( 'AWDev Updater: could not delete existing target folder "' . $corrected . '" for plugin ' . $this->plugin_slug );
 				return $source;
 			}
 		}
@@ -193,7 +191,6 @@ class AWDev_Updater {
 			return $corrected;
 		}
 
-		error_log( 'AWDev Updater: failed to rename "' . $source . '" to "' . $corrected . '" for plugin ' . $this->plugin_slug );
 		return $source;
 	}
 
