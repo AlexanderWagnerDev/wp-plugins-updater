@@ -12,6 +12,7 @@ jobs:
   checkcs:
     name: 'Check code style'
     runs-on: ubuntu-latest
+    continue-on-error: true
 
     steps:
       - name: Checkout code
@@ -40,7 +41,6 @@ jobs:
 
       - name: Check PHP code style
         id: phpcs
-        continue-on-error: true
         run: |
           vendor/bin/phpcs \
             --standard=WordPress \
@@ -50,6 +50,5 @@ jobs:
             includes/ awdev-plugins-updater.php uninstall.php
 
       - name: Show PHPCS results in PR
-        continue-on-error: true
         if: ${{ always() && steps.phpcs.outcome == 'failure' }}
         run: cs2pr ./phpcs-report.xml
