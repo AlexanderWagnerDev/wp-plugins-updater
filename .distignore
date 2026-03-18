@@ -13,9 +13,6 @@ README-de.md
 README.md
 readme-de.txt
 
-# Assets directory (banner/icon source files, not needed in plugin zip)
-assets
-
 # Node / build tools
 node_modules
 package.json
@@ -38,7 +35,11 @@ phpunit.xml
 # Tests
 tests
 phpunit
+phpunit.xml
+phpunit.xml.dist
+.phpunit.result.cache
 
 # Misc
-*.map
-*.sh
+*.log
+*.DS_Store
+Thumbs.db
