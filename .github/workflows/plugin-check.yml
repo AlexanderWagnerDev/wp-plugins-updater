@@ -3,9 +3,7 @@ name: Plugin Check
 on:
   workflow_dispatch:
   push:
-    branches: [ main ]
   pull_request:
-    branches: [ main ]
 
 jobs:
   plugin-check-latest:
@@ -20,6 +18,7 @@ jobs:
         wp-version: latest
         strict: true
         exclude: |
+          .github/
           tests/
           vendor/
           composer.json
@@ -39,6 +38,7 @@ jobs:
         include-experimental: true
         strict: true
         exclude: |
+          .github/
           tests/
           vendor/
           composer.json
