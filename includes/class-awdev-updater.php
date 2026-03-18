@@ -156,10 +156,9 @@ class AWDev_Updater {
 
 	/**
 	 * Perform the actual WP_Filesystem rename to the correct plugin slug folder.
-	 * Receives the fully resolved $corrected path (not $remote_source) so it
-	 * never has to recalculate the target — avoids the rename-into-self bug.
+	 * Receives the fully resolved $corrected path so it never has to recalculate
+	 * the target — avoids the rename-into-self bug.
 	 * Deletes an existing target folder first to prevent silent move() failure.
-	 * Logs an error if move() fails so the cause can be diagnosed.
 	 */
 	private function rename_source( string $source, string $corrected ): string {
 		if ( trailingslashit( $source ) === $corrected ) {

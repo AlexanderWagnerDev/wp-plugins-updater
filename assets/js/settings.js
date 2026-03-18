@@ -31,7 +31,6 @@
 				if ( ! json.success ) { throw new Error( 'wp_send_json_error' ); }
 			} )
 			.catch( function () {
-				// Revert the toggle visually if the save failed.
 				if ( checkboxEl ) {
 					checkboxEl.checked = ! checkboxEl.checked;
 				}
@@ -74,7 +73,6 @@
 						cell.textContent = remote;
 					}
 
-					// Inject Update button when a newer version is available.
 					if ( needsUpdate && actionsCell && basename ) {
 						var placeholder = actionsCell.querySelector( '.awdev-update-btn-placeholder' );
 						if ( placeholder && ! placeholder.dataset.injected ) {
@@ -118,7 +116,6 @@
 			btn.disabled = true;
 			if ( icon ) { icon.classList.add( 'awdev-spin' ); }
 
-			// Reset the version cell to the loading indicator before the new fetch.
 			var remoteCell = document.querySelector( '.awdev-remote-version[data-slug="' + slug + '"]' );
 			if ( remoteCell ) {
 				remoteCell.innerHTML = '<span class="awdev-version-loading">\u2026</span>';
@@ -138,7 +135,6 @@
 				loadRemoteVersions();
 			} )
 			.catch( function () {
-				// Show '?' in the version cell so the user knows the check failed.
 				if ( remoteCell ) {
 					var loadingEl = remoteCell.querySelector( '.awdev-version-loading' );
 					if ( loadingEl ) { loadingEl.textContent = '?'; }
@@ -193,42 +189,6 @@
 					enabled  : cb.checked ? '1' : '0',
 				}, cb );
 			} );
-		} );
-
-		// Add plugin row.
-		var addBtn = document.getElementById( 'awdev-add-plugin' );
-		if ( addBtn ) {
-			addBtn.addEventListener( 'click', function () {
-				var tbody = document.querySelector( '.awdev-plugin-table tbody' );
-				var ts    = Date.now();
-				var row   = document.createElement( 'tr' );
-				row.className = 'awdev-dynamic-row';
-				row.innerHTML =
-					'<td><input type="text" name="awdev_managed_plugins_basename[' + ts + ']" placeholder="folder/plugin-file.php" class="awdev-input-basename" /></td>' +
-					'<td>\u2013</td>' +
-					'<td>\u2013</td>' +
-					'<td>' +
-					  '<label class="awdev-toggle">' +
-					  '<input type="checkbox" class="awdev-per-plugin-toggle" data-basename="" value="1" checked />' +
-					  '<span class="awdev-toggle-slider"></span>' +
-					  '</label>' +
-					'</td>' +
-					'<td>\u2013</td>' +
-					'<td>' +
-					  '<input type="text" name="awdev_managed_plugins[__new_' + ts + ']" placeholder="api-slug" class="awdev-input-slug" />' +
-					  '<button type="button" class="awdev-remove-row button-link" title="Remove"><span class="dashicons dashicons-trash"></span></button>' +
-					'</td>';
-				tbody.appendChild( row );
-				row.querySelector( '.awdev-input-basename' ).focus();
-			} );
-		}
-
-		// Remove plugin row.
-		document.addEventListener( 'click', function ( e ) {
-			var btn = e.target.closest( '.awdev-remove-row' );
-			if ( btn ) {
-				btn.closest( 'tr' ).remove();
-			}
 		} );
 
 		// Kick off remote version fetch after DOM is ready.

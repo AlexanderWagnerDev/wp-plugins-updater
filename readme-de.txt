@@ -23,7 +23,6 @@ Funktionen:
 * Globaler Auto-Update-Hauptschalter — uebertraegt Zustand sofort auf alle Per-Plugin-Toggles
 * Manueller Re-Check-Button pro Plugin — leert den Transient und ruft sofort die neueste Version ab
 * Ein-Klick-Aktualisieren-Button — erscheint automatisch wenn eine neuere Remote-Version verfuegbar ist
-* Weitere Plugins ueber die Einstellungsseite hinzufuegen — keine Codeaenderungen noetig
 * Konfigurierbares Update-Cache-Intervall (1h–168h, Standard 6h)
 * Manueller Cache-Flush-Button
 * Unterstuetzung fuer das "Version Details"-Popup im WP-Update-Bildschirm
@@ -41,9 +40,6 @@ Funktionen:
 == Haeufig gestellte Fragen ==
 = Muss ich etwas konfigurieren? =
 Nein. DarkAdmin wird automatisch registriert, wenn es installiert ist. Die Standard-Server-URL ist vorkonfiguriert.
-
-= Kann ich weitere Plugins hinzufuegen? =
-Ja. Verwende die Einstellungsseite, um weitere AlexanderWagnerDev-Plugins ueber ihren Basename (z. B. my-plugin/my-plugin.php) und API-Slug hinzuzufuegen.
 
 = Wie funktioniert der Auto-Update-Toggle? =
 Jedes Plugin hat einen Auto-Update-Toggle auf der Einstellungsseite. Ein Klick speichert den Zustand sofort via AJAX — kein Speichern-Button noetig. Wenn aktiviert, installiert WordPress Updates automatisch im regelmaessigen Hintergrund-Update-Zyklus.
