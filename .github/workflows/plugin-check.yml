@@ -14,39 +14,51 @@ jobs:
     continue-on-error: true
     steps:
     - uses: actions/checkout@v6
+    - name: Prepare clean plugin directory
+      run: |
+        mkdir ../plugin-clean
+        rsync -av --exclude='.git' \
+                  --exclude='.github' \
+                  --exclude='tests' \
+                  --exclude='vendor' \
+                  --exclude='composer.json' \
+                  --exclude='composer.lock' \
+                  --exclude='phpunit.xml' \
+                  --exclude='.distignore' \
+                  --exclude='*.md' \
+                  --exclude='readme-de.txt' \
+                  --exclude='CHANGELOG.txt' \
+                  --exclude='CHANGELOG-de.txt' \
+                  ./ ../plugin-clean/
     - uses: WordPress/plugin-check-action@v1
       with:
-        build-dir: '.'
+        build-dir: '../plugin-clean'
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         slug: "awdev-plugins-updater"
-        wp-version: latest
-        strict: true
-        exclude: |
-          .github/
-          tests/
-          vendor/
-          composer.json
-          composer.lock
-          phpunit.xml
-          .distignore
+        
   plugin-check-trunk:
     runs-on: ubuntu-latest
     continue-on-error: true
     steps:
     - uses: actions/checkout@v6
+    - name: Prepare clean plugin directory
+      run: |
+        mkdir ../plugin-clean
+        rsync -av --exclude='.git' \
+                  --exclude='.github' \
+                  --exclude='tests' \
+                  --exclude='vendor' \
+                  --exclude='composer.json' \
+                  --exclude='composer.lock' \
+                  --exclude='phpunit.xml' \
+                  --exclude='.distignore' \
+                  --exclude='*.md' \
+                  --exclude='readme-de.txt' \
+                  --exclude='CHANGELOG.txt' \
+                  --exclude='CHANGELOG-de.txt' \
+                  ./ ../plugin-clean/
     - uses: WordPress/plugin-check-action@v1
       with:
-        build-dir: '.'
+        build-dir: '../plugin-clean'
         repo-token: ${{ secrets.GITHUB_TOKEN }}
         slug: "awdev-plugins-updater"
-        wp-version: trunk
-        include-experimental: true
-        strict: true
-        exclude: |
-          .github/
-          tests/
-          vendor/
-          composer.json
-          composer.lock
-          phpunit.xml
-          .distignore
