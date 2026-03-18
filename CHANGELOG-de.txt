@@ -4,6 +4,7 @@ AWDev Plugins Updater - Changelog
 0.1.2 - 2026-03-18
 -------------------
 - Entfernt: Error-Logging-Aufrufe entfernt
+- Entfernt: Toter Add-Plugin-JS-Code entfernt (kein UI-Gegenstueck vorhanden)
 
 0.1.1 - 2026-03-17
 -------------------

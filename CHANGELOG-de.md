@@ -9,13 +9,14 @@ Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1
 
 ### Entfernt
 - Error-Logging-Aufrufe entfernt
+- Toter Add-Plugin-JS-Code entfernt (kein UI-Gegenstück vorhanden)
 
 ---
 
 ## [0.1.1] — 2026-03-17
 
 ### Behoben
-- `fix_folder_name()`: Absturz wenn der ZIP-Inhalt ohne Unterordner extrahiert wird (flache Struktur) — `rename()` wurde mit einem Zielpfad *innerhalb* des Quellverzeichnisses aufgerufen, was zu `Invalid argument` fuehrte; Quell- und Remote-Source-Pfade werden jetzt normalisiert und verglichen, um flache ZIPs zu erkennen und die Umbenennung in ein Geschwisterverzeichnis umzuleiten
+- `fix_folder_name()`: Absturz wenn der ZIP-Inhalt ohne Unterordner extrahiert wird (flache Struktur) — `rename()` wurde mit einem Zielpfad *innerhalb* des Quellverzeichnisses aufgerufen, was zu `Invalid argument` führte; Quell- und Remote-Source-Pfade werden jetzt normalisiert und verglichen, um flache ZIPs zu erkennen und die Umbenennung in ein Geschwisterverzeichnis umzuleiten
 - `plugins_loaded`-Hook-Priorität auf `20` erhöht, damit Update-Filter erst nach vollständigem Laden aller anderen Plugins registriert werden
 
 ### Geändert
