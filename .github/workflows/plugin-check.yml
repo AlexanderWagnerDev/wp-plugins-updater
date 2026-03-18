@@ -16,4 +16,4 @@ jobs:
       with:
         build-dir: '.'
         repo-token: ${{ secrets.GITHUB_TOKEN }}
-        slug: "darkadmin-dark-mode-for-adminpanel"
+        slug: "awdev-plugins-updater"
