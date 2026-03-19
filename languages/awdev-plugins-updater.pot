@@ -25,7 +25,7 @@ msgid "AWDev Plugins Updater"
 msgstr ""
 
 #: includes/settings.php
-msgid "Self-hosted update manager for AlexanderWagnerDev plugins"
+msgid "Updater for AlexanderWagnerDev plugins"
 msgstr ""
 
 #: includes/settings.php
@@ -33,15 +33,15 @@ msgid "Active"
 msgstr ""
 
 #: includes/settings.php
-msgid "✓ Update cache flushed."
+msgid "Update cache flushed."
 msgstr ""
 
 #: includes/settings.php
-msgid "✓ Plugin cache cleared. WordPress will re-check on next load."
+msgid "Plugin cache cleared. WordPress will re-check on next load."
 msgstr ""
 
 #: includes/settings.php
-msgid "✓ Settings saved."
+msgid "Settings saved."
 msgstr ""
 
 #: includes/settings.php
@@ -61,7 +61,7 @@ msgid "Check interval (hours)"
 msgstr ""
 
 #: includes/settings.php
-msgid "Min: 1h — Max: 168h (7 days). Default: 6h."
+msgid "Min: 1h - Max: 168h (7 days). Default: 6h."
 msgstr ""
 
 #: includes/settings.php
@@ -69,7 +69,7 @@ msgid "Managed Plugins"
 msgstr ""
 
 #: includes/settings.php
-msgid "All AlexanderWagnerDev plugins that receive updates from the self-hosted server."
+msgid "All AlexanderWagnerDev plugins managed by this updater."
 msgstr ""
 
 #: includes/settings.php

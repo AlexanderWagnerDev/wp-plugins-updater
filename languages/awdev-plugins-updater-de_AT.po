@@ -26,24 +26,24 @@ msgid "AWDev Plugins Updater"
 msgstr "AWDev Plugins Updater"
 
 #: includes/settings.php
-msgid "Self-hosted update manager for AlexanderWagnerDev plugins"
-msgstr "Self-hosted Update-Manager für AlexanderWagnerDev Plugins"
+msgid "Updater for AlexanderWagnerDev plugins"
+msgstr "Updater fuer AlexanderWagnerDev Plugins"
 
 #: includes/settings.php
 msgid "Active"
 msgstr "Aktiv"
 
 #: includes/settings.php
-msgid "✓ Update cache flushed."
-msgstr "✓ Update-Cache geleert."
+msgid "Update cache flushed."
+msgstr "Update-Cache geleert."
 
 #: includes/settings.php
-msgid "✓ Plugin cache cleared. WordPress will re-check on next load."
-msgstr "✓ Plugin-Cache geleert. WordPress prüft beim nächsten Laden erneut."
+msgid "Plugin cache cleared. WordPress will re-check on next load."
+msgstr "Plugin-Cache geleert. WordPress prueft beim naechsten Laden erneut."
 
 #: includes/settings.php
-msgid "✓ Settings saved."
-msgstr "✓ Einstellungen gespeichert."
+msgid "Settings saved."
+msgstr "Einstellungen gespeichert."
 
 #: includes/settings.php
 msgid "Auto-Update Settings"
@@ -51,7 +51,7 @@ msgstr "Auto-Update Einstellungen"
 
 #: includes/settings.php
 msgid "Configure how often the updater checks for new plugin versions."
-msgstr "Legt fest, wie oft der Updater auf neue Plugin-Versionen prüft."
+msgstr "Legt fest, wie oft der Updater auf neue Plugin-Versionen prueft."
 
 #: includes/settings.php
 msgid "Auto-Update (all plugins)"
@@ -59,19 +59,19 @@ msgstr "Auto-Update (alle Plugins)"
 
 #: includes/settings.php
 msgid "Check interval (hours)"
-msgstr "Prüfintervall (Stunden)"
+msgstr "Pruefintervall (Stunden)"
 
 #: includes/settings.php
-msgid "Min: 1h — Max: 168h (7 days). Default: 6h."
-msgstr "Min: 1h — Max: 168h (7 Tage). Standard: 6h."
+msgid "Min: 1h - Max: 168h (7 days). Default: 6h."
+msgstr "Min: 1h - Max: 168h (7 Tage). Standard: 6h."
 
 #: includes/settings.php
 msgid "Managed Plugins"
 msgstr "Verwaltete Plugins"
 
 #: includes/settings.php
-msgid "All AlexanderWagnerDev plugins that receive updates from the self-hosted server."
-msgstr "Alle AlexanderWagnerDev Plugins, die Updates vom self-hosted Server erhalten."
+msgid "All AlexanderWagnerDev plugins managed by this updater."
+msgstr "Alle AlexanderWagnerDev Plugins, die von diesem Updater verwaltet werden."
 
 #: includes/settings.php
 msgid "Plugin"
@@ -103,7 +103,7 @@ msgstr "AWDev"
 
 #: includes/settings.php
 msgid "Re-check update"
-msgstr "Update erneut prüfen"
+msgstr "Update erneut pruefen"
 
 #: includes/settings.php
 msgid "Update"
@@ -127,7 +127,7 @@ msgstr "Cache-Verwaltung"
 #: includes/settings.php
 #. translators: %d: cache duration in hours
 msgid "Update data is cached for %d hour(s) per plugin. Flush the cache to force an immediate re-check."
-msgstr "Update-Daten werden %d Stunde(n) pro Plugin gecacht. Cache leeren, um eine sofortige Neuprüfung zu erzwingen."
+msgstr "Update-Daten werden %d Stunde(n) pro Plugin gecacht. Cache leeren, um eine sofortige Neupruefung zu erzwingen."
 
 #: includes/settings.php
 msgid "Flush Update Cache"
