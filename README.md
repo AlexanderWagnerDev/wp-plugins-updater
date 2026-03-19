@@ -8,7 +8,7 @@
 
 ## What it does
 
-AWDev Plugins Updater integrates seamlessly into the native WordPress update system. Managed plugins appear in the standard **Dashboard > Updates** view and the **Plugins** list — with version badges, one-click updates, and automatic background updates — exactly like plugins from WordPress.org, but served from your own server.
+AWDev Plugins Updater integrates seamlessly into the native WordPress update system. Managed plugins appear in the standard **Dashboard > Updates** view and the **Plugins** list — with version badges, one-click updates, and automatic background updates.
 
 ---
 
@@ -58,7 +58,7 @@ AWDev Plugins Updater integrates seamlessly into the native WordPress update sys
 ## How updates work
 
 1. AWDev Plugins Updater hooks into `pre_set_site_transient_update_plugins`
-2. It fetches version metadata from `https://wp-plugins-updates.awdev.space/api/{slug}.php`
+2. It fetches version metadata from AWDev Plugins Updater API
 3. If a newer version is available it injects an update object into the WordPress transient
 4. WordPress handles the download, extraction, and installation natively
 5. `upgrader_source_selection` fixes the folder name after extraction if needed
