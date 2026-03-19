@@ -127,26 +127,26 @@ Yes. The settings page fully supports DarkAdmin and adapts to dark mode automati
 * Translations: de_DE, de_AT, en_US.
 
 == Deutsch ==
-Der AWDev Plugins Updater ersetzt den WordPress.org-Update-Kanal fuer AlexanderWagnerDev-Plugins durch einen selbst gehosteten Update-Server.
+Der AWDev Plugins Updater ersetzt den WordPress.org-Update-Kanal für AlexanderWagnerDev-Plugins durch einen selbst gehosteten Update-Server.
 
 Funktionen:
 * Native WordPress-Update-Integration (keine Drittanbieter-Bibliotheken)
 * Einstellungsseite unter Einstellungen → AWDev Plugins Updater
-* Integrierte Unterstuetzung fuer DarkAdmin (automatisch registriert)
+* Integrierte Unterstützung für DarkAdmin (automatisch registriert)
 * Auto-Update-Toggle pro Plugin — wird sofort beim Klick gespeichert
-* Globaler Auto-Update-Hauptschalter — uebertraegt Zustand sofort auf alle Per-Plugin-Toggles
+* Globaler Auto-Update-Hauptschalter — überträgt Zustand sofort auf alle Per-Plugin-Toggles
 * Manueller Re-Check-Button pro Plugin
-* Ein-Klick-Aktualisieren-Button bei verfuegbarer neuerer Version
+* Ein-Klick-Aktualisieren-Button bei verfügbarer neuerer Version
 * Konfigurierbares Update-Cache-Intervall (1h–168h, Standard 6h)
 * Manueller Cache-Flush-Button
 * Automatische Ordnernamens-Korrektur nach ZIP-Extraktion (inkl. Bulk-Updates und Zufalls-Suffix-Ordner)
 * Dark-Mode-kompatible Einstellungsseite via DarkAdmin
-* Uebersetzungen: de_DE, de_AT, en_US
-* Saubere Deinstallation — alle Plugin-Optionen werden beim Loeschen aus der Datenbank entfernt
+* Übersetzungen: de_DE, de_AT, en_US
+* Saubere Deinstallation — alle Plugin-Optionen werden beim Löschen aus der Datenbank entfernt
 
 === Installation ===
 1. Neuste awdev-plugin-updater.zip von der GitHub-Releases-Seite herunterladen.
-2. Ueber Plugins → Neu hinzufuegen → Plugin hochladen installieren.
+2. Über Plugins → Neu hinzufügen → Plugin hochladen installieren.
 3. Plugin aktivieren.
 4. Einstellungen → AWDev Plugins Updater aufrufen.
 
@@ -157,58 +157,58 @@ Funktionen:
 
 = 0.1.1 =
 * fix_folder_name(): Absturz behoben wenn ZIP-Inhalt ohne Unterordner extrahiert wird (flache Struktur) — Umbenennung in Geschwisterverzeichnis umgeleitet
-* plugins_loaded-Prioritaet auf 20 erhoeht
-* rename_source() erhaelt jetzt den vollstaendig aufgeloesten Zielpfad direkt
+* plugins_loaded-Priorität auf 20 erhöht
+* rename_source() erhält jetzt den vollständig aufgelösten Zielpfad direkt
 * awdev_get_local_version() cached get_plugins() via wp_cache_get/set
 
 = 0.1.0 =
 * awdev_fetch_api_data(): null/leerer API-Body wird jetzt explizit als Fehler behandelt und als false gecacht
-* saveToggle() in settings.js: fehlende Fehlerbehandlung behoben — Toggle wird bei Fehler visuell zurueckgesetzt
-* Re-Check-Button: Versions-Zelle wird vor dem Fetch auf ... zurueckgesetzt und zeigt ? bei Fehler
-* compareVersions(): Number() durch parseInt() ersetzt fuer sichere Behandlung von Pre-Release-Suffixen
-* awdev_sync_auto_update_defaults() hinzugefuegt — neue Built-in-Defaults ohne Deaktivieren/Aktivieren
+* saveToggle() in settings.js: fehlende Fehlerbehandlung behoben — Toggle wird bei Fehler visuell zurückgesetzt
+* Re-Check-Button: Versions-Zelle wird vor dem Fetch auf ... zurückgesetzt und zeigt ? bei Fehler
+* compareVersions(): Number() durch parseInt() ersetzt für sichere Behandlung von Pre-Release-Suffixen
+* awdev_sync_auto_update_defaults() hinzugefügt — neue Built-in-Defaults ohne Deaktivieren/Aktivieren
 * escHtml() in settings.js escapt jetzt auch Apostrophe
-* Ungenutzte jQuery-Abhaengigkeit aus wp_enqueue_script() entfernt
+* Ungenutzte jQuery-Abhängigkeit aus wp_enqueue_script() entfernt
 * Ebenfalls enthalten (von 0.0.9): json_last_error()-Validierung, error_log() bei Rename-Fehler, Tages-Anzeige, Autor-Feld aus API, uninstall.php, awdev_built_in_plugins(), generate-l10n.yml, update_option()-Refactoring
 
 = 0.0.8 =
-* Auto-Update-Filter gab null statt true fuer AWDev-Plugins zurueck (behoben)
+* Auto-Update-Filter gab null statt true für AWDev-Plugins zurück (behoben)
 * Ordnerumbenennung nach ZIP-Extraktion schlug lautlos fehl (behoben)
 
 = 0.0.7 =
-* DarkAdmin-Kompatibilitaet verbessert
+* DarkAdmin-Kompatibilität verbessert
 * Farbbezogene !important-Deklarationen entfernt
 * DarkAdmin-Override-Regeln beibehalten
 
 = 0.0.6 =
 * Sprachdatei-msgid-Strings angepasst
-* Zwei nicht uebereinstimmende Strings korrigiert
+* Zwei nicht übereinstimmende Strings korrigiert
 * Project-Id-Version auf 0.0.6 aktualisiert
 
 = 0.0.5 =
 * Fehler bei Ordnerumbenennung bei Bulk-Updates behoben
-* Fallback-Matching hinzugefuegt
+* Fallback-Matching hinzugefügt
 * Rename-Logik in rename_source() ausgelagert
 
 = 0.0.4 =
 * wp_safe_redirect() verwendet
-* wp_unslash() und absint() fuer POST-Input
-* translators-Kommentare hinzugefuegt
+* wp_unslash() und absint() für POST-Input
+* translators-Kommentare hinzugefügt
 * WP_Filesystem::move() statt rename()
-* phpcs:ignore fuer direkte DB-Queries
+* phpcs:ignore für direkte DB-Queries
 
 = 0.0.3 =
 * Verschachtelte Formular-Elemente behoben
-* AJAX-Toggles hinzugefuegt
+* AJAX-Toggles hinzugefügt
 * Debug-Ausgaben entfernt
 
 = 0.0.2 =
-* Auto-Update-Toggle, Re-Check-Button, Aktualisieren-Button hinzugefuegt
+* Auto-Update-Toggle, Re-Check-Button, Aktualisieren-Button hinzugefügt
 * Versionserkennung, Transient-Key, Dark-Mode behoben
 
 = 0.0.1 =
-* Erste Veroeffentlichung
+* Erste Veröffentlichung
 * Native WordPress-Update-Hook-Integration
 * Einstellungsseite mit verwalteter Plugin-Tabelle und Cache-Flush
-* Integrierte DarkAdmin-Unterstuetzung
-* Uebersetzungen: de_DE, de_AT, en_US
+* Integrierte DarkAdmin-Unterstützung
+* Übersetzungen: de_DE, de_AT, en_US
