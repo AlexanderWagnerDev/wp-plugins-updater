@@ -8,10 +8,10 @@ Stable tag: 0.1.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Self-hosted update manager for AlexanderWagnerDev plugins. No WordPress.org required.
+Updater for AlexanderWagnerDev plugins. No WordPress.org required.
 
 == Description ==
-AWDev Plugins Updater replaces the WordPress.org update channel for AlexanderWagnerDev plugins with a self-hosted update server. This gives full control over versioning, distribution and release timing — completely independent of the WordPress.org review queue.
+AWDev Plugins Updater replaces the WordPress.org update channel for AlexanderWagnerDev plugins with a direct connection to the AWDev update server. This gives full control over versioning, distribution and release timing — completely independent of the WordPress.org review queue.
 
 The updater hooks directly into the native WordPress update system, so updates appear in the standard Plugins screen just like any other plugin update. No third-party update libraries are used.
 
@@ -127,7 +127,7 @@ Yes. The settings page fully supports DarkAdmin and adapts to dark mode automati
 * Translations: de_DE, de_AT, en_US.
 
 == Deutsch ==
-Der AWDev Plugins Updater ersetzt den WordPress.org-Update-Kanal für AlexanderWagnerDev-Plugins durch einen selbst gehosteten Update-Server.
+Der AWDev Plugins Updater ersetzt den WordPress.org-Update-Kanal für AlexanderWagnerDev-Plugins durch eine direkte Verbindung zum AWDev Update-Server.
 
 Funktionen:
 * Native WordPress-Update-Integration (keine Drittanbieter-Bibliotheken)

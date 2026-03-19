@@ -1,6 +1,6 @@
 # AWDev Plugins Updater
 
-**Self-hosted Update-Manager fuer AlexanderWagnerDev Plugins - ohne WordPress.org.**
+**Updater für AlexanderWagnerDev Plugins — ohne WordPress.org.**
 
 > Version 0.1.2 | Erfordert WordPress 6.3+ | Erfordert PHP 7.4+ | Lizenz: GPLv2
 

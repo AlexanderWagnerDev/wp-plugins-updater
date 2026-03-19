@@ -8,10 +8,10 @@ Stabile Version: 0.1.2
 Lizenz: GPLv2 or later
 Lizenz-URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-Selbst gehosteter Update-Manager für AlexanderWagnerDev-Plugins. Kein WordPress.org erforderlich.
+Updater für AlexanderWagnerDev-Plugins. Kein WordPress.org erforderlich.
 
 == Beschreibung ==
-Der AWDev Plugins Updater ersetzt den WordPress.org-Update-Kanal für AlexanderWagnerDev-Plugins durch einen selbst gehosteten Update-Server. Damit hast du die volle Kontrolle über Versionierung, Verteilung und Veröffentlichungszeitpunkt — vollständig unabhängig von der WordPress.org-Review-Queue.
+Der AWDev Plugins Updater ersetzt den WordPress.org-Update-Kanal für AlexanderWagnerDev-Plugins durch eine direkte Verbindung zum AWDev Update-Server. Damit hast du die volle Kontrolle über Versionierung, Verteilung und Veröffentlichungszeitpunkt — vollständig unabhängig von der WordPress.org-Review-Queue.
 
 Der Updater klinkt sich direkt in das native WordPress-Update-System ein, sodass Updates wie jedes andere Plugin-Update im Standard-Plugins-Bildschirm erscheinen. Es werden keine Drittanbieter-Update-Bibliotheken verwendet.
 
