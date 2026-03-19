@@ -540,7 +540,7 @@ function awdev_render_settings_page(): void {
 				<div>
 					<h1 class="awdev-page-title"><?php esc_html_e( 'AWDev Plugins Updater', 'awdev-plugins-updater' ); ?></h1>
 					<p class="awdev-page-subtitle">
-						<?php esc_html_e( 'Self-hosted update manager for AlexanderWagnerDev plugins', 'awdev-plugins-updater' ); ?>
+						<?php esc_html_e( 'Updater for AlexanderWagnerDev plugins', 'awdev-plugins-updater' ); ?>
 						&mdash; v<?php echo esc_html( AWDEV_UPDATER_VERSION ); ?>
 					</p>
 				</div>
@@ -623,7 +623,7 @@ function awdev_render_settings_page(): void {
 			</div>
 			<div class="awdev-card-body">
 				<p class="awdev-card-description">
-					<?php esc_html_e( 'All AlexanderWagnerDev plugins that receive updates from the self-hosted server.', 'awdev-plugins-updater' ); ?>
+					<?php esc_html_e( 'All AlexanderWagnerDev plugins managed by this updater.', 'awdev-plugins-updater' ); ?>
 				</p>
 
 				<table class="awdev-plugin-table">
