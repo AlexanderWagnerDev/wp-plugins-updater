@@ -5,7 +5,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 }
 
 /**
- * Handles self-hosted update checks for a single plugin.
+ * Handles update checks for a single AWDev plugin.
  */
 class AWDev_Updater {
 
@@ -24,7 +24,7 @@ class AWDev_Updater {
 	}
 
 	/**
-	 * Fetch update metadata from the self-hosted API endpoint.
+	 * Fetch update metadata from the AWDev update API endpoint.
 	 * Delegates to awdev_fetch_api_data() for transient-cached HTTP logic.
 	 */
 	public function get_remote_data(): ?object {
@@ -122,10 +122,10 @@ class AWDev_Updater {
 		$remote_norm = trailingslashit( $remote_source );
 
 		if ( $source_norm === $remote_norm ) {
-			// Scenario B: flat ZIP — target is a sibling of remote_source.
+			// Scenario B: flat ZIP -- target is a sibling of remote_source.
 			$corrected = trailingslashit( dirname( untrailingslashit( $remote_source ) ) ) . $this->plugin_slug . '/';
 		} else {
-			// Scenario A: ZIP had a subfolder — target is inside remote_source.
+			// Scenario A: ZIP had a subfolder -- target is inside remote_source.
 			$corrected = $remote_norm . $this->plugin_slug . '/';
 		}
 
@@ -133,7 +133,7 @@ class AWDev_Updater {
 			return $source;
 		}
 
-		// Scenario 1: single-plugin update — hook_extra['plugin'] is populated.
+		// Scenario 1: single-plugin update -- hook_extra['plugin'] is populated.
 		$extra_plugin = $hook_extra['plugin'] ?? '';
 		if ( $extra_plugin !== '' ) {
 			if ( $extra_plugin !== $this->plugin_basename ) {
@@ -142,7 +142,7 @@ class AWDev_Updater {
 			return $this->rename_source( $source, $corrected );
 		}
 
-		// Scenario 2: bulk/auto update — hook_extra['plugin'] is empty.
+		// Scenario 2: bulk/auto update -- hook_extra['plugin'] is empty.
 		// Only match if the extracted folder is exactly our slug followed by
 		// the WP-appended random suffix (-[A-Za-z0-9]{5,12}). This ensures
 		// third-party plugins are never accidentally renamed.
@@ -157,7 +157,7 @@ class AWDev_Updater {
 	/**
 	 * Perform the actual WP_Filesystem rename to the correct plugin slug folder.
 	 * Receives the fully resolved $corrected path so it never has to recalculate
-	 * the target — avoids the rename-into-self bug.
+	 * the target -- avoids the rename-into-self bug.
 	 * Deletes an existing target folder first to prevent silent move() failure.
 	 */
 	private function rename_source( string $source, string $corrected ): string {
