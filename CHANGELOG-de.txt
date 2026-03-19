@@ -4,7 +4,7 @@ AWDev Plugins Updater - Changelog
 0.1.2 - 2026-03-18
 -------------------
 - Entfernt: Error-Logging-Aufrufe entfernt
-- Entfernt: Toter Add-Plugin-JS-Code entfernt (kein UI-Gegenstueck vorhanden)
+- Entfernt: Toter Add-Plugin-JS-Code entfernt (kein UI-Gegenstück vorhanden)
 
 0.1.1 - 2026-03-17
 -------------------
@@ -12,70 +12,70 @@ AWDev Plugins Updater - Changelog
   rename() wurde mit Zielpfad innerhalb des Quellverzeichnisses aufgerufen -> Invalid argument
   Quell- und Remote-Source-Pfade werden jetzt normalisiert und verglichen
   Umbenennung wird in ein Geschwisterverzeichnis umgeleitet
-- Behoben: plugins_loaded-Hook-Prioritaet auf 20 erhoeht fuer zuverlaessige Initialisierungsreihenfolge
-- Geaendert: rename_source() erhaelt jetzt den vollstaendig aufgeloesten Zielpfad direkt
-- Geaendert: awdev_get_local_version() cached get_plugins() via wp_cache_get/set (Gruppe awdev_updater)
-  get_plugins() liest das Dateisystem jetzt hoechstens einmal pro Request
+- Behoben: plugins_loaded-Hook-Priorität auf 20 erhöht für zuverlässige Initialisierungsreihenfolge
+- Geändert: rename_source() erhält jetzt den vollständig aufgelösten Zielpfad direkt
+- Geändert: awdev_get_local_version() cached get_plugins() via wp_cache_get/set (Gruppe awdev_updater)
+  get_plugins() liest das Dateisystem jetzt höchstens einmal pro Request
 
 0.1.0 - 2026-03-17
 -------------------
 - Behoben: awdev_fetch_api_data(): null/leerer API-Body wird jetzt explizit als Fehler behandelt
 - Behoben: saveToggle() in settings.js: fehlende .then()/.catch()-Kette wurde lautlos ignoriert
-- Behoben: Re-Check-Button: Versions-Zelle wird vor dem Fetch zurueckgesetzt
+- Behoben: Re-Check-Button: Versions-Zelle wird vor dem Fetch zurückgesetzt
 - Behoben: compareVersions(): Number() durch parseInt() ersetzt
-- Hinzugefuegt: register_activation_hook() ruft awdev_activate() auf
-- Hinzugefuegt: awdev_sync_auto_update_defaults(): ergaenzt fehlende Eintraege fuer Built-in-Plugins
-- Hinzugefuegt: escHtml() escapt jetzt auch Apostrophe
-- Geaendert: awdev_activate() delegiert an awdev_sync_auto_update_defaults()
-- Geaendert: get_remote_data() delegiert an awdev_fetch_api_data()
-- Geaendert: jQuery-Abhaengigkeit entfernt
-- Geaendert: JS-Unicode-Escapes durch literale UTF-8-Zeichen ersetzt
+- Hinzugefügt: register_activation_hook() ruft awdev_activate() auf
+- Hinzugefügt: awdev_sync_auto_update_defaults(): ergänzt fehlende Einträge für Built-in-Plugins
+- Hinzugefügt: escHtml() escapt jetzt auch Apostrophe
+- Geändert: awdev_activate() delegiert an awdev_sync_auto_update_defaults()
+- Geändert: get_remote_data() delegiert an awdev_fetch_api_data()
+- Geändert: jQuery-Abhängigkeit entfernt
+- Geändert: JS-Unicode-Escapes durch literale UTF-8-Zeichen ersetzt
 - Ebenfalls enthalten (von 0.0.9): json_last_error()-Validierung, error_log() bei Rename-Fehler,
   Tages-Anzeige, Autor-Feld aus API, uninstall.php, awdev_built_in_plugins(),
   generate-l10n.yml, update_option()-Refactor, uninstall.php-Konsolidierung
 
 0.0.8
 -----
-- Behoben: Auto-Update-Filter gab null statt true zurueck
+- Behoben: Auto-Update-Filter gab null statt true zurück
 - Behoben: Ordnerumbenennung schlug lautlos fehl wenn Zielordner existierte
 
 0.0.7
 -----
-- Geaendert: DarkAdmin-Kompatibilitaet verbessert
-- Geaendert: Farbbezogene !important-Deklarationen entfernt
-- Geaendert: DarkAdmin-Override-Regeln beibehalten
+- Geändert: DarkAdmin-Kompatibilität verbessert
+- Geändert: Farbbezogene !important-Deklarationen entfernt
+- Geändert: DarkAdmin-Override-Regeln beibehalten
 
 0.0.6
 -----
 - Behoben: Sprachdatei-msgid-Strings angepasst
-- Behoben: Zwei nicht uebereinstimmende Strings korrigiert
+- Behoben: Zwei nicht übereinstimmende Strings korrigiert
 - Behoben: Project-Id-Version auf 0.0.6 aktualisiert
 
 0.0.5
 -----
 - Behoben: Ordnerumbenennung bei Bulk-Updates fehlgeschlagen
-- Hinzugefuegt: Fallback-Matching ueber Quellordnernamen
-- Geaendert: Rename-Logik in rename_source() ausgelagert
+- Hinzugefügt: Fallback-Matching über Quellordnernamen
+- Geändert: Rename-Logik in rename_source() ausgelagert
 
 0.0.4
 -----
-- Geaendert: wp_safe_redirect() verwendet
-- Geaendert: wp_unslash() und absint() fuer POST-Input
-- Geaendert: translators-Kommentare hinzugefuegt
-- Geaendert: WP_Filesystem::move() statt rename()
-- Geaendert: phpcs:ignore fuer direkte DB-Queries
+- Geändert: wp_safe_redirect() verwendet
+- Geändert: wp_unslash() und absint() für POST-Input
+- Geändert: translators-Kommentare hinzugefügt
+- Geändert: WP_Filesystem::move() statt rename()
+- Geändert: phpcs:ignore für direkte DB-Queries
 
 0.0.3
 -----
 - Behoben: Illegal verschachtelte Formular-Elemente
-- Hinzugefuegt: AJAX-Toggles
-- Geaendert: Debug-Ausgaben und Button-Position
+- Hinzugefügt: AJAX-Toggles
+- Geändert: Debug-Ausgaben und Button-Position
 
 0.0.2
 -----
-- Hinzugefuegt: Auto-Update-Toggle, Re-Check-Button, Aktualisieren-Button
+- Hinzugefügt: Auto-Update-Toggle, Re-Check-Button, Aktualisieren-Button
 - Behoben: Versionserkennung, Transient-Key, Dark-Mode, Remote-Version-Fetch
 
 0.0.1
 -----
-- Erste Veroeffentlichung
+- Erste Veröffentlichung
