@@ -4,7 +4,7 @@ Schlagwörter: updater, awdev, plugin update, wordpress update
 Erfordert mindestens: 6.3
 Getestet bis: 6.9
 Erfordert PHP: 7.4
-Stabile Version: 0.1.2
+Stabile Version: 0.1.3
 Lizenz: GPLv2 or later
 Lizenz-URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,11 @@ Nur für AlexanderWagnerDev-Plugins, die in diesem Updater registriert sind. All
 Ja. Die Einstellungsseite unterstützt DarkAdmin vollständig und passt sich automatisch an den Dark Mode an.
 
 == Changelog ==
+= 0.1.3 =
+* Irreführende Zeichenketten in .pot- und .po-Sprachdateien korrigiert. 
+* Irreführenden Klassen-Docblock in AWDev_Updater korrigiert. 
+* Irreführende Tags korrigiert.
+
 = 0.1.2 =
 * Removed error logging calls
 * Removed dead add-plugin JS code (no UI counterpart existed)
