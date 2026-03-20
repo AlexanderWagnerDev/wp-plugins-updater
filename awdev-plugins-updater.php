@@ -3,7 +3,7 @@
  * Plugin Name: AWDev Plugins Updater
  * Plugin URI: https://github.com/AlexanderWagnerDev/wp-plugins-updater
  * Description: Keeps AlexanderWagnerDev plugins up to date - without WordPress.org.
- * Version: 0.1.2
+ * Version: 0.1.3
  * Requires at least: 6.3
  * Tested up to: 6.9
  * Requires PHP: 7.4
