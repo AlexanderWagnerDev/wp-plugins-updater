@@ -5,6 +5,15 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.1.3] — 2026-03-20
+
+### Removed
+- Fix misleading strings in .pot / .po language files
+- Fix misleading class docblock in AWDev_Updater
+- Fix misleading tags
+
+---
+
 ## [0.1.2] — 2026-03-18
 
 ### Removed
