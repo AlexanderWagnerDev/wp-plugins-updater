@@ -8,6 +8,15 @@ Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1
 ## [0.1.2] — 2026-03-18
 
 ### Entfernt
+- Irreführende Zeichenketten in .pot- und .po-Sprachdateien korrigiert.
+- Irreführenden Klassen-Docblock in AWDev_Updater korrigiert.
+- Irreführende Tags korrigiert.
+
+---
+
+## [0.1.2] — 2026-03-18
+
+### Entfernt
 - Error-Logging-Aufrufe entfernt
 - Toter Add-Plugin-JS-Code entfernt (kein UI-Gegenstück vorhanden)
 
