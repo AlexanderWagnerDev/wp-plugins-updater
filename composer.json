@@ -1,5 +1,5 @@
 {
-    "name": "awdev-plugins-updater",
+    "name": "awdev/awdev-plugins-updater",
     "description": "AWDev Plugins Updater - self-hosted WordPress plugin updater",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
