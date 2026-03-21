@@ -1,5 +1,5 @@
 {
-    "name": "awdev/plugins-updater",
+    "name": "awdev-plugins-updater",
     "description": "AWDev Plugins Updater - self-hosted WordPress plugin updater",
     "type": "wordpress-plugin",
     "license": "GPL-2.0-or-later",
@@ -7,8 +7,8 @@
         "php": ">=7.4"
     },
     "require-dev": {
-        "phpunit/phpunit": "*",
-        "yoast/phpunit-polyfills": "*"
+        "phpunit/phpunit": "^9.6",
+        "yoast/phpunit-polyfills": "^2.0"
     },
     "config": {
         "allow-plugins": {
