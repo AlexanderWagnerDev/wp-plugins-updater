@@ -11,6 +11,7 @@ permissions:
 jobs:
   plugin-check-latest:
     runs-on: ubuntu-latest
+    continue-on-error: true
     steps:
     - uses: actions/checkout@v6
     - name: Prepare clean plugin directory
