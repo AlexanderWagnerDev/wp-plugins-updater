@@ -3,7 +3,7 @@
  * Tests for the AWDev_Updater class and related functions.
  */
 
-class AwdevUpdaterTest extends WP_UnitTestCase {
+class AWDevUpdaterTest extends WP_UnitTestCase {
 
     private AWDev_Updater $updater;
     private string $basename = 'test-plugin/test-plugin.php';
