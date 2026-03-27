@@ -149,20 +149,22 @@ class AWDev_Updater {
 	 * @return string Corrected or original source path.
 	 */
 	public function fix_folder_name( string $source, string $remote_source, object $upgrader, array $hook_extra ): string {
-		// Resolve the correct target path. Two ZIP structures are possible:
-		//
-		// A) ZIP contains a subfolder (standard GitHub/most hosts):
-		//    $remote_source = /upgrade/tmp-xyz/
-		//    $source        = /upgrade/tmp-xyz/plugin-slug-Gmctwk/
-		//    Target         = /upgrade/tmp-xyz/plugin-slug/  (sibling of source inside remote_source)
-		//
-		// B) ZIP extracts flat, no subfolder (rare but valid):
-		//    $remote_source = /upgrade/plugin-slug-Gmctwk/
-		//    $source        = /upgrade/plugin-slug-Gmctwk/  (same as remote_source)
-		//    Target         = /upgrade/plugin-slug/          (sibling of remote_source)
-		//
-		// Distinguishing the two: if normalised $source === normalised $remote_source
-		// we are in scenario B and must use dirname($remote_source) as the parent.
+		/*
+		 * Resolve the correct target path. Two ZIP structures are possible:
+		 *
+		 * A) ZIP contains a subfolder (standard GitHub/most hosts):
+		 *    $remote_source = /upgrade/tmp-xyz/
+		 *    $source        = /upgrade/tmp-xyz/plugin-slug-Gmctwk/
+		 *    Target         = /upgrade/tmp-xyz/plugin-slug/  (sibling of source inside remote_source)
+		 *
+		 * B) ZIP extracts flat, no subfolder (rare but valid):
+		 *    $remote_source = /upgrade/plugin-slug-Gmctwk/
+		 *    $source        = /upgrade/plugin-slug-Gmctwk/  (same as remote_source)
+		 *    Target         = /upgrade/plugin-slug/          (sibling of remote_source)
+		 *
+		 * Distinguishing the two: if normalised $source === normalised $remote_source
+		 * we are in scenario B and must use dirname($remote_source) as the parent.
+		 */
 		$source_norm = trailingslashit( $source );
 		$remote_norm = trailingslashit( $remote_source );
 
@@ -180,17 +182,19 @@ class AWDev_Updater {
 
 		// Scenario 1: single-plugin update -- hook_extra['plugin'] is populated.
 		$extra_plugin = $hook_extra['plugin'] ?? '';
-		if ( $extra_plugin !== '' ) {
-			if ( $extra_plugin !== $this->plugin_basename ) {
+		if ( '' !== $extra_plugin ) {
+			if ( $this->plugin_basename !== $extra_plugin ) {
 				return $source;
 			}
 			return $this->rename_source( $source, $corrected );
 		}
 
-		// Scenario 2: bulk/auto update -- hook_extra['plugin'] is empty.
-		// Only match if the extracted folder is exactly our slug followed by
-		// the WP-appended random suffix (-[A-Za-z0-9]{5,12}). This ensures
-		// third-party plugins are never accidentally renamed.
+		/*
+		 * Scenario 2: bulk/auto update -- hook_extra['plugin'] is empty.
+		 * Only match if the extracted folder is exactly our slug followed by
+		 * the WP-appended random suffix (-[A-Za-z0-9]{5,12}). This ensures
+		 * third-party plugins are never accidentally renamed.
+		 */
 		$source_dirname = basename( untrailingslashit( $source ) );
 		if ( ! preg_match( '/^' . preg_quote( $this->plugin_slug, '/' ) . '-[A-Za-z0-9]{5,12}$/', $source_dirname ) ) {
 			return $source;
@@ -201,9 +205,14 @@ class AWDev_Updater {
 
 	/**
 	 * Perform the actual WP_Filesystem rename to the correct plugin slug folder.
+	 *
 	 * Receives the fully resolved $corrected path so it never has to recalculate
 	 * the target -- avoids the rename-into-self bug.
 	 * Deletes an existing target folder first to prevent silent move() failure.
+	 *
+	 * @param string $source    Path to the extracted source folder.
+	 * @param string $corrected Fully resolved target path with correct plugin slug.
+	 * @return string           The corrected path on success, original $source on failure.
 	 */
 	private function rename_source( string $source, string $corrected ): string {
 		if ( trailingslashit( $source ) === $corrected ) {
@@ -245,7 +254,30 @@ class AWDev_Updater {
 		delete_transient( 'awdev_upd_' . sanitize_key( $this->plugin_slug ) );
 	}
 
-	public function get_api_url(): string  { return $this->api_url; }
-	public function get_slug(): string     { return $this->plugin_slug; }
-	public function get_basename(): string { return $this->plugin_basename; }
+	/**
+	 * Return the API endpoint URL for this plugin.
+	 *
+	 * @return string API endpoint URL.
+	 */
+	public function get_api_url(): string {
+		return $this->api_url;
+	}
+
+	/**
+	 * Return the plugin slug (directory name).
+	 *
+	 * @return string Plugin slug.
+	 */
+	public function get_slug(): string {
+		return $this->plugin_slug;
+	}
+
+	/**
+	 * Return the plugin basename (folder/file.php).
+	 *
+	 * @return string Plugin basename.
+	 */
+	public function get_basename(): string {
+		return $this->plugin_basename;
+	}
 }
