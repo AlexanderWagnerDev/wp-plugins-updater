@@ -14,7 +14,7 @@ define( 'AWDEV_SETTINGS_SLUG', 'awdev-plugins-updater' );
  */
 function awdev_built_in_plugins(): array {
 	return [
-		'awdev-plugins-updater/awdev-plugins-updater.php' => [
+		'awdev-plugins-updater/awdev-plugins-updater.php'  => [
 			'name'     => 'AWDev Plugins Updater',
 			'api_slug' => 'awdev-plugins-updater',
 		],
