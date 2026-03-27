@@ -7,18 +7,19 @@
  * includes from awdev-plugins-updater.php are available here.
  *
  * @see https://developer.wordpress.org/plugins/plugin-basics/uninstall-methods/
+ * @package AWDev_Updater
  */
 
 if ( ! defined( 'WP_UNINSTALL_PLUGIN' ) ) {
 	exit;
 }
 
-$options = [
+$options = array(
 	'awdev_auto_updates_global',
 	'awdev_auto_updates',
 	'awdev_cache_hours',
 	'awdev_managed_plugins',
-];
+);
 
 foreach ( $options as $option ) {
 	delete_option( $option );
