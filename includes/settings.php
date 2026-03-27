@@ -142,135 +142,157 @@ add_action( 'admin_init', 'awdev_sync_auto_update_defaults' );
 /**
  * Register settings and menu.
  */
-add_action( 'admin_menu', function () {
-	add_options_page(
-		__( 'AWDev Plugins Updater', 'awdev-plugins-updater' ),
-		__( 'AWDev Plugins Updater', 'awdev-plugins-updater' ),
-		'manage_options',
-		AWDEV_SETTINGS_SLUG,
-		'awdev_render_settings_page'
-	);
-} );
+add_action(
+	'admin_menu',
+	function () {
+		add_options_page(
+			__( 'AWDev Plugins Updater', 'awdev-plugins-updater' ),
+			__( 'AWDev Plugins Updater', 'awdev-plugins-updater' ),
+			'manage_options',
+			AWDEV_SETTINGS_SLUG,
+			'awdev_render_settings_page'
+		);
+	}
+);
 
 /**
  * Handle main settings form save.
  */
-add_action( 'admin_post_awdev_save_settings', function () {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'Not allowed.', 'awdev-plugins-updater' ) );
+add_action(
+	'admin_post_awdev_save_settings',
+	function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Not allowed.', 'awdev-plugins-updater' ) );
+		}
+		check_admin_referer( 'awdev_save_settings' );
+
+		$global = isset( $_POST['awdev_auto_updates_global'] );
+		update_option( 'awdev_auto_updates_global', $global );
+
+		$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? absint( wp_unslash( $_POST['awdev_cache_hours'] ) ) : 6;
+		if ( $cache_hours < 1 ) {
+			$cache_hours = 1;
+		}
+		if ( $cache_hours > 168 ) {
+			$cache_hours = 168;
+		}
+		update_option( 'awdev_cache_hours', $cache_hours );
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'             => AWDEV_SETTINGS_SLUG,
+					'settings-updated' => '1',
+				),
+				admin_url( 'options-general.php' )
+			)
+		);
+		exit;
 	}
-	check_admin_referer( 'awdev_save_settings' );
-
-	$global = isset( $_POST['awdev_auto_updates_global'] );
-	update_option( 'awdev_auto_updates_global', $global );
-
-	$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? absint( wp_unslash( $_POST['awdev_cache_hours'] ) ) : 6;
-	if ( $cache_hours < 1 )   { $cache_hours = 1; }
-	if ( $cache_hours > 168 ) { $cache_hours = 168; }
-	update_option( 'awdev_cache_hours', $cache_hours );
-
-	wp_safe_redirect(
-		add_query_arg(
-			array(
-				'page'             => AWDEV_SETTINGS_SLUG,
-				'settings-updated' => '1',
-			),
-			admin_url( 'options-general.php' )
-		)
-	);
-	exit;
-} );
+);
 
 /**
  * AJAX: instant-save a single per-plugin auto-update toggle.
  */
-add_action( 'wp_ajax_awdev_toggle_auto_update', function () {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json_error( 'not_allowed', 403 );
+add_action(
+	'wp_ajax_awdev_toggle_auto_update',
+	function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'not_allowed', 403 );
+		}
+		check_ajax_referer( 'awdev_toggle_auto_update' );
+
+		$basename = sanitize_text_field( wp_unslash( $_POST['basename'] ?? '' ) );
+		$enabled  = filter_var( wp_unslash( $_POST['enabled'] ?? false ), FILTER_VALIDATE_BOOLEAN );
+
+		if ( ! $basename ) {
+			wp_send_json_error( 'missing_basename', 400 );
+		}
+
+		$auto_updates              = (array) get_option( 'awdev_auto_updates', array() );
+		$auto_updates[ $basename ] = $enabled;
+		update_option( 'awdev_auto_updates', $auto_updates );
+
+		wp_send_json_success( array( 'basename' => $basename, 'enabled' => $enabled ) );
 	}
-	check_ajax_referer( 'awdev_toggle_auto_update' );
-
-	$basename = sanitize_text_field( wp_unslash( $_POST['basename'] ?? '' ) );
-	$enabled  = filter_var( wp_unslash( $_POST['enabled'] ?? false ), FILTER_VALIDATE_BOOLEAN );
-
-	if ( ! $basename ) {
-		wp_send_json_error( 'missing_basename', 400 );
-	}
-
-	$auto_updates              = (array) get_option( 'awdev_auto_updates', array() );
-	$auto_updates[ $basename ] = $enabled;
-	update_option( 'awdev_auto_updates', $auto_updates );
-
-	wp_send_json_success( array( 'basename' => $basename, 'enabled' => $enabled ) );
-} );
+);
 
 /**
  * AJAX: instant-save the global auto-update toggle and mirror to all per-plugin entries.
  */
-add_action( 'wp_ajax_awdev_toggle_global_auto_update', function () {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json_error( 'not_allowed', 403 );
+add_action(
+	'wp_ajax_awdev_toggle_global_auto_update',
+	function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'not_allowed', 403 );
+		}
+		check_ajax_referer( 'awdev_toggle_auto_update' );
+
+		$enabled = filter_var( wp_unslash( $_POST['enabled'] ?? false ), FILTER_VALIDATE_BOOLEAN );
+
+		update_option( 'awdev_auto_updates_global', $enabled );
+
+		$auto_updates = (array) get_option( 'awdev_auto_updates', array() );
+		foreach ( $auto_updates as $basename => $_ ) {
+			$auto_updates[ $basename ] = $enabled;
+		}
+		update_option( 'awdev_auto_updates', $auto_updates );
+
+		wp_send_json_success( array( 'enabled' => $enabled ) );
 	}
-	check_ajax_referer( 'awdev_toggle_auto_update' );
-
-	$enabled = filter_var( wp_unslash( $_POST['enabled'] ?? false ), FILTER_VALIDATE_BOOLEAN );
-
-	update_option( 'awdev_auto_updates_global', $enabled );
-
-	$auto_updates = (array) get_option( 'awdev_auto_updates', array() );
-	foreach ( $auto_updates as $basename => $_ ) {
-		$auto_updates[ $basename ] = $enabled;
-	}
-	update_option( 'awdev_auto_updates', $auto_updates );
-
-	wp_send_json_success( array( 'enabled' => $enabled ) );
-} );
+);
 
 /**
  * AJAX: fetch remote versions for all managed plugins in one request.
  * Returns a map of dirname_slug => version string (or '?' on failure).
  * Uses awdev_fetch_remote_version() — no WP update filters are registered.
  */
-add_action( 'wp_ajax_awdev_get_remote_versions', function () {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json_error( 'not_allowed', 403 );
+add_action(
+	'wp_ajax_awdev_get_remote_versions',
+	function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'not_allowed', 403 );
+		}
+		check_ajax_referer( 'awdev_get_remote_versions' );
+
+		$built_in = awdev_built_in_plugins();
+		$managed  = (array) get_option( 'awdev_managed_plugins', array() );
+		$versions = array();
+
+		foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
+			$dirname_slug = sanitize_key( dirname( $basename ) );
+			$api_slug     = $managed[ $basename ] ?? ( $built_in[ $basename ]['api_slug'] ?? $dirname_slug );
+			$api_url      = AWDEV_UPDATE_SERVER . '/' . sanitize_key( $api_slug ) . '.php';
+
+			$versions[ $dirname_slug ] = awdev_fetch_remote_version( $basename, $api_url );
+		}
+
+		wp_send_json_success( $versions );
 	}
-	check_ajax_referer( 'awdev_get_remote_versions' );
-
-	$built_in = awdev_built_in_plugins();
-	$managed  = (array) get_option( 'awdev_managed_plugins', array() );
-	$versions = array();
-
-	foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
-		$dirname_slug = sanitize_key( dirname( $basename ) );
-		$api_slug     = $managed[ $basename ] ?? ( $built_in[ $basename ]['api_slug'] ?? $dirname_slug );
-		$api_url      = AWDEV_UPDATE_SERVER . '/' . sanitize_key( $api_slug ) . '.php';
-
-		$versions[ $dirname_slug ] = awdev_fetch_remote_version( $basename, $api_url );
-	}
-
-	wp_send_json_success( $versions );
-} );
+);
 
 /**
  * AJAX: clear the transient cache for a single plugin and return JSON.
  */
-add_action( 'wp_ajax_awdev_check_plugin', function () {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_send_json_error( 'not_allowed', 403 );
+add_action(
+	'wp_ajax_awdev_check_plugin',
+	function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_send_json_error( 'not_allowed', 403 );
+		}
+		check_ajax_referer( 'awdev_check_plugin' );
+
+		$dirname_slug = sanitize_key( wp_unslash( $_POST['dirname_slug'] ?? '' ) );
+		if ( ! $dirname_slug ) {
+			wp_send_json_error( 'missing_slug', 400 );
+		}
+
+		delete_transient( 'awdev_upd_' . $dirname_slug );
+		delete_site_transient( 'update_plugins' );
+
+		wp_send_json_success( array( 'cleared' => $dirname_slug ) );
 	}
-	check_ajax_referer( 'awdev_check_plugin' );
-
-	$dirname_slug = sanitize_key( wp_unslash( $_POST['dirname_slug'] ?? '' ) );
-	if ( ! $dirname_slug ) {
-		wp_send_json_error( 'missing_slug', 400 );
-	}
-
-	delete_transient( 'awdev_upd_' . $dirname_slug );
-	delete_site_transient( 'update_plugins' );
-
-	wp_send_json_success( array( 'cleared' => $dirname_slug ) );
-} );
+);
 
 /**
  * Auto-update hook: respect per-plugin toggle; global toggle overrides all when off.
@@ -278,120 +300,131 @@ add_action( 'wp_ajax_awdev_check_plugin', function () {
  * For AWDev-managed plugins not yet in the awdev_auto_updates option,
  * default to true so WP does not skip them due to a null/false return value.
  */
-add_filter( 'auto_update_plugin', function ( $update, $item ) {
-	$plugin_basename = $item->plugin ?? '';
-	if ( ! $plugin_basename ) {
-		return $update;
-	}
+add_filter(
+	'auto_update_plugin',
+	function ( $update, $item ) {
+		$plugin_basename = $item->plugin ?? '';
+		if ( ! $plugin_basename ) {
+			return $update;
+		}
 
-	$managed  = (array) get_option( 'awdev_managed_plugins', array() );
-	$built_in = awdev_built_in_plugins();
+		$managed  = (array) get_option( 'awdev_managed_plugins', array() );
+		$built_in = awdev_built_in_plugins();
 
-	$is_awdev = isset( $built_in[ $plugin_basename ] ) || isset( $managed[ $plugin_basename ] );
-	if ( ! $is_awdev ) {
-		return $update;
-	}
+		$is_awdev = isset( $built_in[ $plugin_basename ] ) || isset( $managed[ $plugin_basename ] );
+		if ( ! $is_awdev ) {
+			return $update;
+		}
 
-	// Global toggle off - never auto-update any AWDev plugin.
-	$global = (bool) get_option( 'awdev_auto_updates_global', true );
-	if ( ! $global ) {
-		return false;
-	}
+		// Global toggle off - never auto-update any AWDev plugin.
+		$global = (bool) get_option( 'awdev_auto_updates_global', true );
+		if ( ! $global ) {
+			return false;
+		}
 
-	// Per-plugin toggle: if explicitly set, honour it; otherwise default to true.
-	$auto_updates = (array) get_option( 'awdev_auto_updates', array() );
-	if ( isset( $auto_updates[ $plugin_basename ] ) ) {
-		return (bool) $auto_updates[ $plugin_basename ];
-	}
+		// Per-plugin toggle: if explicitly set, honour it; otherwise default to true.
+		$auto_updates = (array) get_option( 'awdev_auto_updates', array() );
+		if ( isset( $auto_updates[ $plugin_basename ] ) ) {
+			return (bool) $auto_updates[ $plugin_basename ];
+		}
 
-	return true;
-}, 10, 2 );
+		return true;
+	},
+	10,
+	2
+);
 
 /**
  * Enqueue settings page assets.
  * Passes all data needed by settings.js via wp_localize_script().
  */
-add_action( 'admin_enqueue_scripts', function ( $hook ) {
-	if ( $hook !== 'settings_page_' . AWDEV_SETTINGS_SLUG ) {
-		return;
+add_action(
+	'admin_enqueue_scripts',
+	function ( $hook ) {
+		if ( $hook !== 'settings_page_' . AWDEV_SETTINGS_SLUG ) {
+			return;
+		}
+
+		wp_enqueue_style(
+			'awdev-settings',
+			AWDEV_UPDATER_URL . 'assets/css/settings.css',
+			array(),
+			AWDEV_UPDATER_VERSION
+		);
+		// No jQuery dependency — settings.js uses only vanilla JS.
+		wp_enqueue_script(
+			'awdev-settings-js',
+			AWDEV_UPDATER_URL . 'assets/js/settings.js',
+			array(),
+			AWDEV_UPDATER_VERSION,
+			true
+		);
+
+		// Build per-plugin update nonces for the one-click Update button.
+		$built_in      = awdev_built_in_plugins();
+		$managed       = (array) get_option( 'awdev_managed_plugins', array() );
+		$update_nonces = array();
+
+		foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
+			$update_nonces[ $basename ] = wp_create_nonce( 'upgrade-plugin_' . $basename );
+		}
+
+		wp_localize_script(
+			'awdev-settings-js',
+			'awdevSettings',
+			array(
+				'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
+				'nonce'              => wp_create_nonce( 'awdev_toggle_auto_update' ),
+				'nonceRemoteVersion' => wp_create_nonce( 'awdev_get_remote_versions' ),
+				'nonceCheckPlugin'   => wp_create_nonce( 'awdev_check_plugin' ),
+				'updateBase'         => admin_url( 'update.php?action=upgrade-plugin' ),
+				'updateNonces'       => $update_nonces,
+				'i18n'               => array(
+					'update' => __( 'Update', 'awdev-plugins-updater' ),
+				),
+			)
+		);
 	}
-
-	wp_enqueue_style(
-		'awdev-settings',
-		AWDEV_UPDATER_URL . 'assets/css/settings.css',
-		array(),
-		AWDEV_UPDATER_VERSION
-	);
-	// No jQuery dependency — settings.js uses only vanilla JS.
-	wp_enqueue_script(
-		'awdev-settings-js',
-		AWDEV_UPDATER_URL . 'assets/js/settings.js',
-		array(),
-		AWDEV_UPDATER_VERSION,
-		true
-	);
-
-	// Build per-plugin update nonces for the one-click Update button.
-	$built_in      = awdev_built_in_plugins();
-	$managed       = (array) get_option( 'awdev_managed_plugins', array() );
-	$update_nonces = array();
-
-	foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
-		$update_nonces[ $basename ] = wp_create_nonce( 'upgrade-plugin_' . $basename );
-	}
-
-	wp_localize_script(
-		'awdev-settings-js',
-		'awdevSettings',
-		array(
-			'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
-			'nonce'              => wp_create_nonce( 'awdev_toggle_auto_update' ),
-			'nonceRemoteVersion' => wp_create_nonce( 'awdev_get_remote_versions' ),
-			'nonceCheckPlugin'   => wp_create_nonce( 'awdev_check_plugin' ),
-			'updateBase'         => admin_url( 'update.php?action=upgrade-plugin' ),
-			'updateNonces'       => $update_nonces,
-			'i18n'               => array(
-				'update' => __( 'Update', 'awdev-plugins-updater' ),
-			),
-		)
-	);
-} );
+);
 
 /**
  * Handle manual cache flush.
  */
-add_action( 'admin_post_awdev_flush_cache', function () {
-	if ( ! current_user_can( 'manage_options' ) ) {
-		wp_die( esc_html__( 'Not allowed.', 'awdev-plugins-updater' ) );
+add_action(
+	'admin_post_awdev_flush_cache',
+	function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			wp_die( esc_html__( 'Not allowed.', 'awdev-plugins-updater' ) );
+		}
+		check_admin_referer( 'awdev_flush_cache' );
+
+		global $wpdb;
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+				'_transient_awdev_upd_%'
+			)
+		);
+		$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
+			$wpdb->prepare(
+				"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
+				'_transient_timeout_awdev_upd_%'
+			)
+		);
+		delete_site_transient( 'update_plugins' );
+
+		wp_safe_redirect(
+			add_query_arg(
+				array(
+					'page'          => AWDEV_SETTINGS_SLUG,
+					'cache-flushed' => '1',
+				),
+				admin_url( 'options-general.php' )
+			)
+		);
+		exit;
 	}
-	check_admin_referer( 'awdev_flush_cache' );
-
-	global $wpdb;
-	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->prepare(
-			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
-			'_transient_awdev_upd_%'
-		)
-	);
-	$wpdb->query( // phpcs:ignore WordPress.DB.DirectDatabaseQuery.DirectQuery,WordPress.DB.DirectDatabaseQuery.NoCaching
-		$wpdb->prepare(
-			"DELETE FROM {$wpdb->options} WHERE option_name LIKE %s",
-			'_transient_timeout_awdev_upd_%'
-		)
-	);
-	delete_site_transient( 'update_plugins' );
-
-	wp_safe_redirect(
-		add_query_arg(
-			array(
-				'page'          => AWDEV_SETTINGS_SLUG,
-				'cache-flushed' => '1',
-			),
-			admin_url( 'options-general.php' )
-		)
-	);
-	exit;
-} );
+);
 
 /**
  * Resolve local installed version for a plugin basename.
@@ -439,7 +472,9 @@ function awdev_get_local_version( string $basename ): string {
  */
 function awdev_get_last_checked( string $dirname_slug ): string {
 	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
-	if ( $cache_hours < 1 ) { $cache_hours = 1; }
+	if ( $cache_hours < 1 ) {
+		$cache_hours = 1;
+	}
 	$key     = '_transient_timeout_awdev_upd_' . sanitize_key( $dirname_slug );
 	$timeout = (int) get_option( $key, 0 );
 	if ( ! $timeout ) {
@@ -525,7 +560,9 @@ function awdev_render_settings_page(): void {
 	$auto_updates = (array) get_option( 'awdev_auto_updates', array() );
 	$global_auto  = get_option( 'awdev_auto_updates_global', true );
 	$cache_hours  = (int) get_option( 'awdev_cache_hours', 6 );
-	if ( $cache_hours < 1 ) { $cache_hours = 1; }
+	if ( $cache_hours < 1 ) {
+		$cache_hours = 1;
+	}
 
 	// Build statuses: built-in first, then managed-only (skip duplicates).
 	$statuses = array();
@@ -630,7 +667,7 @@ function awdev_render_settings_page(): void {
 							max="168"
 							step="1"
 							class="small-text"
-					/>
+						/>
 						<span class="description"><?php esc_html_e( 'Min: 1h - Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
 					</div>
 
