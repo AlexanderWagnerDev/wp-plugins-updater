@@ -48,7 +48,7 @@ function awdev_fetch_api_data( string $transient_key, string $api_url ): ?object
 		return $cached ? $cached : null;
 	}
 
-	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
+	$cache_hours = (int) get_option( 'awdev_cache_hours', 1 );
 	if ( $cache_hours < 1 ) {
 		$cache_hours = 1;
 	}
@@ -104,7 +104,7 @@ function awdev_activate(): void {
 	awdev_sync_auto_update_defaults();
 
 	if ( get_option( 'awdev_cache_hours' ) === false ) {
-		update_option( 'awdev_cache_hours', 6 );
+		update_option( 'awdev_cache_hours', 1 );
 	}
 
 	if ( get_option( 'awdev_auto_updates_global' ) === false ) {
@@ -169,7 +169,7 @@ add_action(
 		$global = isset( $_POST['awdev_auto_updates_global'] );
 		update_option( 'awdev_auto_updates_global', $global );
 
-		$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? absint( wp_unslash( $_POST['awdev_cache_hours'] ) ) : 6;
+		$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? absint( wp_unslash( $_POST['awdev_cache_hours'] ) ) : 1;
 		if ( $cache_hours < 1 ) {
 			$cache_hours = 1;
 		}
@@ -482,7 +482,7 @@ function awdev_get_local_version( string $basename ): string {
  * @return string              Human-readable time since last check.
  */
 function awdev_get_last_checked( string $dirname_slug ): string {
-	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
+	$cache_hours = (int) get_option( 'awdev_cache_hours', 1 );
 	if ( $cache_hours < 1 ) {
 		$cache_hours = 1;
 	}
@@ -614,7 +614,7 @@ function awdev_render_settings_page(): void {
 					<h1 class="awdev-page-title"><?php esc_html_e( 'AWDev Plugins Updater', 'awdev-plugins-updater' ); ?></h1>
 					<p class="awdev-page-subtitle">
 						<?php esc_html_e( 'Updater for AlexanderWagnerDev plugins', 'awdev-plugins-updater' ); ?>
-						&mdash; v<?php echo esc_html( AWDEV_UPDATER_VERSION ); ?>
+						 — <?php echo esc_html( AWDEV_UPDATER_VERSION ); ?>
 					</p>
 				</div>
 			</div>
