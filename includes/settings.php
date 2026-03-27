@@ -679,7 +679,7 @@ function awdev_render_settings_page(): void {
 							step="1"
 							class="small-text"
 						/>
-						<span class="description"><?php esc_html_e( 'Min: 1h - Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
+						<span class="description"><?php esc_html_e( 'Min: 1h - Max: 168h (7 days). Default: 1h.', 'awdev-plugins-updater' ); ?></span>
 					</div>
 
 					<div class="awdev-submit-row">
