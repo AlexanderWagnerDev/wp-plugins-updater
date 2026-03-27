@@ -62,8 +62,8 @@ msgid "Check interval (hours)"
 msgstr "Prüfintervall (Stunden)"
 
 #: includes/settings.php
-msgid "Min: 1h - Max: 168h (7 days). Default: 6h."
-msgstr "Min: 1h - Max: 168h (7 Tage). Standard: 6h."
+msgid "Min: 1h - Max: 168h (7 days). Default: 1h."
+msgstr "Min: 1h - Max: 168h (7 Tage). Standard: 1h."
 
 #: includes/settings.php
 msgid "Managed Plugins"
