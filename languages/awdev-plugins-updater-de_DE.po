@@ -27,7 +27,7 @@ msgstr "AWDev Plugins Updater"
 
 #: includes/settings.php
 msgid "Updater for AlexanderWagnerDev plugins"
-msgstr "Updater fuer AlexanderWagnerDev Plugins"
+msgstr "Updater für AlexanderWagnerDev Plugins"
 
 #: includes/settings.php
 msgid "Active"
@@ -39,7 +39,7 @@ msgstr "Update-Cache geleert."
 
 #: includes/settings.php
 msgid "Plugin cache cleared. WordPress will re-check on next load."
-msgstr "Plugin-Cache geleert. WordPress prueft beim naechsten Laden erneut."
+msgstr "Plugin-Cache geleert. WordPress prüft beim nächsten Laden erneut."
 
 #: includes/settings.php
 msgid "Settings saved."
@@ -51,7 +51,7 @@ msgstr "Auto-Update Einstellungen"
 
 #: includes/settings.php
 msgid "Configure how often the updater checks for new plugin versions."
-msgstr "Legt fest, wie oft der Updater auf neue Plugin-Versionen prueft."
+msgstr "Legt fest, wie oft der Updater auf neue Plugin-Versionen prüft."
 
 #: includes/settings.php
 msgid "Auto-Update (all plugins)"
@@ -59,7 +59,7 @@ msgstr "Auto-Update (alle Plugins)"
 
 #: includes/settings.php
 msgid "Check interval (hours)"
-msgstr "Pruefintervall (Stunden)"
+msgstr "Prüfintervall (Stunden)"
 
 #: includes/settings.php
 msgid "Min: 1h - Max: 168h (7 days). Default: 6h."
@@ -103,7 +103,7 @@ msgstr "AWDev"
 
 #: includes/settings.php
 msgid "Re-check update"
-msgstr "Update erneut pruefen"
+msgstr "Update erneut prüfen"
 
 #: includes/settings.php
 msgid "Update"
@@ -127,7 +127,7 @@ msgstr "Cache-Verwaltung"
 #: includes/settings.php
 #. translators: %d: cache duration in hours
 msgid "Update data is cached for %d hour(s) per plugin. Flush the cache to force an immediate re-check."
-msgstr "Update-Daten werden %d Stunde(n) pro Plugin gecacht. Cache leeren, um eine sofortige Neupruefung zu erzwingen."
+msgstr "Update-Daten werden %d Stunde(n) pro Plugin gecacht. Cache leeren, um eine sofortige Neuprüfung zu erzwingen."
 
 #: includes/settings.php
 msgid "Flush Update Cache"
