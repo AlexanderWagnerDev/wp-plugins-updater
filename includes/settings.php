@@ -13,7 +13,7 @@ define( 'AWDEV_SETTINGS_SLUG', 'awdev-plugins-updater' );
 
 /**
  * Single source of truth for all built-in AWDev plugins.
- * Add new plugins here only — every other place reads from this function.
+ * Add new plugins here only -- every other place reads from this function.
  *
  * @return array<string, array{name: string, api_slug: string}>
  */
@@ -82,7 +82,7 @@ function awdev_fetch_api_data( string $transient_key, string $api_url ): ?object
 /**
  * Lightweight helper to fetch a single plugin's remote version string.
  *
- * Uses awdev_fetch_api_data() — no WP update filters are registered.
+ * Uses awdev_fetch_api_data() -- no WP update filters are registered.
  * Safe to call in AJAX or admin contexts.
  *
  * @param string $basename   Plugin basename (folder/file.php).
@@ -213,7 +213,12 @@ add_action(
 		$auto_updates[ $basename ] = $enabled;
 		update_option( 'awdev_auto_updates', $auto_updates );
 
-		wp_send_json_success( array( 'basename' => $basename, 'enabled' => $enabled ) );
+		wp_send_json_success(
+			array(
+				'basename' => $basename,
+				'enabled'  => $enabled,
+			)
+		);
 	}
 );
 
@@ -245,7 +250,7 @@ add_action(
 /**
  * AJAX: fetch remote versions for all managed plugins in one request.
  * Returns a map of dirname_slug => version string (or '?' on failure).
- * Uses awdev_fetch_remote_version() — no WP update filters are registered.
+ * Uses awdev_fetch_remote_version() -- no WP update filters are registered.
  */
 add_action(
 	'wp_ajax_awdev_get_remote_versions',
@@ -341,7 +346,7 @@ add_filter(
 add_action(
 	'admin_enqueue_scripts',
 	function ( $hook ) {
-		if ( $hook !== 'settings_page_' . AWDEV_SETTINGS_SLUG ) {
+		if ( 'settings_page_' . AWDEV_SETTINGS_SLUG !== $hook ) {
 			return;
 		}
 
@@ -351,7 +356,7 @@ add_action(
 			array(),
 			AWDEV_UPDATER_VERSION
 		);
-		// No jQuery dependency — settings.js uses only vanilla JS.
+		// No jQuery dependency -- settings.js uses only vanilla JS.
 		wp_enqueue_script(
 			'awdev-settings-js',
 			AWDEV_UPDATER_URL . 'assets/js/settings.js',
@@ -435,6 +440,9 @@ add_action(
  * object cache, so avoiding repeated calls keeps the settings page fast.
  *
  * Returns '?' when the plugin is not found.
+ *
+ * @param string $basename Plugin basename (folder/file.php).
+ * @return string          Installed version string, or '?' when not found.
  */
 function awdev_get_local_version( string $basename ): string {
 	if ( ! function_exists( 'get_plugins' ) ) {
@@ -469,6 +477,9 @@ function awdev_get_local_version( string $basename ): string {
 
 /**
  * Return human-readable "last checked" time from the transient timeout.
+ *
+ * @param string $dirname_slug Sanitized plugin directory slug.
+ * @return string              Human-readable time since last check.
  */
 function awdev_get_last_checked( string $dirname_slug ): string {
 	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
@@ -704,12 +715,15 @@ function awdev_render_settings_page(): void {
 							<?php awdev_render_plugin_row( $basename, $info['name'], $statuses[ $basename ], 'awdev-badge-builtin' ); ?>
 						<?php endforeach; ?>
 
-						<?php foreach ( $managed as $basename => $slug ) :
-							if ( isset( $built_in[ $basename ] ) ) { continue; }
+						<?php
+						foreach ( $managed as $basename => $slug ) {
+							if ( isset( $built_in[ $basename ] ) ) {
+								continue;
+							}
 							$plugin_name = sanitize_text_field( dirname( $basename ) );
+							awdev_render_plugin_row( $basename, $plugin_name, $statuses[ $basename ], 'awdev-badge-custom' );
+						}
 						?>
-							<?php awdev_render_plugin_row( $basename, $plugin_name, $statuses[ $basename ], 'awdev-badge-custom' ); ?>
-						<?php endforeach; ?>
 					</tbody>
 				</table>
 			</div>
