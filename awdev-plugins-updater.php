@@ -11,7 +11,7 @@
  * Author URI: https://alexanderwagnerdev.com
  * License: GPLv2 or later
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
- * Text Domain: awdev-plugins-updater-dev
+ * Text Domain: awdev-plugins-updater
  * Domain Path: /languages
  *
  * @package AWDev_Updater
