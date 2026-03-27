@@ -1,4 +1,9 @@
 <?php
+/**
+ * AWDev Updater class.
+ *
+ * @package AWDev_Updater
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -9,18 +14,44 @@ if ( ! defined( 'ABSPATH' ) ) {
  */
 class AWDev_Updater {
 
+	/**
+	 * Plugin basename (e.g. plugin-folder/plugin-file.php).
+	 *
+	 * @var string
+	 */
 	private string $plugin_basename;
+
+	/**
+	 * Plugin slug derived from the basename directory name.
+	 *
+	 * @var string
+	 */
 	private string $plugin_slug;
+
+	/**
+	 * URL of the AWDev update API endpoint for this plugin.
+	 *
+	 * @var string
+	 */
 	private string $api_url;
 
+	/**
+	 * Constructor.
+	 *
+	 * Registers WordPress filters for update checking, plugin info,
+	 * and folder name correction after installation.
+	 *
+	 * @param string $plugin_basename Plugin basename (folder/file.php).
+	 * @param string $api_url         URL of the AWDev update API endpoint.
+	 */
 	public function __construct( string $plugin_basename, string $api_url ) {
 		$this->plugin_basename = $plugin_basename;
 		$this->plugin_slug     = dirname( $plugin_basename );
 		$this->api_url         = $api_url;
 
-		add_filter( 'pre_set_site_transient_update_plugins', [ $this, 'check_update' ] );
-		add_filter( 'plugins_api', [ $this, 'plugin_info' ], 10, 3 );
-		add_filter( 'upgrader_source_selection', [ $this, 'fix_folder_name' ], 10, 4 );
+		add_filter( 'pre_set_site_transient_update_plugins', array( $this, 'check_update' ) );
+		add_filter( 'plugins_api', array( $this, 'plugin_info' ), 10, 3 );
+		add_filter( 'upgrader_source_selection', array( $this, 'fix_folder_name' ), 10, 4 );
 	}
 
 	/**
@@ -34,6 +65,9 @@ class AWDev_Updater {
 
 	/**
 	 * Inject update data into the WordPress plugin update transient.
+	 *
+	 * @param object $transient The plugin update transient object.
+	 * @return object The (possibly modified) transient object.
 	 */
 	public function check_update( object $transient ): object {
 		if ( empty( $transient->checked ) ) {
@@ -45,13 +79,13 @@ class AWDev_Updater {
 
 		// Guard against incomplete API responses that are missing the version field.
 		if ( $data && isset( $data->version ) && version_compare( $data->version, $current, '>' ) ) {
-			$transient->response[ $this->plugin_basename ] = (object) [
+			$transient->response[ $this->plugin_basename ] = (object) array(
 				'slug'        => $this->plugin_slug,
 				'plugin'      => $this->plugin_basename,
 				'new_version' => $data->version,
 				'url'         => $data->details_url  ?? '',
 				'package'     => $data->download_url ?? '',
-			];
+			);
 		}
 
 		return $transient;
@@ -75,18 +109,18 @@ class AWDev_Updater {
 			? esc_html( $data->author )
 			: '<a href="https://alexanderwagnerdev.com">AlexanderWagnerDev</a>';
 
-		return (object) [
+		return (object) array(
 			'name'          => $data->name         ?? $this->plugin_slug,
 			'slug'          => $this->plugin_slug,
 			'version'       => $data->version,
 			'author'        => $author,
 			'homepage'      => $data->details_url  ?? '',
-			'sections'      => [ 'changelog' => $data->changelog ?? '' ],
+			'sections'      => array( 'changelog' => $data->changelog ?? '' ),
 			'download_link' => $data->download_url ?? '',
 			'requires'      => $data->requires     ?? '6.0',
 			'tested'        => $data->tested       ?? '6.9',
 			'requires_php'  => $data->requires_php ?? '7.4',
-		];
+		);
 	}
 
 	/**
