@@ -1,4 +1,9 @@
 <?php
+/**
+ * AWDev Updater settings, helpers and AJAX handlers.
+ *
+ * @package AWDev_Updater
+ */
 
 if ( ! defined( 'ABSPATH' ) ) {
 	exit;
@@ -13,16 +18,16 @@ define( 'AWDEV_SETTINGS_SLUG', 'awdev-plugins-updater' );
  * @return array<string, array{name: string, api_slug: string}>
  */
 function awdev_built_in_plugins(): array {
-	return [
-		'awdev-plugins-updater/awdev-plugins-updater.php'  => [
+	return array(
+		'awdev-plugins-updater/awdev-plugins-updater.php'  => array(
 			'name'     => 'AWDev Plugins Updater',
 			'api_slug' => 'awdev-plugins-updater',
-		],
-		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => [
+		),
+		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => array(
 			'name'     => 'DarkAdmin - Dark Mode for Adminpanel',
 			'api_slug' => 'darkadmin-dark-mode-for-adminpanel',
-		],
-	];
+		),
+	);
 }
 
 /**
@@ -39,8 +44,8 @@ function awdev_built_in_plugins(): array {
 function awdev_fetch_api_data( string $transient_key, string $api_url ): ?object {
 	$cached = get_transient( $transient_key );
 
-	if ( $cached !== false ) {
-		return $cached ?: null;
+	if ( false !== $cached ) {
+		return $cached ? $cached : null;
 	}
 
 	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
@@ -48,10 +53,13 @@ function awdev_fetch_api_data( string $transient_key, string $api_url ): ?object
 		$cache_hours = 1;
 	}
 
-	$response = wp_remote_get( $api_url, [
-		'timeout'    => 10,
-		'user-agent' => 'AWDev-Plugin-Updater/' . AWDEV_UPDATER_VERSION . '; ' . get_bloginfo( 'url' ),
-	] );
+	$response = wp_remote_get(
+		$api_url,
+		array(
+			'timeout'    => 10,
+			'user-agent' => 'AWDev-Plugin-Updater/' . AWDEV_UPDATER_VERSION . '; ' . get_bloginfo( 'url' ),
+		)
+	);
 
 	if ( is_wp_error( $response ) || wp_remote_retrieve_response_code( $response ) !== 200 ) {
 		set_transient( $transient_key, false, $cache_hours * HOUR_IN_SECONDS );
@@ -61,7 +69,7 @@ function awdev_fetch_api_data( string $transient_key, string $api_url ): ?object
 	$data = json_decode( wp_remote_retrieve_body( $response ) );
 
 	// Treat invalid JSON or a null body as a failed response.
-	if ( json_last_error() !== JSON_ERROR_NONE || $data === null ) {
+	if ( json_last_error() !== JSON_ERROR_NONE || null === $data ) {
 		set_transient( $transient_key, false, $cache_hours * HOUR_IN_SECONDS );
 		return null;
 	}
@@ -113,7 +121,7 @@ function awdev_activate(): void {
  * Existing entries are never overwritten.
  */
 function awdev_sync_auto_update_defaults(): void {
-	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
+	$auto_updates = (array) get_option( 'awdev_auto_updates', array() );
 	$changed      = false;
 
 	foreach ( array_keys( awdev_built_in_plugins() ) as $basename ) {
@@ -161,10 +169,15 @@ add_action( 'admin_post_awdev_save_settings', function () {
 	if ( $cache_hours > 168 ) { $cache_hours = 168; }
 	update_option( 'awdev_cache_hours', $cache_hours );
 
-	wp_safe_redirect( add_query_arg(
-		[ 'page' => AWDEV_SETTINGS_SLUG, 'settings-updated' => '1' ],
-		admin_url( 'options-general.php' )
-	) );
+	wp_safe_redirect(
+		add_query_arg(
+			array(
+				'page'             => AWDEV_SETTINGS_SLUG,
+				'settings-updated' => '1',
+			),
+			admin_url( 'options-general.php' )
+		)
+	);
 	exit;
 } );
 
@@ -184,11 +197,11 @@ add_action( 'wp_ajax_awdev_toggle_auto_update', function () {
 		wp_send_json_error( 'missing_basename', 400 );
 	}
 
-	$auto_updates              = (array) get_option( 'awdev_auto_updates', [] );
+	$auto_updates              = (array) get_option( 'awdev_auto_updates', array() );
 	$auto_updates[ $basename ] = $enabled;
 	update_option( 'awdev_auto_updates', $auto_updates );
 
-	wp_send_json_success( [ 'basename' => $basename, 'enabled' => $enabled ] );
+	wp_send_json_success( array( 'basename' => $basename, 'enabled' => $enabled ) );
 } );
 
 /**
@@ -204,13 +217,13 @@ add_action( 'wp_ajax_awdev_toggle_global_auto_update', function () {
 
 	update_option( 'awdev_auto_updates_global', $enabled );
 
-	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
+	$auto_updates = (array) get_option( 'awdev_auto_updates', array() );
 	foreach ( $auto_updates as $basename => $_ ) {
 		$auto_updates[ $basename ] = $enabled;
 	}
 	update_option( 'awdev_auto_updates', $auto_updates );
 
-	wp_send_json_success( [ 'enabled' => $enabled ] );
+	wp_send_json_success( array( 'enabled' => $enabled ) );
 } );
 
 /**
@@ -225,8 +238,8 @@ add_action( 'wp_ajax_awdev_get_remote_versions', function () {
 	check_ajax_referer( 'awdev_get_remote_versions' );
 
 	$built_in = awdev_built_in_plugins();
-	$managed  = (array) get_option( 'awdev_managed_plugins', [] );
-	$versions = [];
+	$managed  = (array) get_option( 'awdev_managed_plugins', array() );
+	$versions = array();
 
 	foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
 		$dirname_slug = sanitize_key( dirname( $basename ) );
@@ -256,7 +269,7 @@ add_action( 'wp_ajax_awdev_check_plugin', function () {
 	delete_transient( 'awdev_upd_' . $dirname_slug );
 	delete_site_transient( 'update_plugins' );
 
-	wp_send_json_success( [ 'cleared' => $dirname_slug ] );
+	wp_send_json_success( array( 'cleared' => $dirname_slug ) );
 } );
 
 /**
@@ -271,7 +284,7 @@ add_filter( 'auto_update_plugin', function ( $update, $item ) {
 		return $update;
 	}
 
-	$managed  = (array) get_option( 'awdev_managed_plugins', [] );
+	$managed  = (array) get_option( 'awdev_managed_plugins', array() );
 	$built_in = awdev_built_in_plugins();
 
 	$is_awdev = isset( $built_in[ $plugin_basename ] ) || isset( $managed[ $plugin_basename ] );
@@ -286,7 +299,7 @@ add_filter( 'auto_update_plugin', function ( $update, $item ) {
 	}
 
 	// Per-plugin toggle: if explicitly set, honour it; otherwise default to true.
-	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
+	$auto_updates = (array) get_option( 'awdev_auto_updates', array() );
 	if ( isset( $auto_updates[ $plugin_basename ] ) ) {
 		return (bool) $auto_updates[ $plugin_basename ];
 	}
@@ -306,38 +319,42 @@ add_action( 'admin_enqueue_scripts', function ( $hook ) {
 	wp_enqueue_style(
 		'awdev-settings',
 		AWDEV_UPDATER_URL . 'assets/css/settings.css',
-		[],
+		array(),
 		AWDEV_UPDATER_VERSION
 	);
 	// No jQuery dependency — settings.js uses only vanilla JS.
 	wp_enqueue_script(
 		'awdev-settings-js',
 		AWDEV_UPDATER_URL . 'assets/js/settings.js',
-		[],
+		array(),
 		AWDEV_UPDATER_VERSION,
 		true
 	);
 
 	// Build per-plugin update nonces for the one-click Update button.
 	$built_in      = awdev_built_in_plugins();
-	$managed       = (array) get_option( 'awdev_managed_plugins', [] );
-	$update_nonces = [];
+	$managed       = (array) get_option( 'awdev_managed_plugins', array() );
+	$update_nonces = array();
 
 	foreach ( array_merge( array_keys( $built_in ), array_keys( $managed ) ) as $basename ) {
 		$update_nonces[ $basename ] = wp_create_nonce( 'upgrade-plugin_' . $basename );
 	}
 
-	wp_localize_script( 'awdev-settings-js', 'awdevSettings', [
-		'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
-		'nonce'              => wp_create_nonce( 'awdev_toggle_auto_update' ),
-		'nonceRemoteVersion' => wp_create_nonce( 'awdev_get_remote_versions' ),
-		'nonceCheckPlugin'   => wp_create_nonce( 'awdev_check_plugin' ),
-		'updateBase'         => admin_url( 'update.php?action=upgrade-plugin' ),
-		'updateNonces'       => $update_nonces,
-		'i18n'               => [
-			'update' => __( 'Update', 'awdev-plugins-updater' ),
-		],
-	] );
+	wp_localize_script(
+		'awdev-settings-js',
+		'awdevSettings',
+		array(
+			'ajaxUrl'            => admin_url( 'admin-ajax.php' ),
+			'nonce'              => wp_create_nonce( 'awdev_toggle_auto_update' ),
+			'nonceRemoteVersion' => wp_create_nonce( 'awdev_get_remote_versions' ),
+			'nonceCheckPlugin'   => wp_create_nonce( 'awdev_check_plugin' ),
+			'updateBase'         => admin_url( 'update.php?action=upgrade-plugin' ),
+			'updateNonces'       => $update_nonces,
+			'i18n'               => array(
+				'update' => __( 'Update', 'awdev-plugins-updater' ),
+			),
+		)
+	);
 } );
 
 /**
@@ -364,7 +381,15 @@ add_action( 'admin_post_awdev_flush_cache', function () {
 	);
 	delete_site_transient( 'update_plugins' );
 
-	wp_safe_redirect( add_query_arg( [ 'page' => AWDEV_SETTINGS_SLUG, 'cache-flushed' => '1' ], admin_url( 'options-general.php' ) ) );
+	wp_safe_redirect(
+		add_query_arg(
+			array(
+				'page'         => AWDEV_SETTINGS_SLUG,
+				'cache-flushed' => '1',
+			),
+			admin_url( 'options-general.php' )
+		)
+	);
 	exit;
 } );
 
@@ -496,23 +521,23 @@ function awdev_render_settings_page(): void {
 	}
 
 	$built_in     = awdev_built_in_plugins();
-	$managed      = (array) get_option( 'awdev_managed_plugins', [] );
-	$auto_updates = (array) get_option( 'awdev_auto_updates', [] );
+	$managed      = (array) get_option( 'awdev_managed_plugins', array() );
+	$auto_updates = (array) get_option( 'awdev_auto_updates', array() );
 	$global_auto  = get_option( 'awdev_auto_updates_global', true );
 	$cache_hours  = (int) get_option( 'awdev_cache_hours', 6 );
 	if ( $cache_hours < 1 ) { $cache_hours = 1; }
 
 	// Build statuses: built-in first, then managed-only (skip duplicates).
-	$statuses = [];
+	$statuses = array();
 
 	foreach ( $built_in as $basename => $_ ) {
 		$dirname_slug          = sanitize_key( dirname( $basename ) );
-		$statuses[ $basename ] = [
+		$statuses[ $basename ] = array(
 			'dirname_slug'  => $dirname_slug,
 			'local_version' => awdev_get_local_version( $basename ),
 			'last_checked'  => awdev_get_last_checked( $dirname_slug ),
 			'auto_update'   => $auto_updates[ $basename ] ?? true,
-		];
+		);
 	}
 
 	foreach ( $managed as $basename => $_ ) {
@@ -520,12 +545,12 @@ function awdev_render_settings_page(): void {
 			continue;
 		}
 		$dirname_slug          = sanitize_key( dirname( $basename ) );
-		$statuses[ $basename ] = [
+		$statuses[ $basename ] = array(
 			'dirname_slug'  => $dirname_slug,
 			'local_version' => awdev_get_local_version( $basename ),
 			'last_checked'  => awdev_get_last_checked( $dirname_slug ),
 			'auto_update'   => $auto_updates[ $basename ] ?? true,
-		];
+		);
 	}
 
 	// Read-only GET flags - no nonce needed (no state change).
