@@ -13,6 +13,8 @@
  * License URI: https://www.gnu.org/licenses/gpl-2.0.html
  * Text Domain: awdev-plugins-updater
  * Domain Path: /languages
+ *
+ * @package AWDev_Updater
  */
 
 if ( ! defined( 'ABSPATH' ) ) {
@@ -31,18 +33,21 @@ define( 'AWDEV_UPDATE_SERVER', 'https://wp-plugins-updates.awdev.space/api' );
  *
  * @var AWDev_Updater[]
  */
-$awdev_updaters = [];
+$awdev_updaters = array();
 
 /**
  * Load plugin text domain for translations.
  */
-add_action( 'init', function () {
-	load_plugin_textdomain(
-		'awdev-plugins-updater',
-		false,
-		dirname( plugin_basename( __FILE__ ) ) . '/languages'
-	);
-} );
+add_action(
+	'init',
+	function () {
+		load_plugin_textdomain(
+			'awdev-plugins-updater',
+			false,
+			dirname( plugin_basename( __FILE__ ) ) . '/languages'
+		);
+	}
+);
 
 require_once AWDEV_UPDATER_PATH . 'includes/class-awdev-updater.php';
 require_once AWDEV_UPDATER_PATH . 'includes/settings.php';
@@ -59,34 +64,41 @@ register_activation_hook( __FILE__, 'awdev_activate' );
  * Priority 20 ensures all other plugins are fully loaded before registering
  * update filters, avoiding any hook order conflicts.
  */
-add_action( 'plugins_loaded', function () {
-	global $awdev_updaters;
+add_action(
+	'plugins_loaded',
+	function () {
+		global $awdev_updaters;
 
-	$managed  = (array) get_option( 'awdev_managed_plugins', [] );
-	$built_in = awdev_built_in_plugins();
+		$managed  = (array) get_option( 'awdev_managed_plugins', array() );
+		$built_in = awdev_built_in_plugins();
 
-	foreach ( $built_in as $basename => $info ) {
-		$awdev_updaters[ $basename ] = new AWDev_Updater(
-			$basename,
-			AWDEV_UPDATE_SERVER . '/' . $info['api_slug'] . '.php'
-		);
-	}
-
-	foreach ( $managed as $basename => $api_slug ) {
-		if ( ! isset( $built_in[ $basename ] ) ) {
+		foreach ( $built_in as $basename => $info ) {
 			$awdev_updaters[ $basename ] = new AWDev_Updater(
 				$basename,
-				AWDEV_UPDATE_SERVER . '/' . sanitize_key( $api_slug ) . '.php'
+				AWDEV_UPDATE_SERVER . '/' . $info['api_slug'] . '.php'
 			);
 		}
-	}
-}, 20 );
+
+		foreach ( $managed as $basename => $api_slug ) {
+			if ( ! isset( $built_in[ $basename ] ) ) {
+				$awdev_updaters[ $basename ] = new AWDev_Updater(
+					$basename,
+					AWDEV_UPDATE_SERVER . '/' . sanitize_key( $api_slug ) . '.php'
+				);
+			}
+		}
+	},
+	20
+);
 
 /**
  * Add settings link in the Plugins list.
  */
-add_filter( 'plugin_action_links_' . plugin_basename( __FILE__ ), function ( $actions ) {
-	$url                 = admin_url( 'options-general.php?page=awdev-plugins-updater' );
-	$actions['settings'] = '<a href="' . esc_url( $url ) . '">' . __( 'Settings', 'awdev-plugins-updater' ) . '</a>';
-	return $actions;
-} );
+add_filter(
+	'plugin_action_links_' . plugin_basename( __FILE__ ),
+	function ( $actions ) {
+		$url                 = admin_url( 'options-general.php?page=awdev-plugins-updater' );
+		$actions['settings'] = '<a href="' . esc_url( $url ) . '">' . __( 'Settings', 'awdev-plugins-updater' ) . '</a>';
+		return $actions;
+	}
+);
