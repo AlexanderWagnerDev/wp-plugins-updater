@@ -19,13 +19,13 @@ define( 'AWDEV_SETTINGS_SLUG', 'awdev-plugins-updater' );
  */
 function awdev_built_in_plugins(): array {
 	return array(
-		'awdev-plugins-updater-dev/awdev-plugins-updater.php'  => array(
+		'awdev-plugins-updater/awdev-plugins-updater.php'  => array(
 			'name'     => 'AWDev Plugins Updater',
-			'api_slug' => 'awdev-plugins-updater-dev',
+			'api_slug' => 'awdev-plugins-updater',
 		),
-		'darkadmin-dark-mode-for-adminpanel-dev/darkadmin.php' => array(
+		'darkadmin-dark-mode-for-adminpanel/darkadmin.php' => array(
 			'name'     => 'DarkAdmin - Dark Mode for Adminpanel',
-			'api_slug' => 'darkadmin-dark-mode-for-adminpanel-dev',
+			'api_slug' => 'darkadmin-dark-mode-for-adminpanel',
 		),
 	);
 }
