@@ -83,7 +83,7 @@ class AWDev_Updater {
 				'slug'        => $this->plugin_slug,
 				'plugin'      => $this->plugin_basename,
 				'new_version' => $data->version,
-				'url'         => $data->details_url  ?? '',
+				'url'         => $data->details_url ?? '',
 				'package'     => $data->download_url ?? '',
 			);
 		}
@@ -93,9 +93,14 @@ class AWDev_Updater {
 
 	/**
 	 * Provide plugin details for the "View version details" popup.
+	 *
+	 * @param mixed  $result The current result from plugins_api.
+	 * @param string $action The API action being performed.
+	 * @param object $args   Arguments for the API request.
+	 * @return mixed Plugin info object or the original $result.
 	 */
 	public function plugin_info( mixed $result, string $action, object $args ): mixed {
-		if ( $action !== 'plugin_information' || ( $args->slug ?? '' ) !== $this->plugin_slug ) {
+		if ( 'plugin_information' !== $action || ( $args->slug ?? '' ) !== $this->plugin_slug ) {
 			return $result;
 		}
 
@@ -110,15 +115,15 @@ class AWDev_Updater {
 			: '<a href="https://alexanderwagnerdev.com">AlexanderWagnerDev</a>';
 
 		return (object) array(
-			'name'          => $data->name         ?? $this->plugin_slug,
+			'name'          => $data->name ?? $this->plugin_slug,
 			'slug'          => $this->plugin_slug,
 			'version'       => $data->version,
 			'author'        => $author,
-			'homepage'      => $data->details_url  ?? '',
+			'homepage'      => $data->details_url ?? '',
 			'sections'      => array( 'changelog' => $data->changelog ?? '' ),
 			'download_link' => $data->download_url ?? '',
-			'requires'      => $data->requires     ?? '6.0',
-			'tested'        => $data->tested       ?? '6.9',
+			'requires'      => $data->requires ?? '6.0',
+			'tested'        => $data->tested ?? '6.9',
 			'requires_php'  => $data->requires_php ?? '7.4',
 		);
 	}
@@ -136,6 +141,12 @@ class AWDev_Updater {
 	 *    partial slug overlap.
 	 *
 	 * Uses WP_Filesystem to avoid direct rename() call.
+	 *
+	 * @param string $source        Path to the extracted source folder.
+	 * @param string $remote_source Path to the remote/temp extraction directory.
+	 * @param object $upgrader      WP_Upgrader instance.
+	 * @param array  $hook_extra    Extra data passed by the upgrader hook.
+	 * @return string Corrected or original source path.
 	 */
 	public function fix_folder_name( string $source, string $remote_source, object $upgrader, array $hook_extra ): string {
 		// Resolve the correct target path. Two ZIP structures are possible:

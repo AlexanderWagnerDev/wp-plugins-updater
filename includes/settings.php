@@ -384,7 +384,7 @@ add_action( 'admin_post_awdev_flush_cache', function () {
 	wp_safe_redirect(
 		add_query_arg(
 			array(
-				'page'         => AWDEV_SETTINGS_SLUG,
+				'page'          => AWDEV_SETTINGS_SLUG,
 				'cache-flushed' => '1',
 			),
 			admin_url( 'options-general.php' )
