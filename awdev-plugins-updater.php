@@ -3,7 +3,7 @@
  * Plugin Name: AWDev Plugins Updater
  * Plugin URI: https://github.com/AlexanderWagnerDev/wp-plugins-updater
  * Description: Keeps AlexanderWagnerDev plugins up to date - without WordPress.org.
- * Version: dev2026032702
+ * Version: dev2026032901
  * Requires at least: 6.3
  * Tested up to: 7.0
  * Requires PHP: 7.4
@@ -21,7 +21,7 @@ if ( ! defined( 'ABSPATH' ) ) {
 	exit;
 }
 
-define( 'AWDEV_UPDATER_VERSION', 'dev2026032702' );
+define( 'AWDEV_UPDATER_VERSION', 'dev2026032901' );
 define( 'AWDEV_UPDATER_URL', plugin_dir_url( __FILE__ ) );
 define( 'AWDEV_UPDATER_PATH', plugin_dir_path( __FILE__ ) );
 define( 'AWDEV_UPDATE_SERVER', 'https://wp-plugins-updates-dev.awdev.space/api' );
