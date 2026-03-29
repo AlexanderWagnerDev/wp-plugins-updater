@@ -198,20 +198,35 @@ add_action(
 );
 
 /**
- * Show admin notice after settings have been saved (WP standard pattern).
- * options.php sets ?settings-updated=true on redirect; we read it here.
+ * Show admin notice after settings have been saved.
+ *
+ * options.php redirects back with ?settings-updated=true&_wpnonce=<nonce>
+ * after a successful save. The nonce action is '{option_group}-options',
+ * i.e. 'awdev_settings-options' -- the same value settings_fields() emits.
+ * Verifying it here ensures the notice is only shown after a genuine save
+ * and not when someone manually crafts the URL.
  */
 add_action(
 	'admin_notices',
 	function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
 		$screen = get_current_screen();
 		if ( ! $screen || 'settings_page_' . AWDEV_SETTINGS_SLUG !== $screen->id ) {
 			return;
 		}
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display flag set by options.php
-		if ( ! isset( $_GET['settings-updated'] ) ) {
+
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'awdev_settings-options' ) ) {
 			return;
 		}
+
+		if ( empty( sanitize_key( wp_unslash( $_GET['settings-updated'] ?? '' ) ) ) ) {
+			return;
+		}
+
 		echo '<div class="notice notice-success is-dismissible"><p>'
 			. '<span aria-hidden="true">&#10003;</span> '
 			. esc_html__( 'Settings saved.', 'awdev-plugins-updater' )
