@@ -5,7 +5,15 @@ Das Format orientiert sich an [Keep a Changelog](https://keepachangelog.com/de/1
 
 ---
 
-## [0.1.2] — 2026-03-18
+## [0.1.4] — 2026-03-29
+
+### Sicherheit
+- `admin_notices`: `_wpnonce` aus dem `options.php`-Redirect wird jetzt gegen `awdev_settings-options` verifiziert, bevor die Erfolgsmeldung angezeigt wird — verhindert, dass die Notice erscheint wenn die URL manuell zusammengebaut wird; Muster orientiert sich an wp-darkadmin-plugin für konsistentes Verhalten aller AWDev-Plugins
+- `phpcs:ignore WordPress.Security.NonceVerification.Recommended`-Unterdrückungskommentar entfernt — nicht mehr nötig da der Nonce jetzt verifiziert wird
+
+---
+
+## [0.1.3] — 2026-03-20
 
 ### Entfernt
 - Irreführende Zeichenketten in .pot- und .po-Sprachdateien korrigiert.

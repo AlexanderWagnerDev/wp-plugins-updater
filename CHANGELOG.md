@@ -5,6 +5,14 @@ Format follows [Keep a Changelog](https://keepachangelog.com/en/1.1.0/).
 
 ---
 
+## [0.1.4] — 2026-03-29
+
+### Security
+- `admin_notices`: verify `_wpnonce` from the `options.php` redirect against `awdev_settings-options` before displaying the success notice — prevents the notice from appearing when the URL is crafted manually; pattern mirrors wp-darkadmin-plugin for consistency across AWDev plugins
+- Removed `phpcs:ignore WordPress.Security.NonceVerification.Recommended` suppression comment — no longer needed now that the nonce is verified
+
+---
+
 ## [0.1.3] — 2026-03-20
 
 ### Removed
