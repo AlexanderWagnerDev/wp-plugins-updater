@@ -170,7 +170,7 @@ function awdev_sanitize_global_auto_update( $value ): bool {
 
 /**
  * Register settings via the WordPress Settings API.
- * options.php handles nonce verification, save and redirect automatically.
+ * Options.php handles nonce verification, save and redirect automatically.
  */
 add_action(
 	'admin_init',
@@ -200,7 +200,7 @@ add_action(
 /**
  * Show admin notice after settings have been saved.
  *
- * options.php redirects back with ?settings-updated=true&_wpnonce=<nonce>
+ * Options.php redirects back with ?settings-updated=true&_wpnonce=<nonce>
  * after a successful save. The nonce action is '{option_group}-options',
  * i.e. 'awdev_settings-options' -- the same value settings_fields() emits.
  * Verifying it here ensures the notice is only shown after a genuine save
@@ -572,6 +572,9 @@ function awdev_get_last_checked( string $dirname_slug ): string {
 
 /**
  * Render a single plugin row in the managed plugins table.
+ *
+ * Outputs a complete <tr> element with version info, auto-update toggle,
+ * action buttons and a type badge for the given plugin.
  *
  * @param string $basename    Plugin basename (folder/file.php).
  * @param string $name        Display name.
