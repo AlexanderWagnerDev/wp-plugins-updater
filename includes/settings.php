@@ -48,7 +48,7 @@ function awdev_fetch_api_data( string $transient_key, string $api_url ): ?object
 		return $cached ? $cached : null;
 	}
 
-	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
+	$cache_hours = (int) get_option( 'awdev_cache_hours', 1 );
 	if ( $cache_hours < 1 ) {
 		$cache_hours = 1;
 	}
@@ -104,7 +104,7 @@ function awdev_activate(): void {
 	awdev_sync_auto_update_defaults();
 
 	if ( get_option( 'awdev_cache_hours' ) === false ) {
-		update_option( 'awdev_cache_hours', 6 );
+		update_option( 'awdev_cache_hours', 1 );
 	}
 
 	if ( get_option( 'awdev_auto_updates_global' ) === false ) {
@@ -181,7 +181,7 @@ add_action(
 			array(
 				'type'              => 'integer',
 				'sanitize_callback' => 'awdev_sanitize_cache_hours',
-				'default'           => 6,
+				'default'           => 1,
 			)
 		);
 
@@ -198,20 +198,35 @@ add_action(
 );
 
 /**
- * Show admin notice after settings have been saved (WP standard pattern).
- * options.php sets ?settings-updated=true on redirect; we read it here.
+ * Show admin notice after settings have been saved.
+ *
+ * options.php redirects back with ?settings-updated=true&_wpnonce=<nonce>
+ * after a successful save. The nonce action is '{option_group}-options',
+ * i.e. 'awdev_settings-options' -- the same value settings_fields() emits.
+ * Verifying it here ensures the notice is only shown after a genuine save
+ * and not when someone manually crafts the URL.
  */
 add_action(
 	'admin_notices',
 	function () {
+		if ( ! current_user_can( 'manage_options' ) ) {
+			return;
+		}
+
 		$screen = get_current_screen();
 		if ( ! $screen || 'settings_page_' . AWDEV_SETTINGS_SLUG !== $screen->id ) {
 			return;
 		}
-		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display flag set by options.php
-		if ( ! isset( $_GET['settings-updated'] ) ) {
+
+		$nonce = isset( $_GET['_wpnonce'] ) ? sanitize_key( wp_unslash( $_GET['_wpnonce'] ) ) : '';
+		if ( ! wp_verify_nonce( $nonce, 'awdev_settings-options' ) ) {
 			return;
 		}
+
+		if ( empty( sanitize_key( wp_unslash( $_GET['settings-updated'] ?? '' ) ) ) ) {
+			return;
+		}
+
 		echo '<div class="notice notice-success is-dismissible"><p>'
 			. '<span aria-hidden="true">&#10003;</span> '
 			. esc_html__( 'Settings saved.', 'awdev-plugins-updater' )
@@ -526,7 +541,7 @@ function awdev_get_local_version( string $basename ): string {
  * @return string              Human-readable time since last check.
  */
 function awdev_get_last_checked( string $dirname_slug ): string {
-	$cache_hours = (int) get_option( 'awdev_cache_hours', 6 );
+	$cache_hours = (int) get_option( 'awdev_cache_hours', 1 );
 	if ( $cache_hours < 1 ) {
 		$cache_hours = 1;
 	}
@@ -614,7 +629,7 @@ function awdev_render_settings_page(): void {
 	$managed      = (array) get_option( 'awdev_managed_plugins', array() );
 	$auto_updates = (array) get_option( 'awdev_auto_updates', array() );
 	$global_auto  = get_option( 'awdev_auto_updates_global', true );
-	$cache_hours  = (int) get_option( 'awdev_cache_hours', 6 );
+	$cache_hours  = (int) get_option( 'awdev_cache_hours', 1 );
 	if ( $cache_hours < 1 ) {
 		$cache_hours = 1;
 	}
@@ -715,7 +730,7 @@ function awdev_render_settings_page(): void {
 							step="1"
 							class="small-text"
 						/>
-						<span class="description"><?php esc_html_e( 'Min: 1h - Max: 168h (7 days). Default: 6h.', 'awdev-plugins-updater' ); ?></span>
+						<span class="description"><?php esc_html_e( 'Min: 1h - Max: 168h (7 days). Default: 1h.', 'awdev-plugins-updater' ); ?></span>
 					</div>
 
 					<div class="awdev-submit-row">
@@ -776,7 +791,7 @@ function awdev_render_settings_page(): void {
 					printf(
 						/* translators: %d = configured cache duration in hours */
 						esc_html__( 'Update data is cached for %d hour(s) per plugin. Flush the cache to force an immediate re-check.', 'awdev-plugins-updater' ),
-						(int) get_option( 'awdev_cache_hours', 6 )
+						(int) get_option( 'awdev_cache_hours', 1 )
 					);
 					?>
 				</p>
