@@ -140,7 +140,87 @@ function awdev_sync_auto_update_defaults(): void {
 add_action( 'admin_init', 'awdev_sync_auto_update_defaults' );
 
 /**
- * Register settings and menu.
+ * Sanitize callback for awdev_cache_hours.
+ * Clamps the value between 1 and 168.
+ *
+ * @param mixed $value Raw input.
+ * @return int Sanitized cache hours.
+ */
+function awdev_sanitize_cache_hours( $value ): int {
+	$value = absint( $value );
+	if ( $value < 1 ) {
+		$value = 1;
+	}
+	if ( $value > 168 ) {
+		$value = 168;
+	}
+	return $value;
+}
+
+/**
+ * Sanitize callback for awdev_auto_updates_global.
+ * Treats only '1' / 1 as true, everything else as false.
+ *
+ * @param mixed $value Raw input.
+ * @return bool
+ */
+function awdev_sanitize_global_auto_update( $value ): bool {
+	return 1 === absint( $value );
+}
+
+/**
+ * Register settings via the WordPress Settings API.
+ * options.php handles nonce verification, save and redirect automatically.
+ */
+add_action(
+	'admin_init',
+	function () {
+		register_setting(
+			'awdev_settings',
+			'awdev_cache_hours',
+			array(
+				'type'              => 'integer',
+				'sanitize_callback' => 'awdev_sanitize_cache_hours',
+				'default'           => 6,
+			)
+		);
+
+		register_setting(
+			'awdev_settings',
+			'awdev_auto_updates_global',
+			array(
+				'type'              => 'boolean',
+				'sanitize_callback' => 'awdev_sanitize_global_auto_update',
+				'default'           => true,
+			)
+		);
+	}
+);
+
+/**
+ * Show admin notice after settings have been saved (WP standard pattern).
+ * options.php sets ?settings-updated=true on redirect; we read it here.
+ */
+add_action(
+	'admin_notices',
+	function () {
+		$screen = get_current_screen();
+		if ( ! $screen || 'settings_page_' . AWDEV_SETTINGS_SLUG !== $screen->id ) {
+			return;
+		}
+		// phpcs:ignore WordPress.Security.NonceVerification.Recommended -- read-only display flag set by options.php
+		if ( ! isset( $_GET['settings-updated'] ) ) {
+			return;
+		}
+		echo '<div class="notice notice-success is-dismissible"><p>'
+			. '<span aria-hidden="true">&#10003;</span> '
+			. esc_html__( 'Settings saved.', 'awdev-plugins-updater' )
+			. '</p></div>';
+	}
+);
+
+/**
+ * Register settings page menu entry.
  */
 add_action(
 	'admin_menu',
@@ -152,42 +232,6 @@ add_action(
 			AWDEV_SETTINGS_SLUG,
 			'awdev_render_settings_page'
 		);
-	}
-);
-
-/**
- * Handle main settings form save.
- */
-add_action(
-	'admin_post_awdev_save_settings',
-	function () {
-		if ( ! current_user_can( 'manage_options' ) ) {
-			wp_die( esc_html__( 'Not allowed.', 'awdev-plugins-updater' ) );
-		}
-		check_admin_referer( 'awdev_save_settings' );
-
-		$global = isset( $_POST['awdev_auto_updates_global'] );
-		update_option( 'awdev_auto_updates_global', $global );
-
-		$cache_hours = isset( $_POST['awdev_cache_hours'] ) ? absint( wp_unslash( $_POST['awdev_cache_hours'] ) ) : 6;
-		if ( $cache_hours < 1 ) {
-			$cache_hours = 1;
-		}
-		if ( $cache_hours > 168 ) {
-			$cache_hours = 168;
-		}
-		update_option( 'awdev_cache_hours', $cache_hours );
-
-		wp_safe_redirect(
-			add_query_arg(
-				array(
-					'page'             => AWDEV_SETTINGS_SLUG,
-					'settings-updated' => '1',
-				),
-				admin_url( 'options-general.php' )
-			)
-		);
-		exit;
 	}
 );
 
@@ -601,9 +645,8 @@ function awdev_render_settings_page(): void {
 		);
 	}
 
-	// Read-only GET flags - no nonce needed (no state change).
-	$cache_flushed  = isset( $_GET['cache-flushed'] );    // phpcs:ignore WordPress.Security.NonceVerification.Recommended
-	$settings_saved = isset( $_GET['settings-updated'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
+	// Read-only GET flag for cache-flush notice - no nonce needed (no state change).
+	$cache_flushed = isset( $_GET['cache-flushed'] ); // phpcs:ignore WordPress.Security.NonceVerification.Recommended
 	?>
 	<div class="wrap awdev-settings-wrap">
 
@@ -630,15 +673,8 @@ function awdev_render_settings_page(): void {
 		</p></div>
 		<?php endif; ?>
 
-		<?php if ( $settings_saved ) : ?>
-		<div class="notice notice-success is-dismissible"><p>
-			<span aria-hidden="true">&#10003;</span> <?php esc_html_e( 'Settings saved.', 'awdev-plugins-updater' ); ?>
-		</p></div>
-		<?php endif; ?>
-
-		<form method="post" action="<?php echo esc_url( admin_url( 'admin-post.php' ) ); ?>">
-			<input type="hidden" name="action" value="awdev_save_settings" />
-			<?php wp_nonce_field( 'awdev_save_settings' ); ?>
+		<form method="post" action="<?php echo esc_url( admin_url( 'options.php' ) ); ?>">
+			<?php settings_fields( 'awdev_settings' ); ?>
 
 			<div class="awdev-card">
 				<div class="awdev-card-header">
