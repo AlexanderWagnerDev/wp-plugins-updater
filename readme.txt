@@ -4,7 +4,7 @@ Tags: updater, awdev, plugin update, wordpress update
 Requires at least: 6.3
 Tested up to: 6.9
 Requires PHP: 7.4
-Stable tag: 0.1.3
+Stable tag: 0.1.4
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
@@ -57,6 +57,10 @@ Only for AlexanderWagnerDev plugins registered in this updater. All other plugin
 Yes. The settings page fully supports DarkAdmin and adapts to dark mode automatically.
 
 == Changelog ==
+= 0.1.4 =
+* Security: admin_notices now verifies _wpnonce from the options.php redirect against 'awdev_settings-options' before showing the success notice — prevents the notice from appearing when the URL is crafted manually; pattern mirrors wp-darkadmin-plugin
+* Security: removed phpcs:ignore NonceVerification suppression comment — no longer needed
+
 = 0.1.3 =
 * Fix misleading strings in .pot / .po language files
 * Fix misleading class docblock in AWDev_Updater
@@ -156,6 +160,10 @@ Funktionen:
 4. Einstellungen > AWDev Plugins Updater aufrufen.
 
 === Changelog ===
+= 0.1.4 =
+* Sicherheit: admin_notices verifiziert jetzt _wpnonce aus dem options.php-Redirect gegen 'awdev_settings-options' bevor die Erfolgsmeldung angezeigt wird — verhindert dass die Notice bei manuell zusammengebauter URL erscheint
+* Sicherheit: phpcs:ignore NonceVerification-Unterdrückungskommentar entfernt
+
 = 0.1.3 =
 * Fix misleading strings in .pot / .po language files
 * Fix misleading class docblock in AWDev_Updater

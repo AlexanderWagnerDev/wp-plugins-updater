@@ -2,13 +2,13 @@
 
 **Updater für AlexanderWagnerDev Plugins — ohne WordPress.org.**
 
-> Version 0.1.2 | Erfordert WordPress 6.3+ | Erfordert PHP 7.4+ | Lizenz: GPLv2
+> Version 0.1.4 | Erfordert WordPress 6.3+ | Erfordert PHP 7.4+ | Lizenz: GPLv2
 
 ---
 
 ## Was es macht
 
-AWDev Plugins Updater integriert sich nahtlos in das native WordPress-Update-System. Verwaltete Plugins erscheinen in der Standard-Ansicht **Dashboard > Updates** und in der **Plugins**-Liste - mit Versions-Badges, Ein-Klick-Updates und automatischen Hintergrund-Updates.
+AWDev Plugins Updater integriert sich nahtlos in das native WordPress-Update-System. Verwaltete Plugins erscheinen in der Standard-Ansicht **Dashboard > Updates** und in der **Plugins**-Liste — mit Versions-Badges, Ein-Klick-Updates und automatischen Hintergrund-Updates.
 
 ---
 
@@ -17,11 +17,11 @@ AWDev Plugins Updater integriert sich nahtlos in das native WordPress-Update-Sys
 - Native WordPress-Update-Hook-Integration (keine eigenen Update-Seiten)
 - Per-Plugin-Auto-Update-Toggles mit sofortigem AJAX-Speichern
 - Globaler Auto-Update-Ein/Aus-Schalter
-- Konfigurierbares Prüfintervall (1-168 Stunden, Standard 6 h)
+- Konfigurierbares Prüfintervall (1–168 Stunden, Standard 6 h)
 - Manueller Ein-Klick-Re-Check pro Plugin
 - Ein-Klick-Aktualisieren-Button in der Einstellungstabelle wenn eine neue Version verfügbar ist
 - "Version Details"-Popup mit Changelog, Requires, Tested, Autor
-- Integrierte Unterstützung für DarkAdmin - Dark Mode for Adminpanel
+- Integrierte Unterstützung für DarkAdmin – Dark Mode for Adminpanel
 - Übersetzungen: de\_DE, de\_AT, en\_US
 
 ---
@@ -31,7 +31,7 @@ AWDev Plugins Updater integriert sich nahtlos in das native WordPress-Update-Sys
 | Plugin | API-Slug |
 |---|---|
 | AWDev Plugins Updater | `awdev-plugins-updater` |
-| DarkAdmin - Dark Mode for Adminpanel | `darkadmin-dark-mode-for-adminpanel` |
+| DarkAdmin – Dark Mode for Adminpanel | `darkadmin-dark-mode-for-adminpanel` |
 
 ---
 
@@ -48,9 +48,9 @@ AWDev Plugins Updater integriert sich nahtlos in das native WordPress-Update-Sys
 
 | Option | Beschreibung |
 |---|---|
-| Auto-Update (alle Plugins) | Master-Schalter - deaktivieren verhindert alle AWDev Auto-Updates unabhängig von Per-Plugin-Toggles |
+| Auto-Update (alle Plugins) | Master-Schalter — deaktivieren verhindert alle AWDev Auto-Updates unabhängig von Per-Plugin-Toggles |
 | Per-Plugin Auto-Update | Individueller Toggle pro verwaltetem Plugin |
-| Prüfintervall | Wie oft der Updater den Update-Server abfragt (1-168 h) |
+| Prüfintervall | Wie oft der Updater den Update-Server abfragt (1–168 h) |
 | Update-Cache leeren | Erzwingt sofortigen Re-Check beim nächsten Seitenaufruf |
 
 ---
@@ -69,6 +69,8 @@ AWDev Plugins Updater integriert sich nahtlos in das native WordPress-Update-Sys
 
 Siehe [CHANGELOG-de.md](CHANGELOG-de.md) für die vollständige Historie.
 
+**0.1.4** — Sicherheit: Nonce-Prüfung in admin_notices; phpcs:ignore-Unterdrückung entfernt  
+**0.1.3** — Irreführende Dateien korrigiert  
 **0.1.2** — Error-Logging-Aufrufe entfernt  
 **0.1.1** — Fix Rename-in-sich-selbst-Absturz bei flacher ZIP-Extraktion, plugins_loaded Priorität 20, get_plugins()-Caching  
 **0.1.0** — Mehrere Bugfixes und Verbesserungen (siehe CHANGELOG-de.md)  
@@ -78,4 +80,4 @@ Siehe [CHANGELOG-de.md](CHANGELOG-de.md) für die vollständige Historie.
 
 ## Lizenz
 
-GPLv2 oder höher - siehe [LICENSE](LICENSE)
+GPLv2 oder höher — siehe [LICENSE](LICENSE)
